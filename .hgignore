@@ -1,0 +1,8 @@
+bin/Debug
+bin/Release
+obj/Debug
+obj/Release
+obj/x86
+MoMA/Reports
+.DS_Store
+KNX.net.suo
