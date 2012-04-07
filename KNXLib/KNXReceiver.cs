@@ -184,7 +184,7 @@ namespace KNXLib
                 }
 
                 if (datagram.message_code == 0x29)
-                    this.KNXConnection.Event(datagram);
+                    this.KNXConnection.Event(datagram.destination_address, datagram.data);
             }
             catch (Exception)
             {

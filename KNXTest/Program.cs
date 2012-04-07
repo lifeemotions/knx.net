@@ -11,8 +11,9 @@ namespace KNXTest
         static void Main(string[] args)
         {
             KNXLib.KNXConnection connection = new KNXLib.KNXConnectionMulticast();
-            connection.Debug = true;
+            //connection.Debug = true;
             connection.Connect();
+            connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
 
             Console.WriteLine("Press [ENTER] to send command (0/0/1) - true");
             Console.ReadLine();
@@ -42,6 +43,11 @@ namespace KNXTest
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
             System.Environment.Exit(0);
+        }
+
+        static void Event(string address, string state)
+        {
+            Console.WriteLine("New Event: device " + address + " has status " + state);
         }
     }
 }

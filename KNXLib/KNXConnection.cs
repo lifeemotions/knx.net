@@ -153,17 +153,17 @@ namespace KNXLib
         #endregion
 
         #region events
-        public delegate void KNXEvent(KNXDatagram datagram);
+        public delegate void KNXEvent(string address, string state);
         public KNXEvent KNXEventDelegate = null;
 
-        public void Event(KNXDatagram datagram)
+        public void Event(string address, string state)
         {
             if (KNXEventDelegate != null)
-                KNXEventDelegate(datagram);
+                KNXEventDelegate(address, state);
 
             if (this.Debug)
             {
-                Console.WriteLine("Device " + datagram.destination_address + " has status " + datagram.data);
+                Console.WriteLine("Device " + address + " has status " + state);
             }
         }
         #endregion
