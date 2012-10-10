@@ -19,7 +19,7 @@ namespace KNXLib
 
         #region variables
         private KNXConnection _connection;
-        internal KNXConnection KNXConnection
+        private KNXConnection KNXConnection
         {
             get
             {
@@ -156,13 +156,12 @@ namespace KNXLib
                 datagram.apdu = new byte[datagram.data_length + 1];
                 for (int i = 0; i < datagram.apdu.Length; i++)
                 {
-                    datagram.apdu[i] = dgram[15 + i + datagram.aditional_info_length];
+                    datagram.apdu[i] = dgram[15 + i];
                 }
                 datagram.data = KNXHelper.GetData(datagram.data_length, datagram.apdu);
 
                 if (KNXConnection.Debug)
                 {
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
                     Console.WriteLine(BitConverter.ToString(dgram));
                     Console.WriteLine("Event Header Length: " + datagram.header_length);
                     Console.WriteLine("Event Protocol Version: " + datagram.protocol_version.ToString("x"));
@@ -182,7 +181,6 @@ namespace KNXLib
                     Console.WriteLine("Event Data Length: " + datagram.data_length);
                     Console.WriteLine("Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
                     Console.WriteLine("Event Data: " + datagram.data);
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
                 }
 
                 if (datagram.message_code == 0x29)

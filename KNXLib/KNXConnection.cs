@@ -28,15 +28,15 @@ namespace KNXLib
             IP = null;
             try
             {
-                IP = Dns.GetHostEntry(host).AddressList[0];
+                IP = IPAddress.Parse(host);
             }
-            catch (SocketException)
+            catch (Exception)
             {
                 try
                 {
-                    IP = IPAddress.Parse(host);
+                    IP = Dns.GetHostEntry(host).AddressList[0];
                 }
-                catch (Exception)
+                catch (SocketException)
                 {
                 }
             }
@@ -174,7 +174,7 @@ namespace KNXLib
             byte[] val = null;
             try
             {
-                val = new byte[]{Convert.ToByte(data)};
+                val = new byte[] { Convert.ToByte(data) };
             }
             catch (Exception)
             {
@@ -226,7 +226,7 @@ namespace KNXLib
         }
         public void Action(string address, byte data)
         {
-            this.KNXSender.Action(address, new byte[]{0x00, data});
+            this.KNXSender.Action(address, new byte[] { 0x00, data });
         }
         public void Action(string address, byte[] data)
         {

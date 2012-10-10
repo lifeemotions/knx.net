@@ -8,20 +8,25 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KNXConnectionMulticast : KNXConnection
+    public class KNXConnectionRouting : KNXConnection
     {
         #region constructor
-        public KNXConnectionMulticast()
+        public KNXConnectionRouting()
             : this("224.0.23.12", 3671)
         {
         }
 
-        public KNXConnectionMulticast(String host)
+        public KNXConnectionRouting(int port)
+            : this("224.0.23.12", port)
+        {
+        }
+
+        public KNXConnectionRouting(String host)
             : this(host, 3671)
         {
         }
 
-        public KNXConnectionMulticast(String host, int port) : base(host, port)
+        public KNXConnectionRouting(String host, int port) : base(host, port)
         {
             RemoteEndpoint = new IPEndPoint(IP, port);
             LocalEndpoint = new IPEndPoint(IPAddress.Any, 0);
@@ -87,10 +92,10 @@ namespace KNXLib
                 throw new ConnectionErrorException(this.Host, this.Port);
             }
 
-            KNXReceiver = new KNXReceiverMulticast(this, UdpClient, LocalEndpoint);
+            KNXReceiver = new KNXReceiverRouting(this, UdpClient, LocalEndpoint);
             KNXReceiver.Start();
 
-            KNXSender = new KNXSenderMulticast(this, UdpClient, RemoteEndpoint);
+            KNXSender = new KNXSenderRouting(this, UdpClient, RemoteEndpoint);
         }
 
         public override void Disconnect()

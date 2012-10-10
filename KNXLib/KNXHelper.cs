@@ -319,5 +319,78 @@ namespace KNXLib
             }
         }
         #endregion
+
+        #region Service Type
+
+        public enum SERVICE_TYPE
+        {
+            //0x0201
+            SEARCH_REQUEST,
+            //0x0202
+            SEARCH_RESPONSE,
+            //0x0203
+            DESCRIPTION_REQUEST,
+            //0x0204
+            DESCRIPTION_RESPONSE,
+            //0x0205
+            CONNECT_REQUEST,
+            //0x0206
+            CONNECT_RESPONSE,
+            //0x0207
+            CONNECTIONSTATE_REQUEST,
+            //0x0208
+            CONNECTIONSTATE_RESPONSE,
+            //0x0209
+            DISCONNECT_REQUEST,
+            //0x020A
+            DISCONNECT_RESPONSE,
+            //0x0310
+            DEVICE_CONFIGURATION_REQUEST,
+            //0x0311
+            DEVICE_CONFIGURATION_ACK,
+            //0x0420
+            TUNNELLING_REQUEST,
+            //0x0421
+            TUNNELLING_ACK,
+            //0x0530
+            ROUTING_INDICATION,
+            //0x0531
+            ROUTING_LOST_MESSAGE,
+            // UNKNOWN
+            UNKNOWN
+        }
+        public static SERVICE_TYPE GetServiceType(byte[] dgram)
+        {
+            switch (dgram[2])
+            {
+                case (0x02):
+                    {
+                        switch (dgram[3])
+                        {
+                            case (0x06):
+                                return SERVICE_TYPE.CONNECT_RESPONSE;
+                        }
+                    }
+                    break;
+                case (0x04):
+                    {
+                        switch (dgram[3])
+                        {
+                            case (0x21):
+                                return SERVICE_TYPE.TUNNELLING_ACK;
+                        }
+                    }
+                    break;
+            }
+            return SERVICE_TYPE.UNKNOWN;
+        }
+        public static int GetChannelID(byte[] dgram)
+        {
+            if (dgram.Length > 6)
+                return dgram[6];
+            return -1;
+        }
+
+        #endregion
     }
 }

@@ -8,10 +8,10 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXReceiverMulticast : KNXReceiver
+    internal class KNXReceiverRouting : KNXReceiver
     {
         #region constructor
-        internal KNXReceiverMulticast(KNXConnection connection, UdpClient udpClient, IPEndPoint localEndpoint) : base (connection)
+        internal KNXReceiverRouting(KNXConnection connection, UdpClient udpClient, IPEndPoint localEndpoint) : base (connection)
         {
             this.LocalEndpoint = localEndpoint;
             this.UdpClient = udpClient;

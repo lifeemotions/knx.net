@@ -122,7 +122,7 @@ namespace KNXLib
             }
             else
             {
-                dgram[9] = 0xF0;
+                dgram[9] = 0xD0;
             }
             dgram[10] = 0x00;
             dgram[11] = 0x00;

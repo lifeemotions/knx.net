@@ -40,15 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
     <Compile Include="Exceptions\InvalidKNXDataException.cs" />
-    <Compile Include="KNXSenderRouting.cs" />
+    <Compile Include="KNXSenderMulticast.cs" />
     <Compile Include="Exceptions\ConnectionErrorException.cs" />
     <Compile Include="Exceptions\InvalidKNXAddressException.cs" />
     <Compile Include="Exceptions\InvalidHostException.cs" />
     <Compile Include="KNXSender.cs" />
-    <Compile Include="KNXReceiverRouting.cs" />
-    <Compile Include="KNXConnectionRouting.cs" />
+    <Compile Include="KNXReceiverMulticast.cs" />
+    <Compile Include="KNXConnectionMulticast.cs" />
     <Compile Include="KNXConnection.cs" />
     <Compile Include="KNXDatagram.cs" />
     <Compile Include="KNXHelper.cs" />
