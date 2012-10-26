@@ -153,8 +153,21 @@ namespace KNXLib
         #endregion
 
         #region events
+        public delegate void KNXConnected();
+        public KNXConnected KNXConnectedDelegate = null;
         public delegate void KNXEvent(string address, string state);
         public KNXEvent KNXEventDelegate = null;
+
+        public virtual void Connected()
+        {
+            if (KNXConnectedDelegate != null)
+                KNXConnectedDelegate();
+
+            if (this.Debug)
+            {
+                Console.WriteLine("KNX is connected");
+            }
+        }
 
         public void Event(string address, string state)
         {

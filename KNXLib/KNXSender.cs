@@ -19,7 +19,7 @@ namespace KNXLib
 
         #region variables
         private KNXConnection _connection;
-        private KNXConnection KNXConnection
+        internal KNXConnection KNXConnection
         {
             get
             {
@@ -42,18 +42,19 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal byte[] CreateDatagram(string destination_address, byte[] data)
+
+        internal abstract byte[] CreateDatagram(string destination_address, byte[] data);
+
+        protected byte[] CreateDatagram(string destination_address, byte[] data, byte[] header)
         {
+            int i = 0;
             int data_length = KNXHelper.GetDataLength(data);
             // HEADER
-            byte[] dgram = new byte[data_length + 16];
-            dgram[0] = 0x06;
-            dgram[1] = 0x10;
-            dgram[2] = 0x05;
-            dgram[3] = 0x30;
-            byte[] total_length = BitConverter.GetBytes(data_length + 16);
-            dgram[4] = total_length[1];
-            dgram[5] = total_length[0];
+            byte[] dgram = new byte[data_length + 11 + header.Length];
+            for (i = 0; i < header.Length; i++)
+            {
+                dgram[i] = header[i];
+            }
 
             // CEMI (start at position 6)
             // +--------+--------+--------+--------+----------------+----------------+--------+----------------+
@@ -113,25 +114,25 @@ namespace KNXLib
             //                    information (APCI) and data passed as an argument from higher layers of
             //                    the KNX communication stack
             //
-            dgram[6] = 0x11;
-            dgram[7] = 0x00;
-            dgram[8] = 0xBC;
+            dgram[i++] = 0x11;
+            dgram[i++] = 0x00;
+            dgram[i++] = 0xBC;
             if (KNXHelper.IsAddressIndividual(destination_address))
             {
-                dgram[9] = 0x50;
+                dgram[i++] = 0x50;
             }
             else
             {
-                dgram[9] = 0xF0;
+                dgram[i++] = 0xF0;
             }
-            dgram[10] = 0x00;
-            dgram[11] = 0x00;
+            dgram[i++] = 0x00;
+            dgram[i++] = 0x00;
             byte[] dst_address = KNXHelper.GetAddress(destination_address);
-            dgram[12] = dst_address[0];
-            dgram[13] = dst_address[1];
-            dgram[14] = (byte)(data_length);
-            dgram[15] = 0x00;
-            dgram[16] = 0x80;
+            dgram[i++] = dst_address[0];
+            dgram[i++] = dst_address[1];
+            dgram[i++] = (byte)(data_length);
+            dgram[i++] = 0x00;
+            dgram[i] = 0x80;
             KNXHelper.WriteData(dgram, data);
 
             return dgram;

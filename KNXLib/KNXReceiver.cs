@@ -62,7 +62,7 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal void ProcessDatagram(byte[] dgram)
+        internal virtual void ProcessDatagram(byte[] dgram)
         {
             try
             {

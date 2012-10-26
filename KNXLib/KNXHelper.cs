@@ -369,6 +369,8 @@ namespace KNXLib
                         {
                             case (0x06):
                                 return SERVICE_TYPE.CONNECT_RESPONSE;
+                            case (0x09):
+                                return SERVICE_TYPE.DISCONNECT_REQUEST;
                         }
                     }
                     break;

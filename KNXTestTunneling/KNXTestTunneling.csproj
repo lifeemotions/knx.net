@@ -2,18 +2,20 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CD1911AD-1967-40CB-A1C3-EC2FA562872B}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{AE4B122B-6ADD-4727-991D-712672AF012D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KNXLib</RootNamespace>
-    <AssemblyName>KNXLib</AssemblyName>
+    <RootNamespace>KNXTestTunneling</RootNamespace>
+    <AssemblyName>KNXTestTunneling</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +24,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,25 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KNXSenderTunneling.cs" />
-    <Compile Include="KNXReceiverTunneling.cs" />
-    <Compile Include="KNXConnectionTunneling.cs" />
-    <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
-    <Compile Include="Exceptions\InvalidKNXDataException.cs" />
-    <Compile Include="KNXSenderRouting.cs" />
-    <Compile Include="Exceptions\ConnectionErrorException.cs" />
-    <Compile Include="Exceptions\InvalidKNXAddressException.cs" />
-    <Compile Include="Exceptions\InvalidHostException.cs" />
-    <Compile Include="KNXSender.cs" />
-    <Compile Include="KNXReceiverRouting.cs" />
-    <Compile Include="KNXConnectionRouting.cs" />
-    <Compile Include="KNXConnection.cs" />
-    <Compile Include="KNXDatagram.cs" />
-    <Compile Include="KNXHelper.cs" />
-    <Compile Include="KNXReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestTunneling.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\KNXLib\KNXLib.csproj">
+      <Project>{CD1911AD-1967-40CB-A1C3-EC2FA562872B}</Project>
+      <Name>KNXLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

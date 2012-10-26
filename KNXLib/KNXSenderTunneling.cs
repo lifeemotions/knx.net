@@ -8,10 +8,10 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXSenderRouting : KNXSender
+    internal class KNXSenderTunneling : KNXSender
     {
         #region constructor
-        internal KNXSenderRouting(KNXConnectionRouting connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
+        internal KNXSenderTunneling(KNXConnectionTunneling connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
             : base(connection)
         {
             this.RemoteEndpoint = remoteEndpoint;
@@ -45,6 +45,18 @@ namespace KNXLib
                 this._udpClient = value;
             }
         }
+
+        private KNXConnectionTunneling KNXConnectionTunneling
+        {
+            get
+            {
+                return (KNXConnectionTunneling) this.KNXConnection;
+            }
+            set
+            {
+                this.KNXConnection = value;
+            }
+        }
         #endregion
 
         #region send
@@ -59,14 +71,19 @@ namespace KNXLib
         {
             int data_length = KNXHelper.GetDataLength(data);
             // HEADER
-            byte[] dgram = new byte[6];
-            dgram[0] = 0x06;
-            dgram[1] = 0x10;
-            dgram[2] = 0x05;
-            dgram[3] = 0x30;
-            byte[] total_length = BitConverter.GetBytes(data_length + 16);
-            dgram[4] = total_length[1];
-            dgram[5] = total_length[0];
+            byte[] dgram = new byte[10];
+            dgram[00] = 0x06;
+            dgram[01] = 0x10;
+            dgram[02] = 0x04;
+            dgram[03] = 0x20;
+            byte[] total_length = BitConverter.GetBytes(data_length + 21);
+            dgram[04] = total_length[1];
+            dgram[05] = total_length[0];
+
+            dgram[06] = 0x04;
+            dgram[07] = this.KNXConnectionTunneling.ChannelId;
+            dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
+            dgram[09] = 0x00;
 
             return base.CreateDatagram(destination_address, data, dgram);
         }

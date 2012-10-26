@@ -96,6 +96,8 @@ namespace KNXLib
             KNXReceiver.Start();
 
             KNXSender = new KNXSenderRouting(this, UdpClient, RemoteEndpoint);
+
+            base.Connected();
         }
 
         public override void Disconnect()

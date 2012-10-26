@@ -13,6 +13,10 @@ namespace KNXLib
         internal byte[] service_type;
         internal int total_length;
 
+        // CONNECTION
+        internal byte channel_id;
+        internal byte status;
+
         // CEMI
         internal byte message_code;
         internal int aditional_info_length;

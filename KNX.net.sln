@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXLib", "KNXLib\KNXLib.csproj", "{CD1911AD-1967-40CB-A1C3-EC2FA562872B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXTest", "KNXTest\KNXTest.csproj", "{042C5633-24D9-47FB-AFA6-92A5108BA7C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXTestRouting", "KNXTest\KNXTestRouting.csproj", "{042C5633-24D9-47FB-AFA6-92A5108BA7C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXTestTunneling", "KNXTestTunneling\KNXTestTunneling.csproj", "{AE4B122B-6ADD-4727-991D-712672AF012D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,16 @@ Global
 		{042C5633-24D9-47FB-AFA6-92A5108BA7C8}.Release|Mixed Platforms.Build.0 = Release|x86
 		{042C5633-24D9-47FB-AFA6-92A5108BA7C8}.Release|x86.ActiveCfg = Release|x86
 		{042C5633-24D9-47FB-AFA6-92A5108BA7C8}.Release|x86.Build.0 = Release|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Debug|x86.ActiveCfg = Debug|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Debug|x86.Build.0 = Debug|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|Any CPU.ActiveCfg = Release|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|x86.ActiveCfg = Release|x86
+		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
