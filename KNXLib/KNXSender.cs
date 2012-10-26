@@ -116,7 +116,7 @@ namespace KNXLib
             //
             dgram[i++] = 0x11;
             dgram[i++] = 0x00;
-            dgram[i++] = 0xBC;
+            dgram[i++] = 0xAC;
             if (KNXHelper.IsAddressIndividual(destination_address))
             {
                 dgram[i++] = 0x50;
@@ -133,7 +133,7 @@ namespace KNXLib
             dgram[i++] = (byte)(data_length);
             dgram[i++] = 0x00;
             dgram[i] = 0x80;
-            KNXHelper.WriteData(dgram, data);
+            KNXHelper.WriteData(dgram, data, i);
 
             return dgram;
         }

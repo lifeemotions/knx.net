@@ -293,7 +293,7 @@ namespace KNXLib
             }
             return 0;
         }
-        internal static void WriteData(byte[] dgram, byte[] data)
+        internal static void WriteData(byte[] dgram, byte[] data, int data_start)
         {
             if (data.Length > 0)
             {
@@ -302,18 +302,18 @@ namespace KNXLib
                     // is this approach correct? if the first byte fits in 6 bits and we have more data,
                     //  we keep the first in the 2nd APDU byte? or we should only fit the first byte
                     //  in dgram[16] if data.Lenght is equal to 1?
-                    dgram[16] = (byte)(dgram[16] | data[0]);
+                    dgram[data_start] = (byte)(dgram[data_start] | data[0]);
                 }
                 else
                 {
-                    dgram[17] = data[0];
+                    dgram[data_start + 1] = data[0];
                 }
                 if (data.Length > 1)
                 {
                     int i = data[0] < 0x3F ? 0 : 1;
                     for (; i < data.Length - 1; i++)
                     {
-                        dgram[17 + i] = data[i + 1];
+                        dgram[data_start + 1 + i] = data[i + 1];
                     }
                 }
             }
