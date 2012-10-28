@@ -35,17 +35,21 @@ namespace KNXLib
         #region send
         internal void Action(string destination_address, byte[] data)
         {
-            SendData(CreateDatagram(destination_address, data));
+            SendData(CreateActionDatagram(destination_address, data));
+        }
+        internal void RequestStatus(string destination_address)
+        {
+            SendData(CreateRequestStatusDatagram(destination_address));
         }
 
         internal abstract void SendData(byte[] dgram);
         #endregion
 
-        #region datagram processing
+        #region action datagram processing
 
-        internal abstract byte[] CreateDatagram(string destination_address, byte[] data);
+        internal abstract byte[] CreateActionDatagram(string destination_address, byte[] data);
 
-        protected byte[] CreateDatagram(string destination_address, byte[] data, byte[] header)
+        protected byte[] CreateActionDatagramCommon(string destination_address, byte[] data, byte[] header)
         {
             int i = 0;
             int data_length = KNXHelper.GetDataLength(data);
@@ -137,6 +141,39 @@ namespace KNXLib
 
             return dgram;
         }
+        #endregion
+
+        #region request status datagram processing
+
+        internal abstract byte[] CreateRequestStatusDatagram(string destination_address);
+
+        protected byte[] CreateRequestStatusDatagramCommon(string destination_address, byte[] dgram, int cemi_start_pos)
+        {
+            int i = 0;
+            dgram[cemi_start_pos + i++] = 0x11;
+            dgram[cemi_start_pos + i++] = 0x00;
+            dgram[cemi_start_pos + i++] = 0xAC;
+            if (KNXHelper.IsAddressIndividual(destination_address))
+            {
+                dgram[cemi_start_pos + i++] = 0x50;
+            }
+            else
+            {
+                dgram[cemi_start_pos + i++] = 0xF0;
+            }
+            dgram[cemi_start_pos + i++] = 0x00;
+            dgram[cemi_start_pos + i++] = 0x00;
+            byte[] dst_address = KNXHelper.GetAddress(destination_address);
+            dgram[cemi_start_pos + i++] = dst_address[0];
+            dgram[cemi_start_pos + i++] = dst_address[1];
+
+            dgram[cemi_start_pos + i++] = 0x01;
+            dgram[cemi_start_pos + i++] = 0x00;
+            dgram[cemi_start_pos + i] = 0x00;
+
+            return dgram;
+        }
+
         #endregion
     }
 }

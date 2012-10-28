@@ -63,5 +63,35 @@ namespace KNXLib
             }
         }
         #endregion
+
+
+        #region datagram processing
+        internal override void ProcessDatagram(byte[] dgram)
+        {
+            try
+            {
+                ProcessDatagramHeaders(dgram);
+            }
+            catch (Exception)
+            {
+                // ignore, missing warning information
+            }
+        }
+
+        private void ProcessDatagramHeaders(byte[] dgram)
+        {
+            // HEADER
+            KNXDatagram datagram = new KNXDatagram();
+            datagram.header_length = (int)dgram[0];
+            datagram.protocol_version = dgram[1];
+            datagram.service_type = new byte[] { dgram[2], dgram[3] };
+            datagram.total_length = (int)dgram[4] + (int)dgram[5];
+
+            byte[] cemi = new byte[dgram.Length - 6];
+            Array.Copy(dgram, 6, cemi, 0, dgram.Length - 6);
+
+            base.ProcessCEMI(datagram, cemi);
+        }
+        #endregion
     }
 }

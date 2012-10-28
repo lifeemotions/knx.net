@@ -49,7 +49,7 @@ namespace KNXLib
         {
             get
             {
-                return (KNXConnectionTunneling) base.KNXConnection;
+                return (KNXConnectionTunneling)base.KNXConnection;
             }
             set
             {
@@ -77,7 +77,6 @@ namespace KNXLib
         }
         #endregion
 
-
         #region datagram processing
         internal override void ProcessDatagram(byte[] dgram)
         {
@@ -94,8 +93,8 @@ namespace KNXLib
                     case KNXHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
                         ProcessDisconnectRequest(dgram);
                         break;
-                    default:
-                        base.ProcessDatagram(dgram);
+                    case KNXHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
+                        ProcessDatagramHeaders(dgram);
                         break;
                 }
             }
@@ -105,11 +104,30 @@ namespace KNXLib
             }
         }
 
+        private void ProcessDatagramHeaders(byte[] dgram)
+        {
+            // HEADER
+            KNXDatagram datagram = new KNXDatagram();
+            datagram.header_length = (int)dgram[0];
+            datagram.protocol_version = dgram[1];
+            datagram.service_type = new byte[] { dgram[2], dgram[3] };
+            datagram.total_length = (int)dgram[4] + (int)dgram[5];
+
+            byte[] cemi = new byte[dgram.Length - 10];
+            Array.Copy(dgram, 10, cemi, 0, dgram.Length - 10);
+
+            base.ProcessCEMI(datagram, cemi);
+
+            ((KNXSenderTunneling)KNXConnectionTunneling.KNXSender).SendTunnelingAck(dgram[8]);
+        }
+
         private void ProcessDisconnectRequest(byte[] dgram)
         {
+            KNXConnection.Disconnected();
         }
         private void ProcessTunnelingAck(byte[] dgram)
         {
+            // do nothing
         }
         private void ProcessConnectResponse(byte[] dgram)
         {

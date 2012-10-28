@@ -14,15 +14,20 @@ namespace KNXTest
             connection.Debug = true;
             connection.Connect();
             connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
+            connection.KNXStatusDelegate += new KNXLib.KNXConnection.KNXStatus(Status);
 
-            Console.WriteLine("Press [ENTER] to send command (0/0/15) - true");
+            Console.WriteLine("Press [ENTER] to send command (5/0/16) - true");
             Console.ReadLine();
-            connection.Action("5/0/15", true);
-            Thread.Sleep(2000);
-            Console.WriteLine("Press [ENTER] to send command (0/0/15) - false");
+            connection.Action("5/0/16", true);
+            Thread.Sleep(5000);
+            connection.RequestStatus("5/2/16");
+            Thread.Sleep(5000);
+            Console.WriteLine("Press [ENTER] to send command (5/0/16) - false");
             Console.ReadLine();
-            connection.Action("5/0/15", false);
-            Thread.Sleep(2000);
+            connection.Action("5/0/16", false);
+            Thread.Sleep(5000);
+            connection.RequestStatus("5/2/16");
+            Thread.Sleep(5000);
 
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
@@ -33,6 +38,10 @@ namespace KNXTest
         static void Event(string address, string state)
         {
             Console.WriteLine("New Event: device " + address + " has status " + state);
+        }
+        static void Status(string address, string state)
+        {
+            Console.WriteLine("New Status: device " + address + " has status " + state);
         }
     }
 }

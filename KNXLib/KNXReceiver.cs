@@ -62,18 +62,13 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal virtual void ProcessDatagram(byte[] dgram)
+        internal abstract void ProcessDatagram(byte[] dgram);
+
+        internal void ProcessCEMI(KNXDatagram datagram, byte[] cemi)
         {
             try
             {
-                // HEADER
-                KNXDatagram datagram = new KNXDatagram();
-                datagram.header_length = (int)dgram[0];
-                datagram.protocol_version = dgram[1];
-                datagram.service_type = new byte[] { dgram[2], dgram[3] };
-                datagram.total_length = (int)dgram[4] + (int)dgram[5];
-
-                // CEMI (start at position 6)
+                // CEMI
                 // +--------+--------+--------+--------+----------------+----------------+--------+----------------+
                 // |  Msg   |Add.Info| Ctrl 1 | Ctrl 2 | Source Address | Dest. Address  |  Data  |      APDU      |
                 // | Code   | Length |        |        |                |                | Length |                |
@@ -131,39 +126,40 @@ namespace KNXLib
                 //                    information (APCI) and data passed as an argument from higher layers of
                 //                    the KNX communication stack
                 //
-                datagram.message_code = dgram[6];
-                datagram.aditional_info_length = (int)dgram[7];
+                datagram.message_code = cemi[0];
+                datagram.aditional_info_length = (int)cemi[1];
                 if (datagram.aditional_info_length > 0)
                 {
                     datagram.aditional_info = new byte[datagram.aditional_info_length];
                     for (int i = 0; i < datagram.aditional_info_length; i++)
                     {
-                        datagram.aditional_info[i] = dgram[8 + i];
+                        datagram.aditional_info[i] = cemi[2 + i];
                     }
                 }
-                datagram.control_field_1 = dgram[8 + datagram.aditional_info_length];
-                datagram.control_field_2 = dgram[9 + datagram.aditional_info_length];
-                datagram.source_address = KNXHelper.GetIndividualAddress(new byte[] { dgram[10 + datagram.aditional_info_length], dgram[11 + datagram.aditional_info_length] });
+                datagram.control_field_1 = cemi[2 + datagram.aditional_info_length];
+                datagram.control_field_2 = cemi[3 + datagram.aditional_info_length];
+                datagram.source_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
                 if (KNXHelper.GetKNXDestinationAddressType(datagram.control_field_2).Equals(KNXHelper.KNXDestinationAddressType.INDIVIDUAL))
                 {
-                    datagram.destination_address = KNXHelper.GetIndividualAddress(new byte[] { dgram[12 + datagram.aditional_info_length], dgram[13 + datagram.aditional_info_length] });
+                    datagram.destination_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] });
                 }
                 else
                 {
-                    datagram.destination_address = KNXHelper.GetGroupAddress(new byte[] { dgram[12 + datagram.aditional_info_length], dgram[13 + datagram.aditional_info_length] }, KNXConnection.ThreeLevelGroupAddressing);
+                    datagram.destination_address = KNXHelper.GetGroupAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KNXConnection.ThreeLevelGroupAddressing);
                 }
-                datagram.data_length = (int)dgram[14 + datagram.aditional_info_length];
+
+                datagram.data_length = (int)cemi[8 + datagram.aditional_info_length];
                 datagram.apdu = new byte[datagram.data_length + 1];
                 for (int i = 0; i < datagram.apdu.Length; i++)
                 {
-                    datagram.apdu[i] = dgram[15 + i + datagram.aditional_info_length];
+                    datagram.apdu[i] = cemi[9 + i + datagram.aditional_info_length];
                 }
                 datagram.data = KNXHelper.GetData(datagram.data_length, datagram.apdu);
 
                 if (KNXConnection.Debug)
                 {
                     Console.WriteLine("-----------------------------------------------------------------------------------------------------");
-                    Console.WriteLine(BitConverter.ToString(dgram));
+                    Console.WriteLine(BitConverter.ToString(cemi));
                     Console.WriteLine("Event Header Length: " + datagram.header_length);
                     Console.WriteLine("Event Protocol Version: " + datagram.protocol_version.ToString("x"));
                     Console.WriteLine("Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
@@ -186,7 +182,13 @@ namespace KNXLib
                 }
 
                 if (datagram.message_code == 0x29)
-                    this.KNXConnection.Event(datagram.destination_address, datagram.data);
+                {
+                    int type = ((int)datagram.apdu[1]) >> 4;
+                    if (type == 8)
+                        this.KNXConnection.Event(datagram.destination_address, datagram.data);
+                    else if (type == 4)
+                        this.KNXConnection.Status(datagram.destination_address, datagram.data);
+                }
             }
             catch (Exception)
             {

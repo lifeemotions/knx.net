@@ -56,10 +56,7 @@ namespace KNXLib
         {
             bool group = separator.Equals('/');
             string address = string.Empty;
-
-            if (addr[0] == 0x11 && addr[1] == 0x96)
-                Console.WriteLine("STOP");
-
+            
             if (group && !threeLevelAddressing)
             {
                 // 2 level group
@@ -378,6 +375,8 @@ namespace KNXLib
                     {
                         switch (dgram[3])
                         {
+                            case (0x20):
+                                return SERVICE_TYPE.TUNNELLING_REQUEST;
                             case (0x21):
                                 return SERVICE_TYPE.TUNNELLING_ACK;
                         }

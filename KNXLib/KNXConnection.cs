@@ -155,8 +155,12 @@ namespace KNXLib
         #region events
         public delegate void KNXConnected();
         public KNXConnected KNXConnectedDelegate = null;
+        public delegate void KNXDisconnected();
+        public KNXDisconnected KNXDisconnectedDelegate = null;
         public delegate void KNXEvent(string address, string state);
         public KNXEvent KNXEventDelegate = null;
+        public delegate void KNXStatus(string address, string state);
+        public KNXStatus KNXStatusDelegate = null;
 
         public virtual void Connected()
         {
@@ -168,11 +172,31 @@ namespace KNXLib
                 Console.WriteLine("KNX is connected");
             }
         }
+        public virtual void Disconnected()
+        {
+            if (KNXDisconnectedDelegate != null)
+                KNXDisconnectedDelegate();
+
+            if (this.Debug)
+            {
+                Console.WriteLine("KNX is disconnected");
+            }
+        }
 
         public void Event(string address, string state)
         {
             if (KNXEventDelegate != null)
                 KNXEventDelegate(address, state);
+
+            if (this.Debug)
+            {
+                Console.WriteLine("Device " + address + " has status " + state);
+            }
+        }
+        public void Status(string address, string state)
+        {
+            if (KNXStatusDelegate != null)
+                KNXStatusDelegate(address, state);
 
             if (this.Debug)
             {
@@ -244,6 +268,13 @@ namespace KNXLib
         public void Action(string address, byte[] data)
         {
             this.KNXSender.Action(address, data);
+        }
+        #endregion
+
+        #region status
+        public void RequestStatus(string address)
+        {
+            this.KNXSender.RequestStatus(address);
         }
         #endregion
     }
