@@ -186,7 +186,7 @@ namespace KNXLib
                     int type = ((int)datagram.apdu[1]) >> 4;
                     if (type == 8)
                         this.KNXConnection.Event(datagram.destination_address, datagram.data);
-                    else if (type == 4)
+                    else if (type == 4 || type == 0)
                         this.KNXConnection.Status(datagram.destination_address, datagram.data);
                 }
             }

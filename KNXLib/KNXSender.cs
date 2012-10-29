@@ -54,7 +54,7 @@ namespace KNXLib
             int i = 0;
             int data_length = KNXHelper.GetDataLength(data);
             // HEADER
-            byte[] dgram = new byte[data_length + 11 + header.Length];
+            byte[] dgram = new byte[data_length + 10 + header.Length];
             for (i = 0; i < header.Length; i++)
             {
                 dgram[i] = header[i];
