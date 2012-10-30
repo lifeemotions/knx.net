@@ -53,26 +53,26 @@ namespace KNXLib
 
         #region variables
         private string _host;
-        internal string Host
+        public string Host
         {
             get
             {
                 return this._host;
             }
-            set
+            internal set
             {
                 this._host = value;
             }
         }
 
         private int _port;
-        internal int Port
+        public int Port
         {
             get
             {
                 return this._port;
             }
-            set
+            internal set
             {
                 this._port = value;
             }

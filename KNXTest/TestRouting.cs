@@ -49,8 +49,7 @@ namespace KNXTest
 
         static void Event(string address, string state)
         {
-            if (address.Equals("5/0/15") || address.Equals("5/2/15"))
-                Console.WriteLine("New Event: device " + address + " has status " + state);
+            Console.WriteLine("New Event: device " + address + " has status " + state);
         }
         static void Status(string address, string state)
         {
