@@ -60,7 +60,7 @@ namespace KNXLib
             }
             catch (Exception)
             {
-                // ignore
+                Thread.ResetAbort();
             }
         }
         #endregion

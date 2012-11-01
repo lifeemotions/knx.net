@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using KNXLib.Exceptions;
+using System.Threading;
 
 namespace KNXLib
 {
@@ -164,6 +165,8 @@ namespace KNXLib
 
         public virtual void Connected()
         {
+            this.UnlockSend();
+
             if (KNXConnectedDelegate != null)
                 KNXConnectedDelegate();
 
@@ -174,6 +177,8 @@ namespace KNXLib
         }
         public virtual void Disconnected()
         {
+            this.LockSend();
+
             if (KNXDisconnectedDelegate != null)
                 KNXDisconnectedDelegate();
 
@@ -205,6 +210,26 @@ namespace KNXLib
         }
         #endregion
 
+        #region
+        private SemaphoreSlim _lockSend = new SemaphoreSlim(0);
+        private void LockSend()
+        {
+            _lockSend.Wait();
+        }
+        private void UnlockSend()
+        {
+            _lockSend.Release();
+        }
+        private void RequestSendLock()
+        {
+            _lockSend.Wait();
+        }
+        private void ReleaseSendLock()
+        {
+            _lockSend.Release();
+        }
+        #endregion
+
         #region actions
         public void Action(string address, bool data)
         {
@@ -221,7 +246,9 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data.ToString());
 
+            RequestSendLock();
             this.KNXSender.Action(address, val);
+            ReleaseSendLock();
         }
         public void Action(string address, string data)
         {
@@ -238,7 +265,9 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data);
 
+            RequestSendLock();
             this.KNXSender.Action(address, val);
+            ReleaseSendLock();
         }
         public void Action(string address, int data)
         {
@@ -259,15 +288,21 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data.ToString());
 
+            RequestSendLock();
             this.KNXSender.Action(address, val);
+            ReleaseSendLock();
         }
         public void Action(string address, byte data)
         {
+            RequestSendLock();
             this.KNXSender.Action(address, new byte[] { 0x00, data });
+            ReleaseSendLock();
         }
         public void Action(string address, byte[] data)
         {
+            RequestSendLock();
             this.KNXSender.Action(address, data);
+            ReleaseSendLock();
         }
         #endregion
 
