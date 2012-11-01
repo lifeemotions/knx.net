@@ -94,7 +94,7 @@ namespace KNXLib
             dgram[01] = 0x10;
             dgram[02] = 0x04;
             dgram[03] = 0x20;
-            byte[] total_length = BitConverter.GetBytes(data_length + 21);
+            byte[] total_length = BitConverter.GetBytes(data_length + 20);
             dgram[04] = total_length[1];
             dgram[05] = total_length[0];
 

@@ -12,7 +12,7 @@ namespace KNXTest
         private static KNXLib.KNXConnection connection = null;
         static void Main(string[] args)
         {
-            connection = new KNXLib.KNXConnectionTunneling("10.100.26.20", 3671, "10.100.26.153", 3671);
+            connection = new KNXLib.KNXConnectionTunneling("10.100.26.20", 3671, "10.100.26.53", 3671);
             connection.Debug = false;
             connection.Connect();
             connection.KNXConnectedDelegate += new KNXLib.KNXConnection.KNXConnected(Connected);
@@ -20,23 +20,26 @@ namespace KNXTest
             connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
             connection.KNXStatusDelegate += new KNXLib.KNXConnection.KNXStatus(Status);
 
-            Console.WriteLine("Press [ENTER] to send command (4/2/35) - true");
-            Console.ReadLine();
-            connection.Action("4/2/35", true);
-            Thread.Sleep(5000);
-            Console.WriteLine("Requesting status of 4/3/35");
-            connection.RequestStatus("4/3/35");
-            Thread.Sleep(5000);
-            Console.WriteLine("Press [ENTER] to send command (4/2/35) - false");
-            Console.ReadLine();
-            connection.Action("4/2/35", false);
-            Thread.Sleep(5000);
-            Console.WriteLine("Requesting status of 4/3/35");
-            connection.RequestStatus("4/3/35");
-            Thread.Sleep(5000);
-
+            for (int i = 0; i < 100; i++)
+            {
+                Console.WriteLine("Press [ENTER] to send command (4/0/23) - true");
+                //Console.ReadLine();
+                connection.Action("4/0/23", true);
+                Thread.Sleep(1000);
+                Console.WriteLine("Requesting status of 4/1/23");
+                connection.RequestStatus("4/1/23");
+                Thread.Sleep(1000);
+                //Console.WriteLine("Press [ENTER] to send command (4/0/23) - false");
+                //Console.ReadLine();
+                //connection.Action("4/0/23", false);
+                //Thread.Sleep(1000);
+                //Console.WriteLine("Requesting status of 4/1/23");
+                //connection.RequestStatus("4/1/23");
+                //Thread.Sleep(1000);
+            }
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
+            connection.KNXDisconnectedDelegate -= new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
             connection.Disconnect();
             System.Environment.Exit(0);
         }

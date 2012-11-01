@@ -23,7 +23,7 @@ namespace KNXLib
 
         private void Initialize()
         {
-            stateRequestTimer = new Timer(10000);
+            stateRequestTimer = new Timer(15000); // same time as ETS with group monitor open
             stateRequestTimer.AutoReset = true;
             stateRequestTimer.Elapsed += new ElapsedEventHandler(StateRequest);
         }
@@ -124,10 +124,18 @@ namespace KNXLib
 
         public override void Disconnect()
         {
-            this.TerminateStateRequest();
-            this.DisconnectRequest();
-            this.KNXReceiver.Stop();
-            this.UdpClient.Close();
+            try
+            {
+                this.TerminateStateRequest();
+                this.DisconnectRequest();
+                this.KNXReceiver.Stop();
+                this.UdpClient.Close();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+            base.Disconnected();
         }
 
         #endregion
@@ -206,12 +214,12 @@ namespace KNXLib
             dgram[07] = 0x00;
             dgram[08] = 0x08;
             dgram[09] = 0x01;
-            dgram[10] = this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = (byte)(this.LocalEndpoint.Port >> 8);
-            dgram[15] = (byte)(this.LocalEndpoint.Port);
+            dgram[10] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[0];
+            dgram[11] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[1];
+            dgram[12] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[2];
+            dgram[13] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[3];
+            dgram[14] = 0x00; //(byte)(this.LocalEndpoint.Port >> 8);
+            dgram[15] = 0x00; //(byte)(this.LocalEndpoint.Port);
 
             this.KNXSender.SendData(dgram);
         }

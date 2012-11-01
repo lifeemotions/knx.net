@@ -73,6 +73,7 @@ namespace KNXLib
             }
             catch (ThreadAbortException)
             {
+                Thread.ResetAbort();
             }
         }
         #endregion
@@ -87,6 +88,9 @@ namespace KNXLib
                     case KNXHelper.SERVICE_TYPE.CONNECT_RESPONSE:
                         ProcessConnectResponse(dgram);
                         break;
+                    case KNXHelper.SERVICE_TYPE.CONNECTIONSTATE_RESPONSE:
+                        ProcessConnectionStateResponse(dgram);
+                        break;
                     case KNXHelper.SERVICE_TYPE.TUNNELLING_ACK:
                         ProcessTunnelingAck(dgram);
                         break;
@@ -98,8 +102,18 @@ namespace KNXLib
                         break;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.Write(e.Message);
+                Console.Write(e.ToString());
+                Console.Write(e.StackTrace);
+                if (e.InnerException != null)
+                {
+                    Console.Write(e.InnerException.Message);
+                    Console.Write(e.ToString());
+                    Console.Write(e.InnerException.StackTrace);
+                }
+                
                 // ignore, missing warning information
             }
         }
@@ -123,11 +137,35 @@ namespace KNXLib
 
         private void ProcessDisconnectRequest(byte[] dgram)
         {
-            KNXConnection.Disconnected();
+            this.KNXConnection.KNXReceiver.Stop();
+            this.UdpClient.Close();
+            this.KNXConnection.Disconnected();
         }
         private void ProcessTunnelingAck(byte[] dgram)
         {
             // do nothing
+        }
+        private void ProcessConnectionStateResponse(byte[] dgram)
+        {
+            // HEADER
+            // 06 10 02 08 00 08 -- 48 21
+            KNXDatagram datagram = new KNXDatagram();
+            datagram.header_length = (int)dgram[0];
+            datagram.protocol_version = dgram[1];
+            datagram.service_type = new byte[] { dgram[2], dgram[3] };
+            datagram.total_length = (int)dgram[4] + (int)dgram[5];
+
+            datagram.channel_id = dgram[6];
+            byte response = dgram[7];
+
+            if (response == 0x21)
+            {
+                if (KNXConnection.Debug)
+                {
+                    Console.WriteLine("KNXReceiverTunneling: Received connection state response - No active connection with channel ID " + datagram.channel_id);
+                }
+                this.KNXConnection.Disconnect();
+            }
         }
         private void ProcessConnectResponse(byte[] dgram)
         {

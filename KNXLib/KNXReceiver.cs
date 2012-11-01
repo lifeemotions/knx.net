@@ -53,7 +53,15 @@ namespace KNXLib
         }
         internal void Stop()
         {
-            ReceiverThread.Abort();
+            try
+            {
+                if (ReceiverThread.ThreadState.Equals(ThreadState.Running))
+                    ReceiverThread.Abort();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
         }
         #endregion
 
