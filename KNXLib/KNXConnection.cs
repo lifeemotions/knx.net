@@ -180,11 +180,11 @@ namespace KNXLib
                 Console.WriteLine("KNX is connected. Unlocking send");
             }
 
-            this.UnlockSend();
+            this.SendUnlock();
         }
         public virtual void Disconnected()
         {
-            this.LockSend();
+            this.SendLock();
 
             try
             {
@@ -239,21 +239,14 @@ namespace KNXLib
         #endregion
 
         #region locks
-        private object _lockSend = new object();
-        private void LockSend()
+        private SemaphoreSlim _lockSend = new SemaphoreSlim(0);
+        private void SendLock()
         {
-            Monitor.Enter(_lockSend);
+            _lockSend.Wait();
         }
-        private void UnlockSend()
+        private void SendUnlock()
         {
-            try
-            {
-                Monitor.Exit(_lockSend);
-            }
-            catch (SynchronizationLockException)
-            {
-                // on first run, just ignore
-            }
+            _lockSend.Release();
         }
         #endregion
 
@@ -275,9 +268,14 @@ namespace KNXLib
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.Action(address, val);
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -299,9 +297,14 @@ namespace KNXLib
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.Action(address, val);
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -327,9 +330,14 @@ namespace KNXLib
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.Action(address, val);
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -338,9 +346,14 @@ namespace KNXLib
         {
             if (Debug)
                 Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.Action(address, new byte[] { 0x00, data });
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -349,9 +362,14 @@ namespace KNXLib
         {
             if (Debug)
                 Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.Action(address, data);
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -363,9 +381,14 @@ namespace KNXLib
         {
             if (Debug)
                 Console.WriteLine("Sending request status to " + address + ".");
-            lock (_lockSend)
+            try
             {
+                SendLock();
                 this.KNXSender.RequestStatus(address);
+            }
+            finally
+            {
+                SendUnlock();
             }
             if (Debug)
                 Console.WriteLine("Sent");

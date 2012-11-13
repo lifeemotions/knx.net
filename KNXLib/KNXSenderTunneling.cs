@@ -62,7 +62,7 @@ namespace KNXLib
         #region send
         internal override void SendData(byte[] dgram)
         {
-            UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
         }
         internal void SendTunnelingAck(byte seq_number)
         {
@@ -80,7 +80,7 @@ namespace KNXLib
             dgram[08] = seq_number;
             dgram[09] = 0x00;
 
-            UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
         }
         #endregion
 

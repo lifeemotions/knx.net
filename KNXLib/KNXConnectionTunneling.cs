@@ -125,18 +125,19 @@ namespace KNXLib
         {
             try
             {
-                if (UdpClient != null)
+                if (this.UdpClient != null)
                 {
                     try
                     {
-                        UdpClient.Close();
+                        this.UdpClient.Close();
+                        this.UdpClient.Client.Dispose();
                     }
                     catch (Exception)
                     {
                         // ignore
                     }
                 }
-                UdpClient = new UdpClient(LocalEndpoint);
+                this.UdpClient = new UdpClient(LocalEndpoint);
             }
             catch (SocketException)
             {
