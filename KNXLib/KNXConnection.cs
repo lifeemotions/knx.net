@@ -165,33 +165,54 @@ namespace KNXLib
 
         public virtual void Connected()
         {
-            this.UnlockSend();
-
-            if (KNXConnectedDelegate != null)
-                KNXConnectedDelegate();
+            try
+            {
+                if (KNXConnectedDelegate != null)
+                    KNXConnectedDelegate();
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
 
             if (this.Debug)
             {
-                Console.WriteLine("KNX is connected");
+                Console.WriteLine("KNX is connected. Unlocking send");
             }
+
+            this.UnlockSend();
         }
         public virtual void Disconnected()
         {
             this.LockSend();
 
-            if (KNXDisconnectedDelegate != null)
-                KNXDisconnectedDelegate();
+            try
+            {
+                if (KNXDisconnectedDelegate != null)
+                    KNXDisconnectedDelegate();
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
 
             if (this.Debug)
             {
-                Console.WriteLine("KNX is disconnected");
+                Console.WriteLine("KNX is disconnected. Send locked");
             }
         }
 
         public void Event(string address, string state)
         {
-            if (KNXEventDelegate != null)
-                KNXEventDelegate(address, state);
+            try
+            {
+                if (KNXEventDelegate != null)
+                    KNXEventDelegate(address, state);
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
 
             if (this.Debug)
             {
@@ -200,8 +221,15 @@ namespace KNXLib
         }
         public void Status(string address, string state)
         {
-            if (KNXStatusDelegate != null)
-                KNXStatusDelegate(address, state);
+            try
+            {
+                if (KNXStatusDelegate != null)
+                    KNXStatusDelegate(address, state);
+            }
+            catch (Exception)
+            {
+                //ignore
+            }
 
             if (this.Debug)
             {
@@ -210,23 +238,22 @@ namespace KNXLib
         }
         #endregion
 
-        #region
-        private SemaphoreSlim _lockSend = new SemaphoreSlim(0);
+        #region locks
+        private object _lockSend = new object();
         private void LockSend()
         {
-            _lockSend.Wait();
+            Monitor.Enter(_lockSend);
         }
         private void UnlockSend()
         {
-            _lockSend.Release();
-        }
-        private void RequestSendLock()
-        {
-            _lockSend.Wait();
-        }
-        private void ReleaseSendLock()
-        {
-            _lockSend.Release();
+            try
+            {
+                Monitor.Exit(_lockSend);
+            }
+            catch (SynchronizationLockException)
+            {
+                // on first run, just ignore
+            }
         }
         #endregion
 
@@ -246,9 +273,14 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data.ToString());
 
-            RequestSendLock();
-            this.KNXSender.Action(address, val);
-            ReleaseSendLock();
+            if (Debug)
+                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.Action(address, val);
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         public void Action(string address, string data)
         {
@@ -265,9 +297,14 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data);
 
-            RequestSendLock();
-            this.KNXSender.Action(address, val);
-            ReleaseSendLock();
+            if (Debug)
+                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.Action(address, val);
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         public void Action(string address, int data)
         {
@@ -288,28 +325,50 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKNXDataException(data.ToString());
 
-            RequestSendLock();
-            this.KNXSender.Action(address, val);
-            ReleaseSendLock();
+            if (Debug)
+                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.Action(address, val);
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         public void Action(string address, byte data)
         {
-            RequestSendLock();
-            this.KNXSender.Action(address, new byte[] { 0x00, data });
-            ReleaseSendLock();
+            if (Debug)
+                Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.Action(address, new byte[] { 0x00, data });
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         public void Action(string address, byte[] data)
         {
-            RequestSendLock();
-            this.KNXSender.Action(address, data);
-            ReleaseSendLock();
+            if (Debug)
+                Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.Action(address, data);
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         #endregion
 
         #region status
         public void RequestStatus(string address)
         {
-            this.KNXSender.RequestStatus(address);
+            if (Debug)
+                Console.WriteLine("Sending request status to " + address + ".");
+            lock (_lockSend)
+            {
+                this.KNXSender.RequestStatus(address);
+            }
+            if (Debug)
+                Console.WriteLine("Sent");
         }
         #endregion
     }

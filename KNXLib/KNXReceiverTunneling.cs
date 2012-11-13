@@ -34,7 +34,7 @@ namespace KNXLib
         }
 
         private UdpClient _udpClient;
-        private UdpClient UdpClient
+        public UdpClient UdpClient
         {
             get
             {
@@ -70,6 +70,14 @@ namespace KNXLib
                     dgram = UdpClient.Receive(ref this._localEndpoint);
                     ProcessDatagram(dgram);
                 }
+            }
+            catch (SocketException)
+            {
+                // ignore, probably reconnect happening
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore, probably reconnect happening
             }
             catch (ThreadAbortException)
             {
@@ -137,9 +145,9 @@ namespace KNXLib
 
         private void ProcessDisconnectRequest(byte[] dgram)
         {
-            this.KNXConnection.KNXReceiver.Stop();
-            this.UdpClient.Close();
+            this.Stop();
             this.KNXConnection.Disconnected();
+            this.UdpClient.Close();
         }
         private void ProcessTunnelingAck(byte[] dgram)
         {

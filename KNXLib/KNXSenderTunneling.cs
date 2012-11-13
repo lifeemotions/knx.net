@@ -34,7 +34,7 @@ namespace KNXLib
         }
 
         private UdpClient _udpClient;
-        private UdpClient UdpClient
+        public UdpClient UdpClient
         {
             get
             {
@@ -50,7 +50,7 @@ namespace KNXLib
         {
             get
             {
-                return (KNXConnectionTunneling) this.KNXConnection;
+                return (KNXConnectionTunneling)this.KNXConnection;
             }
             set
             {
@@ -87,44 +87,66 @@ namespace KNXLib
         #region action datagram processing
         internal override byte[] CreateActionDatagram(string destination_address, byte[] data)
         {
-            int data_length = KNXHelper.GetDataLength(data);
-            // HEADER
-            byte[] dgram = new byte[10];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x04;
-            dgram[03] = 0x20;
-            byte[] total_length = BitConverter.GetBytes(data_length + 20);
-            dgram[04] = total_length[1];
-            dgram[05] = total_length[0];
+            lock (this.KNXConnectionTunneling.SequenceNumberLock)
+            {
+                try
+                {
+                    int data_length = KNXHelper.GetDataLength(data);
+                    // HEADER
+                    byte[] dgram = new byte[10];
+                    dgram[00] = 0x06;
+                    dgram[01] = 0x10;
+                    dgram[02] = 0x04;
+                    dgram[03] = 0x20;
+                    byte[] total_length = BitConverter.GetBytes(data_length + 20);
+                    dgram[04] = total_length[1];
+                    dgram[05] = total_length[0];
 
-            dgram[06] = 0x04;
-            dgram[07] = this.KNXConnectionTunneling.ChannelId;
-            dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
-            dgram[09] = 0x00;
+                    dgram[06] = 0x04;
+                    dgram[07] = this.KNXConnectionTunneling.ChannelId;
+                    dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
+                    dgram[09] = 0x00;
 
-            return base.CreateActionDatagramCommon(destination_address, data, dgram);
+                    return base.CreateActionDatagramCommon(destination_address, data, dgram);
+                }
+                catch (Exception)
+                {
+                    this.KNXConnectionTunneling.RevertSingleSequenceNumber();
+                    return null;
+                }
+            }
         }
         #endregion
 
         #region request status datagram processing
         internal override byte[] CreateRequestStatusDatagram(string destination_address)
         {
-            // HEADER
-            byte[] dgram = new byte[21];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x04;
-            dgram[03] = 0x20;
-            dgram[04] = 0x00;
-            dgram[05] = 0x15;
+            lock (this.KNXConnectionTunneling.SequenceNumberLock)
+            {
+                try
+                {
+                    // HEADER
+                    byte[] dgram = new byte[21];
+                    dgram[00] = 0x06;
+                    dgram[01] = 0x10;
+                    dgram[02] = 0x04;
+                    dgram[03] = 0x20;
+                    dgram[04] = 0x00;
+                    dgram[05] = 0x15;
 
-            dgram[06] = 0x04;
-            dgram[07] = this.KNXConnectionTunneling.ChannelId;
-            dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
-            dgram[09] = 0x00;
+                    dgram[06] = 0x04;
+                    dgram[07] = this.KNXConnectionTunneling.ChannelId;
+                    dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
+                    dgram[09] = 0x00;
 
-            return base.CreateRequestStatusDatagramCommon(destination_address, dgram, 10);
+                    return base.CreateRequestStatusDatagramCommon(destination_address, dgram, 10);
+                }
+                catch (Exception)
+                {
+                    this.KNXConnectionTunneling.RevertSingleSequenceNumber();
+                    return null;
+                }
+            }
         }
         #endregion
     }

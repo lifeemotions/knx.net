@@ -23,7 +23,8 @@ namespace KNXLib
 
         private void Initialize()
         {
-            stateRequestTimer = new Timer(15000); // same time as ETS with group monitor open
+            this.SequenceNumberLock = new object();
+            stateRequestTimer = new Timer(60000); // same time as ETS with group monitor open
             stateRequestTimer.AutoReset = true;
             stateRequestTimer.Elapsed += new ElapsedEventHandler(StateRequest);
         }
@@ -95,9 +96,26 @@ namespace KNXLib
             }
         }
 
+        private object _sequenceNumberLock;
+        internal object SequenceNumberLock
+        {
+            get
+            {
+                return this._sequenceNumberLock;
+            }
+            set
+            {
+                this._sequenceNumberLock = value;
+            }
+        }
+
         internal byte GenerateSequenceNumber()
         {
             return this._sequenceNumber++;
+        }
+        internal void RevertSingleSequenceNumber()
+        {
+            this._sequenceNumber--;
         }
         #endregion
 
@@ -107,6 +125,17 @@ namespace KNXLib
         {
             try
             {
+                if (UdpClient != null)
+                {
+                    try
+                    {
+                        UdpClient.Close();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore
+                    }
+                }
                 UdpClient = new UdpClient(LocalEndpoint);
             }
             catch (SocketException)
@@ -114,10 +143,18 @@ namespace KNXLib
                 throw new ConnectionErrorException(this.Host, this.Port);
             }
 
-            KNXReceiver = new KNXReceiverTunneling(this, this.UdpClient, LocalEndpoint);
-            KNXReceiver.Start();
+            if (KNXReceiver == null || KNXSender == null)
+            {
+                KNXReceiver = new KNXReceiverTunneling(this, this.UdpClient, LocalEndpoint);
+                KNXSender = new KNXSenderTunneling(this, this.UdpClient, RemoteEndpoint);
+            }
+            else
+            {
+                ((KNXReceiverTunneling)KNXReceiver).UdpClient = this.UdpClient;
+                ((KNXSenderTunneling)KNXSender).UdpClient = this.UdpClient;
+            }
 
-            KNXSender = new KNXSenderTunneling(this, this.UdpClient, RemoteEndpoint);
+            KNXReceiver.Start();
 
             ConnectRequest();
         }
@@ -184,6 +221,12 @@ namespace KNXLib
 
             this.InitializeStateRequest();
         }
+        public override void Disconnected()
+        {
+            base.Disconnected();
+
+            this.TerminateStateRequest();
+        }
         #endregion
 
         #region state request
@@ -214,14 +257,21 @@ namespace KNXLib
             dgram[07] = 0x00;
             dgram[08] = 0x08;
             dgram[09] = 0x01;
-            dgram[10] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = 0x00; //this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = 0x00; //(byte)(this.LocalEndpoint.Port >> 8);
-            dgram[15] = 0x00; //(byte)(this.LocalEndpoint.Port);
+            dgram[10] = this.LocalEndpoint.Address.GetAddressBytes()[0];
+            dgram[11] = this.LocalEndpoint.Address.GetAddressBytes()[1];
+            dgram[12] = this.LocalEndpoint.Address.GetAddressBytes()[2];
+            dgram[13] = this.LocalEndpoint.Address.GetAddressBytes()[3];
+            dgram[14] = (byte)(this.LocalEndpoint.Port >> 8);
+            dgram[15] = (byte)(this.LocalEndpoint.Port);
 
-            this.KNXSender.SendData(dgram);
+            try
+            {
+                this.KNXSender.SendData(dgram);
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
         }
         #endregion
 
