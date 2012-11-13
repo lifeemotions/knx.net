@@ -57,6 +57,31 @@ namespace KNXLib
             }
         }
 
+        private byte _rxSequenceNumber;
+        internal byte RXSequenceNumber
+        {
+            get
+            {
+                return this._rxSequenceNumber;
+            }
+            set
+            {
+                this._rxSequenceNumber = value;
+            }
+        }
+
+        private object _rxSequenceNumberLock;
+        internal object RXSequenceNumberLock
+        {
+            get
+            {
+                return this._rxSequenceNumberLock;
+            }
+            set
+            {
+                this._rxSequenceNumberLock = value;
+            }
+        }
         #endregion
 
         #region thread
@@ -138,13 +163,25 @@ namespace KNXLib
             byte chID = dgram[7];
             if (chID != this.KNXConnectionTunneling.ChannelId)
                 return;
+            byte seqN = dgram[8];
+            bool process = true;
+            lock (this.RXSequenceNumberLock)
+            {
+                if (seqN <= this.RXSequenceNumber)
+                {
+                    process = false;
+                }
+                this.RXSequenceNumber = seqN;
+            }
 
-            byte[] cemi = new byte[dgram.Length - 10];
-            Array.Copy(dgram, 10, cemi, 0, dgram.Length - 10);
+            if (process)
+            {
+                byte[] cemi = new byte[dgram.Length - 10];
+                Array.Copy(dgram, 10, cemi, 0, dgram.Length - 10);
 
-            base.ProcessCEMI(datagram, cemi);
-
-            ((KNXSenderTunneling)KNXConnectionTunneling.KNXSender).SendTunnelingAck(dgram[8]);
+                base.ProcessCEMI(datagram, cemi);
+            }
+            ((KNXSenderTunneling)KNXConnectionTunneling.KNXSender).SendTunnelingAck(seqN);
         }
 
         private void ProcessDisconnectRequest(byte[] dgram)
