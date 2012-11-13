@@ -135,6 +135,10 @@ namespace KNXLib
             datagram.service_type = new byte[] { dgram[2], dgram[3] };
             datagram.total_length = (int)dgram[4] + (int)dgram[5];
 
+            byte chID = dgram[7];
+            if (chID != this.KNXConnectionTunneling.ChannelId)
+                return;
+
             byte[] cemi = new byte[dgram.Length - 10];
             Array.Copy(dgram, 10, cemi, 0, dgram.Length - 10);
 

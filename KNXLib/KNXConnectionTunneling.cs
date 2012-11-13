@@ -23,6 +23,7 @@ namespace KNXLib
 
         private void Initialize()
         {
+            this.ChannelId = 0x00;
             this.SequenceNumberLock = new object();
             stateRequestTimer = new Timer(60000); // same time as ETS with group monitor open
             stateRequestTimer.AutoReset = true;
