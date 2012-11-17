@@ -268,6 +268,15 @@ namespace KNXLib
         {
             return _lockSend.CurrentCount;
         }
+        private void SendUnlockPause()
+        {
+            new Thread(new ThreadStart(SendUnlockPauseThread)).Start();
+        }
+        private void SendUnlockPauseThread()
+        {
+            Thread.Sleep(50);
+            _lockSend.Release();
+        }
         #endregion
 
         #region actions
@@ -295,7 +304,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -324,7 +333,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -357,7 +366,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -373,7 +382,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -389,7 +398,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
@@ -408,7 +417,7 @@ namespace KNXLib
             }
             finally
             {
-                SendUnlock();
+                SendUnlockPause();
             }
             if (Debug)
                 Console.WriteLine("Sent");
