@@ -158,7 +158,14 @@ namespace KNXLib
 
             KNXReceiver.Start();
 
-            ConnectRequest();
+            try
+            {
+                ConnectRequest();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
         }
 
         public override void Disconnect()

@@ -163,6 +163,8 @@ namespace KNXLib
         public delegate void KNXStatus(string address, string state);
         public KNXStatus KNXStatusDelegate = null;
 
+        private object _connectedKey = new object();
+        private bool _connected = false;
         public virtual void Connected()
         {
             try
@@ -177,14 +179,28 @@ namespace KNXLib
 
             if (this.Debug)
             {
-                Console.WriteLine("KNX is connected. Unlocking send");
+                Console.WriteLine("KNX is connected. Unlocking send - " + SemaphoreCount() + " free locks");
             }
 
-            this.SendUnlock();
+            lock (_connectedKey)
+            {
+                if (_connected == false)
+                {
+                    _connected = true;
+                    this.SendUnlock();
+                }
+            }
         }
         public virtual void Disconnected()
         {
-            this.SendLock();
+            lock (_connectedKey)
+            {
+                if (_connected == true)
+                {
+                    this.SendLock();
+                    _connected = false;
+                }
+            }
 
             try
             {
@@ -198,7 +214,7 @@ namespace KNXLib
 
             if (this.Debug)
             {
-                Console.WriteLine("KNX is disconnected. Send locked");
+                Console.WriteLine("KNX is disconnected. Send locked - " + SemaphoreCount() + " free locks");
             }
         }
 
@@ -247,6 +263,10 @@ namespace KNXLib
         private void SendUnlock()
         {
             _lockSend.Release();
+        }
+        private int SemaphoreCount()
+        {
+            return _lockSend.CurrentCount;
         }
         #endregion
 

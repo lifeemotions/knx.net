@@ -16,6 +16,7 @@ namespace KNXLib
         {
             this.LocalEndpoint = localEndpoint;
             this.UdpClient = udpClient;
+            this.RXSequenceNumberLock = new object();
         }
         #endregion
 
@@ -186,6 +187,10 @@ namespace KNXLib
 
         private void ProcessDisconnectRequest(byte[] dgram)
         {
+            byte chID = dgram[6];
+            if (chID != this.KNXConnectionTunneling.ChannelId)
+                return;
+
             this.Stop();
             this.KNXConnection.Disconnected();
             this.UdpClient.Close();
