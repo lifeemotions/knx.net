@@ -118,45 +118,6 @@ namespace KNXLib
             }
         }
 
-        private UdpClient _udpClient;
-        protected UdpClient UdpClient
-        {
-            get
-            {
-                return this._udpClient;
-            }
-            set
-            {
-                this._udpClient = value;
-            }
-        }
-
-        private IPEndPoint _localEndpoint;
-        protected IPEndPoint LocalEndpoint
-        {
-            get
-            {
-                return this._localEndpoint;
-            }
-            set
-            {
-                this._localEndpoint = value;
-            }
-        }
-
-        private IPEndPoint _remoteEndpoint;
-        protected IPEndPoint RemoteEndpoint
-        {
-            get
-            {
-                return this._remoteEndpoint;
-            }
-            set
-            {
-                this._remoteEndpoint = value;
-            }
-        }
-
         private bool _threeLevelGroupAddressing;
         public bool ThreeLevelGroupAddressing
         {
@@ -203,23 +164,9 @@ namespace KNXLib
         public KNXStatus KNXStatusDelegate = null;
 
         private object _connectedKey = new object();
-        protected ConnectionStatus _connected = ConnectionStatus.UNKNOWN;
+        private bool _connected = false;
         public virtual void Connected()
         {
-            lock (_connectedKey)
-            {
-                if (_connected == ConnectionStatus.CONNECTING)
-                {
-                    _connected = ConnectionStatus.CONNECTED;
-                    this.ConnectionUnlock();
-                }
-            }
-
-            if (this.Debug)
-            {
-                Console.WriteLine("KNX is connected. Unlocked send. " + this.SendCount() + " threads waiting to send (to connect: " + this.ConnectCount() + ")");
-            }
-
             try
             {
                 if (KNXConnectedDelegate != null)
@@ -229,25 +176,30 @@ namespace KNXLib
             {
                 //ignore
             }
+
+            if (this.Debug)
+            {
+                Console.WriteLine("KNX is connected. Unlocking send - " + SemaphoreCount() + " free locks");
+            }
+
+            lock (_connectedKey)
+            {
+                if (_connected == false)
+                {
+                    _connected = true;
+                    this.SendUnlock();
+                }
+            }
         }
         public virtual void Disconnected()
         {
             lock (_connectedKey)
             {
-                if (_connected == ConnectionStatus.CONNECTED)
+                if (_connected == true)
                 {
-                    this.ConnectionLock();
-                    _connected = ConnectionStatus.DISCONNECTED;
+                    this.SendLock();
+                    _connected = false;
                 }
-                else if (_connected == ConnectionStatus.CONNECTING)
-                {
-                    _connected = ConnectionStatus.DISCONNECTED;
-                }
-            }
-
-            if (this.Debug)
-            {
-                Console.WriteLine("KNX is disconnected. Locked send. " + this.SendCount() + " threads waiting to send (to connect: " + this.ConnectCount() + ")");
             }
 
             try
@@ -258,6 +210,11 @@ namespace KNXLib
             catch (Exception)
             {
                 //ignore
+            }
+
+            if (this.Debug)
+            {
+                Console.WriteLine("KNX is disconnected. Send locked - " + SemaphoreCount() + " free locks");
             }
         }
 
@@ -298,27 +255,18 @@ namespace KNXLib
         #endregion
 
         #region locks
-        private ReaderWriterLockSlim _lockSend = new ReaderWriterLockSlim();
-
+        private SemaphoreSlim _lockSend = new SemaphoreSlim(0);
         private void SendLock()
         {
-            _lockSend.EnterReadLock();
+            _lockSend.Wait();
         }
-        protected void ConnectionLock()
+        private void SendUnlock()
         {
-            _lockSend.EnterWriteLock();
+            _lockSend.Release();
         }
-        protected void ConnectionUnlock()
+        private int SemaphoreCount()
         {
-            _lockSend.ExitWriteLock();
-        }
-        private int SendCount()
-        {
-            return _lockSend.WaitingReadCount;
-        }
-        private int ConnectCount()
-        {
-            return _lockSend.WaitingWriteCount;
+            return _lockSend.CurrentCount;
         }
         private void SendUnlockPause()
         {
@@ -327,7 +275,7 @@ namespace KNXLib
         private void SendUnlockPauseThread()
         {
             Thread.Sleep(50);
-            _lockSend.ExitReadLock();
+            _lockSend.Release();
         }
         #endregion
 
@@ -475,12 +423,5 @@ namespace KNXLib
                 Console.WriteLine("Sent");
         }
         #endregion
-    }
-    public enum ConnectionStatus
-    {
-        CONNECTED = 0,
-        DISCONNECTED = 1,
-        CONNECTING = 2,
-        UNKNOWN = 3
     }
 }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using KNXLib.Exceptions;
-using System.Threading;
 
 namespace KNXLib
 {
@@ -26,13 +25,52 @@ namespace KNXLib
         {
             this.ChannelId = 0x00;
             this.SequenceNumberLock = new object();
-            stateRequestTimer = new System.Timers.Timer(60000); // same time as ETS with group monitor open
+            stateRequestTimer = new Timer(60000); // same time as ETS with group monitor open
             stateRequestTimer.AutoReset = true;
             stateRequestTimer.Elapsed += new ElapsedEventHandler(StateRequest);
         }
         #endregion
 
         #region variables
+        private UdpClient _udpClient;
+        private UdpClient UdpClient
+        {
+            get
+            {
+                return this._udpClient;
+            }
+            set
+            {
+                this._udpClient = value;
+            }
+        }
+
+        private IPEndPoint _localEndpoint;
+        private IPEndPoint LocalEndpoint
+        {
+            get
+            {
+                return this._localEndpoint;
+            }
+            set
+            {
+                this._localEndpoint = value;
+            }
+        }
+
+        private IPEndPoint _remoteEndpoint;
+        private IPEndPoint RemoteEndpoint
+        {
+            get
+            {
+                return this._remoteEndpoint;
+            }
+            set
+            {
+                this._remoteEndpoint = value;
+            }
+        }
+
         private byte _channelId;
         internal byte ChannelId
         {
@@ -122,8 +160,6 @@ namespace KNXLib
 
             try
             {
-                Thread.Sleep(10);
-                this._connected = ConnectionStatus.CONNECTING;
                 ConnectRequest();
             }
             catch (Exception)
@@ -140,7 +176,6 @@ namespace KNXLib
                 this.DisconnectRequest();
                 this.KNXReceiver.Stop();
                 this.UdpClient.Close();
-                this.UdpClient.Client.Dispose();
             }
             catch (Exception)
             {
@@ -204,7 +239,7 @@ namespace KNXLib
         #endregion
 
         #region state request
-        private System.Timers.Timer stateRequestTimer;
+        private Timer stateRequestTimer;
         private void InitializeStateRequest()
         {
             stateRequestTimer.Enabled = true;
