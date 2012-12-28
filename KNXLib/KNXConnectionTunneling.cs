@@ -139,6 +139,9 @@ namespace KNXLib
                     }
                 }
                 this.UdpClient = new UdpClient(LocalEndpoint);
+                this.UdpClient.Client.DontFragment = true;
+                //this.UdpClient.Client.NoDelay = true;
+                this.UdpClient.Client.SendBufferSize = 0;
             }
             catch (SocketException)
             {
