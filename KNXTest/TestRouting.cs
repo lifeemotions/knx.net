@@ -14,6 +14,7 @@ namespace KNXTest
         {
             connection = new KNXLib.KNXConnectionRouting();
             connection.Debug = false;
+            connection.ActionMessageCode = 0x29;
             connection.Connect();
             connection.KNXConnectedDelegate += new KNXLib.KNXConnection.KNXConnected(Connected);
             connection.KNXDisconnectedDelegate += new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
@@ -22,24 +23,24 @@ namespace KNXTest
 
             //for (int i = 0; i < 9000; i++)
             //{
-            //    connection.RequestStatus("5/2/15");
+            //    connection.RequestStatus("4/1/21");
             //    Thread.Sleep(100);
             //}
 
-            Console.WriteLine("Press [ENTER] to send command (5/0/15) - true");
+            Console.WriteLine("Press [ENTER] to send command (4/0/21) - true");
             Console.ReadLine();
-            connection.Action("5/0/15", true);
-            Thread.Sleep(5000);
-            Console.WriteLine("Requesting status of 5/2/15");
-            connection.RequestStatus("5/2/15");
-            Thread.Sleep(5000);
-            Console.WriteLine("Press [ENTER] to send command (5/0/15) - false");
+            connection.Action("4/0/21", true);
+            Thread.Sleep(1000);
+            Console.WriteLine("Requesting status of 4/1/21");
+            connection.RequestStatus("4/1/21");
+            Thread.Sleep(1000);
+            Console.WriteLine("Press [ENTER] to send command (4/0/21) - false");
             Console.ReadLine();
-            connection.Action("5/0/15", false);
-            Thread.Sleep(5000);
-            Console.WriteLine("Requesting status of 5/2/15");
-            connection.RequestStatus("5/2/15");
-            Thread.Sleep(5000);
+            connection.Action("4/0/21", false);
+            Thread.Sleep(1000);
+            Console.WriteLine("Requesting status of 4/1/21");
+            connection.RequestStatus("4/1/21");
+            Thread.Sleep(1000);
 
             //Thread.Sleep(2000);
             Console.WriteLine("Done. Press [ENTER] to finish");

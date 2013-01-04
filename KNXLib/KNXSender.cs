@@ -118,7 +118,14 @@ namespace KNXLib
             //                    information (APCI) and data passed as an argument from higher layers of
             //                    the KNX communication stack
             //
-            dgram[i++] = 0x11;
+            if (this._connection.ActionMessageCode != 0x00)
+            {
+                dgram[i++] = this._connection.ActionMessageCode;
+            }
+            else
+            {
+                dgram[i++] = 0x11;
+            }
             dgram[i++] = 0x00;
             dgram[i++] = 0xAC;
             if (KNXHelper.IsAddressIndividual(destination_address))

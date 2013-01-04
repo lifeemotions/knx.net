@@ -14,6 +14,7 @@ namespace KNXLib
         #region constructor
         public KNXConnection()
         {
+            this._actionMessageCode = 0x00;
         }
 
         public KNXConnection(String host)
@@ -141,6 +142,19 @@ namespace KNXLib
             set
             {
                 this._debug = value;
+            }
+        }
+
+        private byte _actionMessageCode;
+        public byte ActionMessageCode
+        {
+            get
+            {
+                return this._actionMessageCode;
+            }
+            set
+            {
+                this._actionMessageCode = value;
             }
         }
         #endregion
