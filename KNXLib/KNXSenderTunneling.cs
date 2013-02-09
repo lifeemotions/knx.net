@@ -60,8 +60,15 @@ namespace KNXLib
         #endregion
 
         #region send
+        internal void SendDataSingle(byte[] dgram)
+        {
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+        }
         internal override void SendData(byte[] dgram)
         {
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
             this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
         }
         internal void SendTunnelingAck(byte seq_number)

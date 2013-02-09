@@ -222,7 +222,7 @@ namespace KNXLib
             dgram[24] = 0x02;
             dgram[25] = 0x00;
 
-            this.KNXSender.SendData(dgram);
+            ((KNXSenderTunneling)this.KNXSender).SendDataSingle(dgram);
         }
         #endregion
 

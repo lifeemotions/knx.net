@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DPT\DPT.cs" />
+    <Compile Include="DPT\DPT2ByteFloat.cs" />
+    <Compile Include="DPT\DPTTranslator.cs" />
     <Compile Include="KNXSenderTunneling.cs" />
     <Compile Include="KNXReceiverTunneling.cs" />
     <Compile Include="KNXConnectionTunneling.cs" />

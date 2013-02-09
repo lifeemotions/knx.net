@@ -12,7 +12,7 @@ namespace KNXTest
         private static KNXLib.KNXConnection connection = null;
         static void Main(string[] args)
         {
-            connection = new KNXLib.KNXConnectionTunneling("10.100.26.20", 3671, "10.100.26.53", 3671);
+            connection = new KNXLib.KNXConnectionTunneling("10.0.2.183", 3671, "10.0.0.99", 3671);
             connection.Debug = false;
             connection.Connect();
             connection.KNXConnectedDelegate += new KNXLib.KNXConnection.KNXConnected(Connected);
@@ -20,23 +20,33 @@ namespace KNXTest
             connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
             connection.KNXStatusDelegate += new KNXLib.KNXConnection.KNXStatus(Status);
 
-            for (int i = 0; i < 100; i++)
+
+            string devAddress = "1/0/5";
+            float value = 18.0f;
+
+            for (int i = 0; i <= 10; i++)
             {
-                Console.WriteLine("Press [ENTER] to send command (4/0/23) - true");
-                //Console.ReadLine();
-                connection.Action("4/0/23", true);
-                Thread.Sleep(1000);
-                Console.WriteLine("Requesting status of 4/1/23");
-                connection.RequestStatus("4/1/23");
-                Thread.Sleep(1000);
-                //Console.WriteLine("Press [ENTER] to send command (4/0/23) - false");
-                //Console.ReadLine();
-                //connection.Action("4/0/23", false);
-                //Thread.Sleep(1000);
-                //Console.WriteLine("Requesting status of 4/1/23");
-                //connection.RequestStatus("4/1/23");
-                //Thread.Sleep(1000);
+                byte[] temperature = null;
+                try
+                {
+                    temperature = connection.toDPT("9.001", value);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("DriverKNX: NOT sending " + devAddress + " (9.001) - " + value + " (ERROR IN VALUE)");
+                    return;
+                }
+                Console.WriteLine("Press [ENTER] to send " + value);
+                Console.ReadLine();
+
+                Console.WriteLine("DriverKNX: sending " + devAddress + " (9.001) - " + value + "(" + BitConverter.ToString(temperature) + ")");
+                connection.Action(devAddress, temperature);
+
+                value += 1f;
+
             }
+
+
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
             connection.KNXDisconnectedDelegate -= new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
@@ -46,7 +56,14 @@ namespace KNXTest
 
         static void Event(string address, string state)
         {
-            Console.WriteLine("New Event: device " + address + " has status " + state);
+            if (address.Equals("1/0/1") || address.Equals("1/0/6"))
+            {
+                Console.WriteLine("New Event: device " + address + " has status (" + state + ")" + connection.fromDPT("9.001", state));
+            }
+            else
+            {
+                Console.WriteLine("New Event: device " + address + " has status " + state);
+            }
         }
         static void Status(string address, string state)
         {

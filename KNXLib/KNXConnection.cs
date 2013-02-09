@@ -284,7 +284,9 @@ namespace KNXLib
         }
         private void SendUnlockPause()
         {
-            new Thread(new ThreadStart(SendUnlockPauseThread)).Start();
+            Thread t = new Thread(new ThreadStart(SendUnlockPauseThread));
+            t.IsBackground = true;
+            t.Start();
         }
         private void SendUnlockPauseThread()
         {
@@ -435,6 +437,28 @@ namespace KNXLib
             }
             if (Debug)
                 Console.WriteLine("Sent");
+        }
+        #endregion
+
+        #region DPT
+        public object fromDPT(string type, byte[] data)
+        {
+            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+        }
+
+        public object fromDPT(string type, String data)
+        {
+            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+        }
+
+        public byte[] toDPT(string type, object value)
+        {
+            return DPT.DPTTranslator.Instance.toDPT(type, value);
+        }
+
+        public byte[] toDPT(string type, String value)
+        {
+            return DPT.DPTTranslator.Instance.toDPT(type, value);
         }
         #endregion
     }

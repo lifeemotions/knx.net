@@ -56,7 +56,7 @@ namespace KNXLib
         {
             bool group = separator.Equals('/');
             string address = string.Empty;
-            
+
             if (group && !threeLevelAddressing)
             {
                 // 2 level group
@@ -258,18 +258,18 @@ namespace KNXLib
             }
             if (data_length == 1)
             {
-                return (0x3F & apdu[1]).ToString();
+                return System.Convert.ToChar(0x3F & apdu[1]).ToString();
             }
             else if (data_length == 2)
             {
-                return apdu[2].ToString();
+                return System.Convert.ToChar(apdu[2]).ToString();
             }
             else
             {
                 string data = string.Empty;
                 for (int i = 2; i < apdu.Length; i++)
                 {
-                    data += apdu[i].ToString();
+                    data += System.Convert.ToChar(apdu[i]);
                 }
                 return data;
             }
@@ -278,10 +278,9 @@ namespace KNXLib
         {
             if (data.Length > 0)
             {
-                if (data[0] < 0x3F)
+                if (data.Length == 1 && data[0] < 0x3F)
                 {
-                    // first is less than 6 bits
-                    return data.Length;
+                    return 1;
                 }
                 else
                 {
@@ -292,26 +291,22 @@ namespace KNXLib
         }
         internal static void WriteData(byte[] dgram, byte[] data, int data_start)
         {
-            if (data.Length > 0)
+            if (data.Length == 1)
             {
                 if (data[0] < 0x3F)
                 {
-                    // is this approach correct? if the first byte fits in 6 bits and we have more data,
-                    //  we keep the first in the 2nd APDU byte? or we should only fit the first byte
-                    //  in dgram[16] if data.Lenght is equal to 1?
                     dgram[data_start] = (byte)(dgram[data_start] | data[0]);
                 }
                 else
                 {
                     dgram[data_start + 1] = data[0];
                 }
-                if (data.Length > 1)
+            }
+            else if (data.Length > 1)
+            {
+                for (int i = 0; i < data.Length; i++)
                 {
-                    int i = data[0] < 0x3F ? 0 : 1;
-                    for (; i < data.Length - 1; i++)
-                    {
-                        dgram[data_start + 1 + i] = data[i + 1];
-                    }
+                    dgram[data_start + 1 + i] = data[i];
                 }
             }
         }

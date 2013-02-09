@@ -49,6 +49,7 @@ namespace KNXLib
         internal void Start()
         {
             ReceiverThread = new Thread(this.ReceiverThreadFlow);
+            ReceiverThread.IsBackground = true;
             ReceiverThread.Start();
         }
         internal void Stop()
