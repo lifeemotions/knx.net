@@ -282,6 +282,10 @@ namespace KNXLib
                 {
                     return 1;
                 }
+                else if (data[0] < 0x3F)
+                {
+                    return data.Length;
+                }
                 else
                 {
                     return data.Length + 1;
@@ -304,9 +308,21 @@ namespace KNXLib
             }
             else if (data.Length > 1)
             {
-                for (int i = 0; i < data.Length; i++)
+                if (data[0] < 0x3F)
                 {
-                    dgram[data_start + 1 + i] = data[i];
+                    dgram[data_start] = (byte)(dgram[data_start] | data[0]);
+
+                    for (int i = 1; i < data.Length; i++)
+                    {
+                        dgram[data_start + i] = data[i];
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        dgram[data_start + 1 + i] = data[i];
+                    }
                 }
             }
         }

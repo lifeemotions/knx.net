@@ -39,7 +39,7 @@ namespace KNXLib.DPT
         public override byte[] toDPT(object val)
         {
             float value = (float)val;
-            byte[] dst = new byte[2];
+            byte[] dst = new byte[3];
             if (value < -273 || value > +670760)
                 return null;
 
@@ -54,8 +54,9 @@ namespace KNXLib.DPT
             short msb = (short)(e << 3 | m >> 8);
             if (value < 0.0f)
                 msb |= 0x80;
-            dst[0] = (byte)msb;
-            dst[1] = (byte)m;
+            dst[0] = 0x00;
+            dst[1] = (byte)msb;
+            dst[2] = (byte)m;
 
             return dst;
         }
