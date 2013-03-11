@@ -63,7 +63,7 @@ namespace KNXLib.DPT
 
         public override byte[] toDPT(String value)
         {
-            return toDPT(float.Parse(value));
+            return toDPT(float.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
         }
     }
 }
