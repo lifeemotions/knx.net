@@ -11,11 +11,12 @@ namespace KNXLib
     internal class KNXSenderRouting : KNXSender
     {
         #region constructor
-        internal KNXSenderRouting(KNXConnectionRouting connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
+        internal KNXSenderRouting(KNXConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint, IPEndPoint remoteEndpoint)
             : base(connection)
         {
+            this.LocalEndpoint = localEndpoint;
             this.RemoteEndpoint = remoteEndpoint;
-            this.UdpClient = udpClient;
+            this.UdpClients = udpClients;
         }
         #endregion
 
@@ -33,16 +34,29 @@ namespace KNXLib
             }
         }
 
-        private UdpClient _udpClient;
-        private UdpClient UdpClient
+        private IPEndPoint _localEndpoint;
+        private IPEndPoint LocalEndpoint
         {
             get
             {
-                return this._udpClient;
+                return this._localEndpoint;
             }
             set
             {
-                this._udpClient = value;
+                this._localEndpoint = value;
+            }
+        }
+
+        private IList<UdpClient> _udpClients;
+        private IList<UdpClient> UdpClients
+        {
+            get
+            {
+                return this._udpClients;
+            }
+            set
+            {
+                this._udpClients = value;
             }
         }
         #endregion
@@ -50,7 +64,10 @@ namespace KNXLib
         #region send
         internal override void SendData(byte[] dgram)
         {
-            UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            foreach (UdpClient client in this.UdpClients)
+            {
+                client.Send(dgram, dgram.Length, RemoteEndpoint);
+            }
         }
         #endregion
 

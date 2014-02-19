@@ -11,10 +11,11 @@ namespace KNXLib
     internal class KNXReceiverRouting : KNXReceiver
     {
         #region constructor
-        internal KNXReceiverRouting(KNXConnectionRouting connection, UdpClient udpClient, IPEndPoint localEndpoint) : base (connection)
+        internal KNXReceiverRouting(KNXConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint)
+            : base(connection)
         {
             this.LocalEndpoint = localEndpoint;
-            this.UdpClient = udpClient;
+            this.UdpClients = udpClients;
         }
         #endregion
 
@@ -32,16 +33,16 @@ namespace KNXLib
             }
         }
 
-        private UdpClient _udpClient;
-        private UdpClient UdpClient
+        private IList<UdpClient> _udpClients;
+        private IList<UdpClient> UdpClients
         {
             get
             {
-                return this._udpClient;
+                return this._udpClients;
             }
             set
             {
-                this._udpClient = value;
+                this._udpClients = value;
             }
         }
         #endregion
@@ -51,11 +52,18 @@ namespace KNXLib
         {
             try
             {
-                byte[] dgram;
+                foreach (UdpClient client in this.UdpClients)
+                {
+                    client.BeginReceive(OnReceive, new object[] { client, client.Client.LocalEndPoint });
+                }
+                //byte[] dgram;
                 while (true)
                 {
-                    dgram = UdpClient.Receive(ref this._localEndpoint);
-                    ProcessDatagram(dgram);
+                    // just wait to be aborted
+                    Thread.Sleep(60000);
+
+                    //dgram = UdpClient.Receive(ref this._localEndpoint);
+                    //ProcessDatagram(dgram);
                 }
             }
             catch (ThreadAbortException)
@@ -64,6 +72,23 @@ namespace KNXLib
         }
         #endregion
 
+        #region Async receive
+
+        private void OnReceive(IAsyncResult result)
+        {
+            IPEndPoint ep = null;
+            var args = (object[])result.AsyncState;
+            var session = (UdpClient)args[0];
+            var local = (IPEndPoint)args[1];
+
+            byte[] dgram = session.EndReceive(result, ref ep);
+            ProcessDatagram(dgram);
+
+            //We make the next call to the begin receive
+            session.BeginReceive(OnReceive, args);
+        }
+
+        #endregion
 
         #region datagram processing
         internal override void ProcessDatagram(byte[] dgram)

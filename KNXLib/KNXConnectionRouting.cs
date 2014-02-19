@@ -26,28 +26,31 @@ namespace KNXLib
         {
         }
 
-        public KNXConnectionRouting(String host, int port) : base(host, port)
+        public KNXConnectionRouting(String host, int port)
+            : base(host, port)
         {
             RemoteEndpoint = new IPEndPoint(IP, port);
-            LocalEndpoint = new IPEndPoint(IPAddress.Any, 0);
+            LocalEndpoint = new IPEndPoint(IPAddress.Any, port);
+            Initialize();
         }
 
         private void Initialize()
         {
+            this.UdpClients = new List<UdpClient>();
         }
         #endregion
 
         #region variables
-        private UdpClient _udpClient;
-        private UdpClient UdpClient
+        private IList<UdpClient> _udpClients;
+        private IList<UdpClient> UdpClients
         {
             get
             {
-                return this._udpClient;
+                return this._udpClients;
             }
             set
             {
-                this._udpClient = value;
+                this._udpClients = value;
             }
         }
 
@@ -84,18 +87,25 @@ namespace KNXLib
         {
             try
             {
-                UdpClient = new UdpClient(base.Port);
-                UdpClient.JoinMulticastGroup(IP);
+
+                foreach (IPAddress localIp in Dns.GetHostAddresses(Dns.GetHostName()).Where(i => i.AddressFamily == AddressFamily.InterNetwork))
+                {
+                    IPAddress ipToUse = localIp;
+
+                    UdpClient client = new UdpClient(new IPEndPoint(ipToUse, this.LocalEndpoint.Port));
+                    this.UdpClients.Add(client);
+                    client.JoinMulticastGroup(IP, ipToUse);
+                }
             }
             catch (SocketException)
             {
                 throw new ConnectionErrorException(this.Host, this.Port);
             }
 
-            KNXReceiver = new KNXReceiverRouting(this, UdpClient, LocalEndpoint);
+            KNXReceiver = new KNXReceiverRouting(this, this.UdpClients, LocalEndpoint);
             KNXReceiver.Start();
 
-            KNXSender = new KNXSenderRouting(this, UdpClient, RemoteEndpoint);
+            KNXSender = new KNXSenderRouting(this, this.UdpClients, LocalEndpoint, RemoteEndpoint);
 
             base.Connected();
         }
@@ -103,8 +113,11 @@ namespace KNXLib
         public override void Disconnect()
         {
             this.KNXReceiver.Stop();
-            this.UdpClient.DropMulticastGroup(IP);
-            this.UdpClient.Close();
+            foreach (UdpClient client in this.UdpClients)
+            {
+                client.DropMulticastGroup(IP);
+                client.Close();
+            }
         }
 
         #endregion
