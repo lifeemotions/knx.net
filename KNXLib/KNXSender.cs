@@ -157,7 +157,14 @@ namespace KNXLib
         protected byte[] CreateRequestStatusDatagramCommon(string destination_address, byte[] dgram, int cemi_start_pos)
         {
             int i = 0;
-            dgram[cemi_start_pos + i++] = 0x11;
+            if (this._connection.ActionMessageCode != 0x00)
+            {
+                dgram[cemi_start_pos + i++] = this._connection.ActionMessageCode;
+            }
+            else
+            {
+                dgram[cemi_start_pos + i++] = 0x11;
+            }
             dgram[cemi_start_pos + i++] = 0x00;
             dgram[cemi_start_pos + i++] = 0xAC;
             if (KNXHelper.IsAddressIndividual(destination_address))
