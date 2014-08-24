@@ -1,7 +1,5 @@
 # KNX.net
 
-=======
-
 KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
 
 This API allows to connect in both modes:
@@ -15,7 +13,7 @@ The following datapoints are available in the API:
 * byte (dimmers, temperature difference, RGB)
 * 9.001 (temperatures)
 
-There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from www.openremote.org Knowlodge Base.
+There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from [OpenRemote](http://www.openremote.org) Knowlodge Base.
 
 # Examples
 
@@ -24,9 +22,9 @@ There may be some bugs on the implementation as I don't have access to KNX docum
 ```csharp
 static void Main(string[] args)
 {
-  var connection = new KNXLib.KNXConnectionRouting();
+  var connection = new KNXConnectionRouting();
   connection.Connect();
-  connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
+  connection.KNXEventDelegate += new KNXConnection.KNXEvent(Event);
   connection.Action("5/0/2", false);
   Thread.Sleep(5000);
   connection.Action("5/0/2", true);
@@ -57,5 +55,5 @@ float temp = (float)connection.fromDPT("9.001", state);
 The only difference is how the connection object is created
 
 ```csharp
-connection = new KNXLib.KNXConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671);
+connection = new KNXConnectionTunneling(remoteIP, remotePort, localIP, localPort);
 ```
