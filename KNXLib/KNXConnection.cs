@@ -290,7 +290,7 @@ namespace KNXLib
         }
         private void SendUnlockPauseThread()
         {
-            Thread.Sleep(150);
+            Thread.Sleep(200);
             _lockSend.Release();
         }
         #endregion

@@ -54,20 +54,22 @@ namespace KNXLib
             {
                 foreach (UdpClient client in this.UdpClients)
                 {
-                    client.BeginReceive(OnReceive, new object[] { client, client.Client.LocalEndPoint });
+                    client.BeginReceive(OnReceive, new object[] {client, client.Client.LocalEndPoint});
                 }
                 //byte[] dgram;
                 while (true)
                 {
                     // just wait to be aborted
                     Thread.Sleep(60000);
-
-                    //dgram = UdpClient.Receive(ref this._localEndpoint);
-                    //ProcessDatagram(dgram);
                 }
             }
             catch (ThreadAbortException)
             {
+                Thread.ResetAbort();
+            }
+            catch (Exception)
+            {
+                // ignore exception and exit
             }
         }
         #endregion
@@ -81,11 +83,18 @@ namespace KNXLib
             var session = (UdpClient)args[0];
             var local = (IPEndPoint)args[1];
 
-            byte[] dgram = session.EndReceive(result, ref ep);
-            ProcessDatagram(dgram);
+            try
+            {
+                byte[] dgram = session.EndReceive(result, ref ep);
+                ProcessDatagram(dgram);
 
-            //We make the next call to the begin receive
-            session.BeginReceive(OnReceive, args);
+                //We make the next call to the begin receive
+                session.BeginReceive(OnReceive, args);
+            }
+            catch (ObjectDisposedException)
+            {
+                // ignore and exit, session was disposed
+            }
         }
 
         #endregion
