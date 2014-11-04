@@ -12,14 +12,12 @@ namespace KNXTest
         private static KNXLib.KNXConnection connection = null;
         static void Main(string[] args)
         {
-            connection = new KNXLib.KNXConnectionRouting();
-            connection.Debug = false;
-            connection.ActionMessageCode = 0x29;
+            connection = new KNXLib.KNXConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
             connection.Connect();
-            connection.KNXConnectedDelegate += new KNXLib.KNXConnection.KNXConnected(Connected);
-            connection.KNXDisconnectedDelegate += new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
-            connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
-            connection.KNXStatusDelegate += new KNXLib.KNXConnection.KNXStatus(Status);
+            connection.KNXConnectedDelegate += Connected;
+            connection.KNXDisconnectedDelegate += Disconnected;
+            connection.KNXEventDelegate += Event;
+            connection.KNXStatusDelegate += Status;
 
             //// LIGHT ON/OFF
             Console.WriteLine("Press [ENTER] to send command (5/0/2) - false");
