@@ -73,7 +73,7 @@ namespace KNXLib
         #region datagram processing
         internal abstract void ProcessDatagram(byte[] dgram);
 
-        internal void ProcessCEMI(KNXDatagram datagram, byte[] cemi)
+        internal void ProcessCEMI(KnxDatagram datagram, byte[] cemi)
         {
             try
             {

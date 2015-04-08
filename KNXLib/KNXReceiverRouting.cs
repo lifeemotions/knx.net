@@ -115,7 +115,7 @@ namespace KNXLib
         private void ProcessDatagramHeaders(byte[] dgram)
         {
             // HEADER
-            KNXDatagram datagram = new KNXDatagram();
+            KnxDatagram datagram = new KnxDatagram();
             datagram.header_length = (int)dgram[0];
             datagram.protocol_version = dgram[1];
             datagram.service_type = new byte[] { dgram[2], dgram[3] };
