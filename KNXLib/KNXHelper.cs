@@ -96,7 +96,7 @@ namespace KNXLib
                     // individual address
                     parts = address.Split('.');
                     if (parts.Length != 3 || parts[0].Length > 2 || parts[1].Length > 2 || parts[2].Length > 3)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace KNXLib
                     if (parts.Length != 3 || parts[0].Length > 2 || parts[1].Length > 1 || parts[2].Length > 3)
                     {
                         if (parts.Length != 2 || parts[0].Length > 2 || parts[1].Length > 4)
-                            throw new InvalidKNXAddressException(address);
+                            throw new InvalidKnxAddressException(address);
                         else
                             threeLevelAddressing = false;
                     }
@@ -115,14 +115,14 @@ namespace KNXLib
                 {
                     int part = int.Parse(parts[0]);
                     if (part > 15)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     addr[0] = (byte)(part << 3);
                     part = int.Parse(parts[1]);
                     if (part > 2047)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     byte[] part2 = BitConverter.GetBytes(part);
                     if (part2.Length > 2)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     addr[0] = (byte)(addr[0] | part2[0]);
                     addr[1] = (byte)part2[1];
                 }
@@ -130,18 +130,18 @@ namespace KNXLib
                 {
                     int part = int.Parse(parts[0]);
                     if (part > 15)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     if (group)
                         addr[0] = (byte)(part << 3);
                     else
                         addr[0] = (byte)(part << 4);
                     part = int.Parse(parts[1]);
                     if ((group && part > 7) || (!group && part > 15))
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     addr[0] = (byte)(addr[0] | part);
                     part = int.Parse(parts[2]);
                     if (part > 255)
-                        throw new InvalidKNXAddressException(address);
+                        throw new InvalidKnxAddressException(address);
                     addr[1] = (byte)part;
                 }
 
@@ -149,7 +149,7 @@ namespace KNXLib
             }
             catch (Exception)
             {
-                throw new InvalidKNXAddressException(address);
+                throw new InvalidKnxAddressException(address);
             }
         }
         #endregion

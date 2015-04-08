@@ -306,11 +306,11 @@ namespace KNXLib
             }
             catch (Exception)
             {
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
             }
 
             if (val == null)
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
@@ -335,11 +335,11 @@ namespace KNXLib
             }
             catch (Exception)
             {
-                throw new InvalidKNXDataException(data);
+                throw new InvalidKnxDataException(data);
             }
 
             if (val == null)
-                throw new InvalidKNXDataException(data);
+                throw new InvalidKnxDataException(data);
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
@@ -369,10 +369,10 @@ namespace KNXLib
                 val[1] = (byte)(data >> 8);
             }
             else // allowing only positive integers less than 65535 (2 bytes), maybe it is incorrect...???
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
 
             if (val == null)
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
 
             if (Debug)
                 Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");

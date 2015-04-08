@@ -47,10 +47,10 @@
     <Compile Include="KNXReceiverTunneling.cs" />
     <Compile Include="KNXConnectionTunneling.cs" />
     <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
-    <Compile Include="Exceptions\InvalidKNXDataException.cs" />
+    <Compile Include="Exceptions\InvalidKnxDataException.cs" />
     <Compile Include="KNXSenderRouting.cs" />
     <Compile Include="Exceptions\ConnectionErrorException.cs" />
-    <Compile Include="Exceptions\InvalidKNXAddressException.cs" />
+    <Compile Include="Exceptions\InvalidKnxAddressException.cs" />
     <Compile Include="Exceptions\InvalidHostException.cs" />
     <Compile Include="KNXSender.cs" />
     <Compile Include="KNXReceiverRouting.cs" />
