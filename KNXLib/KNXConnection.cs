@@ -70,7 +70,7 @@ namespace KNXLib
 
         internal IPAddress IpAddress { get; set; }
 
-        internal KNXReceiver KnxReceiver { get; set; }
+        internal KnxReceiver KnxReceiver { get; set; }
 
         internal KNXSender KnxSender { get; set; }
 

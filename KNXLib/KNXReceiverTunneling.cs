@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXReceiverTunneling : KNXReceiver
+    internal class KNXReceiverTunneling : KnxReceiver
     {
         #region constructor
         internal KNXReceiverTunneling(KnxConnectionTunneling connection, UdpClient udpClient, IPEndPoint localEndpoint)
@@ -50,11 +50,11 @@ namespace KNXLib
         {
             get
             {
-                return (KnxConnectionTunneling)base.KNXConnection;
+                return (KnxConnectionTunneling)base.KnxConnection;
             }
             set
             {
-                base.KNXConnection = value;
+                base.KnxConnection = value;
             }
         }
 
@@ -86,7 +86,7 @@ namespace KNXLib
         #endregion
 
         #region thread
-        internal override void ReceiverThreadFlow()
+        public override void ReceiverThreadFlow()
         {
             try
             {
@@ -113,26 +113,26 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal override void ProcessDatagram(byte[] dgram)
+        public override void ProcessDatagram(byte[] datagram)
         {
             try
             {
-                switch (KnxHelper.GetServiceType(dgram))
+                switch (KnxHelper.GetServiceType(datagram))
                 {
                     case KnxHelper.SERVICE_TYPE.CONNECT_RESPONSE:
-                        ProcessConnectResponse(dgram);
+                        ProcessConnectResponse(datagram);
                         break;
                     case KnxHelper.SERVICE_TYPE.CONNECTIONSTATE_RESPONSE:
-                        ProcessConnectionStateResponse(dgram);
+                        ProcessConnectionStateResponse(datagram);
                         break;
                     case KnxHelper.SERVICE_TYPE.TUNNELLING_ACK:
-                        ProcessTunnelingAck(dgram);
+                        ProcessTunnelingAck(datagram);
                         break;
                     case KnxHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
-                        ProcessDisconnectRequest(dgram);
+                        ProcessDisconnectRequest(datagram);
                         break;
                     case KnxHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
-                        ProcessDatagramHeaders(dgram);
+                        ProcessDatagramHeaders(datagram);
                         break;
                 }
             }
@@ -192,7 +192,7 @@ namespace KNXLib
                 return;
 
             this.Stop();
-            this.KNXConnection.Disconnected();
+            this.KnxConnection.Disconnected();
             this.UdpClient.Close();
         }
         private void ProcessTunnelingAck(byte[] dgram)
@@ -214,11 +214,11 @@ namespace KNXLib
 
             if (response == 0x21)
             {
-                if (KNXConnection.Debug)
+                if (KnxConnection.Debug)
                 {
                     Console.WriteLine("KNXReceiverTunneling: Received connection state response - No active connection with channel ID " + datagram.channel_id);
                 }
-                this.KNXConnection.Disconnect();
+                this.KnxConnection.Disconnect();
             }
         }
         private void ProcessConnectResponse(byte[] dgram)
@@ -235,7 +235,7 @@ namespace KNXLib
 
             if (datagram.channel_id == 0x00 && datagram.status == 0x24)
             {
-                if (KNXConnection.Debug)
+                if (KnxConnection.Debug)
                 {
                     Console.WriteLine("KNXReceiverTunneling: Received connect response - No more connections available");
                 }

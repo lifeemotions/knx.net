@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXReceiverRouting : KNXReceiver
+    internal class KNXReceiverRouting : KnxReceiver
     {
         #region constructor
         internal KNXReceiverRouting(KnxConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint)
@@ -48,7 +48,7 @@ namespace KNXLib
         #endregion
 
         #region thread
-        internal override void ReceiverThreadFlow()
+        public override void ReceiverThreadFlow()
         {
             try
             {
@@ -100,11 +100,11 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal override void ProcessDatagram(byte[] dgram)
+        public override void ProcessDatagram(byte[] datagram)
         {
             try
             {
-                ProcessDatagramHeaders(dgram);
+                ProcessDatagramHeaders(datagram);
             }
             catch (Exception)
             {
