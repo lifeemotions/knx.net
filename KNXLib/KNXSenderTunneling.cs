@@ -98,7 +98,7 @@ namespace KNXLib
             {
                 try
                 {
-                    int data_length = KNXHelper.GetDataLength(data);
+                    int data_length = KnxHelper.GetDataLength(data);
                     // HEADER
                     byte[] dgram = new byte[10];
                     dgram[00] = 0x06;

@@ -147,14 +147,14 @@ namespace KNXLib
                 }
                 datagram.control_field_1 = cemi[2 + datagram.aditional_info_length];
                 datagram.control_field_2 = cemi[3 + datagram.aditional_info_length];
-                datagram.source_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
-                if (KNXHelper.GetKNXDestinationAddressType(datagram.control_field_2).Equals(KNXHelper.KNXDestinationAddressType.INDIVIDUAL))
+                datagram.source_address = KnxHelper.GetIndividualAddress(new byte[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
+                if (KnxHelper.GetKnxDestinationAddressType(datagram.control_field_2).Equals(KnxHelper.KnxDestinationAddressType.INDIVIDUAL))
                 {
-                    datagram.destination_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] });
+                    datagram.destination_address = KnxHelper.GetIndividualAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] });
                 }
                 else
                 {
-                    datagram.destination_address = KNXHelper.GetGroupAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KNXConnection.ThreeLevelGroupAddressing);
+                    datagram.destination_address = KnxHelper.GetGroupAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KNXConnection.ThreeLevelGroupAddressing);
                 }
 
                 datagram.data_length = (int)cemi[8 + datagram.aditional_info_length];
@@ -163,7 +163,7 @@ namespace KNXLib
                 {
                     datagram.apdu[i] = cemi[9 + i + datagram.aditional_info_length];
                 }
-                datagram.data = KNXHelper.GetData(datagram.data_length, datagram.apdu);
+                datagram.data = KnxHelper.GetData(datagram.data_length, datagram.apdu);
 
                 if (KNXConnection.Debug)
                 {

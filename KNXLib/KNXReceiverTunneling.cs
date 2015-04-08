@@ -117,21 +117,21 @@ namespace KNXLib
         {
             try
             {
-                switch (KNXHelper.GetServiceType(dgram))
+                switch (KnxHelper.GetServiceType(dgram))
                 {
-                    case KNXHelper.SERVICE_TYPE.CONNECT_RESPONSE:
+                    case KnxHelper.SERVICE_TYPE.CONNECT_RESPONSE:
                         ProcessConnectResponse(dgram);
                         break;
-                    case KNXHelper.SERVICE_TYPE.CONNECTIONSTATE_RESPONSE:
+                    case KnxHelper.SERVICE_TYPE.CONNECTIONSTATE_RESPONSE:
                         ProcessConnectionStateResponse(dgram);
                         break;
-                    case KNXHelper.SERVICE_TYPE.TUNNELLING_ACK:
+                    case KnxHelper.SERVICE_TYPE.TUNNELLING_ACK:
                         ProcessTunnelingAck(dgram);
                         break;
-                    case KNXHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
+                    case KnxHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
                         ProcessDisconnectRequest(dgram);
                         break;
-                    case KNXHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
+                    case KnxHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
                         ProcessDatagramHeaders(dgram);
                         break;
                 }

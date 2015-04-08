@@ -74,7 +74,7 @@ namespace KNXLib
         #region datagram processing
         internal override byte[] CreateActionDatagram(string destination_address, byte[] data)
         {
-            int data_length = KNXHelper.GetDataLength(data);
+            int data_length = KnxHelper.GetDataLength(data);
             // HEADER
             byte[] dgram = new byte[6];
             dgram[0] = 0x06;

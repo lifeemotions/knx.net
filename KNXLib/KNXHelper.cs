@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    internal class KNXHelper
+    internal class KnxHelper
     {
         #region Address Processing
         //           +-----------------------------------------------+
@@ -40,22 +38,25 @@ namespace KNXLib
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //           |  | Main Grp  |            Sub Group           |
         //           +--+--------------------+-----------------------+
-        internal static bool IsAddressIndividual(string address)
+        public static bool IsAddressIndividual(string address)
         {
             return address.Contains('.');
         }
-        internal static string GetIndividualAddress(byte[] addr)
+
+        public static string GetIndividualAddress(byte[] addr)
         {
             return GetAddress(addr, '.', false);
         }
-        internal static string GetGroupAddress(byte[] addr, bool threeLevelAddressing)
+
+        public static string GetGroupAddress(byte[] addr, bool threeLevelAddressing)
         {
             return GetAddress(addr, '/', threeLevelAddressing);
         }
+
         private static string GetAddress(byte[] addr, char separator, bool threeLevelAddressing)
         {
-            bool group = separator.Equals('/');
-            string address = string.Empty;
+            var group = separator.Equals('/');
+            string address;
 
             if (group && !threeLevelAddressing)
             {
@@ -67,15 +68,17 @@ namespace KNXLib
             else
             {
                 // 3 level individual or group
-                if (group)
-                    address = ((addr[0] & 0x7F) >> 3).ToString();
-                else
-                    address = (addr[0] >> 4).ToString();
+                address = group
+                    ? ((addr[0] & 0x7F) >> 3).ToString()
+                    : (addr[0] >> 4).ToString();
+
                 address += separator;
+
                 if (group)
                     address += (addr[0] & 0x07).ToString();
                 else
                     address += (addr[0] & 0x0F).ToString();
+
                 address += separator;
                 address += addr[1].ToString();
             }
@@ -83,14 +86,15 @@ namespace KNXLib
             return address;
         }
 
-        internal static byte[] GetAddress(string address)
+        public static byte[] GetAddress(string address)
         {
             try
             {
-                byte[] addr = new byte[2];
-                bool threeLevelAddressing = true;
-                string[] parts = null;
-                bool group = address.Contains('/');
+                var addr = new byte[2];
+                var threeLevelAddressing = true;
+                string[] parts;
+                var group = address.Contains('/');
+
                 if (!group)
                 {
                     // individual address
@@ -106,42 +110,48 @@ namespace KNXLib
                     {
                         if (parts.Length != 2 || parts[0].Length > 2 || parts[1].Length > 4)
                             throw new InvalidKnxAddressException(address);
-                        else
-                            threeLevelAddressing = false;
-                    }
 
+                        threeLevelAddressing = false;
+                    }
                 }
+
                 if (!threeLevelAddressing)
                 {
-                    int part = int.Parse(parts[0]);
+                    var part = int.Parse(parts[0]);
                     if (part > 15)
                         throw new InvalidKnxAddressException(address);
+
                     addr[0] = (byte)(part << 3);
                     part = int.Parse(parts[1]);
                     if (part > 2047)
                         throw new InvalidKnxAddressException(address);
-                    byte[] part2 = BitConverter.GetBytes(part);
+
+                    var part2 = BitConverter.GetBytes(part);
                     if (part2.Length > 2)
                         throw new InvalidKnxAddressException(address);
+
                     addr[0] = (byte)(addr[0] | part2[0]);
-                    addr[1] = (byte)part2[1];
+                    addr[1] = part2[1];
                 }
                 else
                 {
-                    int part = int.Parse(parts[0]);
+                    var part = int.Parse(parts[0]);
                     if (part > 15)
                         throw new InvalidKnxAddressException(address);
-                    if (group)
-                        addr[0] = (byte)(part << 3);
-                    else
-                        addr[0] = (byte)(part << 4);
+
+                    addr[0] = group
+                        ? (byte)(part << 3)
+                        : (byte)(part << 4);
+
                     part = int.Parse(parts[1]);
                     if ((group && part > 7) || (!group && part > 15))
                         throw new InvalidKnxAddressException(address);
+
                     addr[0] = (byte)(addr[0] | part);
                     part = int.Parse(parts[2]);
                     if (part > 255)
                         throw new InvalidKnxAddressException(address);
+
                     addr[1] = (byte)part;
                 }
 
@@ -201,17 +211,19 @@ namespace KNXLib
         //  ------+---------------------------------------------------------------
         //   3-0  | Extended Frame Format - 0x0 standard frame
         //  ------+---------------------------------------------------------------
-        internal enum KNXDestinationAddressType
+        public enum KnxDestinationAddressType
         {
             INDIVIDUAL = 0,
             GROUP = 1
         }
-        internal static KNXDestinationAddressType GetKNXDestinationAddressType(byte control_field_2)
+
+        public static KnxDestinationAddressType GetKnxDestinationAddressType(byte control_field_2)
         {
-            if ((0x80 & control_field_2) != 0)
-                return KNXDestinationAddressType.GROUP;
-            return KNXDestinationAddressType.INDIVIDUAL;
+            return (0x80 & control_field_2) != 0
+                ? KnxDestinationAddressType.GROUP
+                : KnxDestinationAddressType.INDIVIDUAL;
         }
+
         #endregion
 
         #region Data Processing
@@ -250,78 +262,68 @@ namespace KNXLib
         // +--------+--------+--------+--------+--------+--------+--------+--------++--------+----....
         // +                            B  Y  T  E    2                            ||       B Y T E  3
         // +-----------------------------------------------------------------------++-------------....
-        internal static string GetData(int data_length, byte[] apdu)
+        public static string GetData(int data_length, byte[] apdu)
         {
-            if (data_length == 0)
+            switch (data_length)
             {
-                return string.Empty;
-            }
-            if (data_length == 1)
-            {
-                return System.Convert.ToChar(0x3F & apdu[1]).ToString();
-            }
-            else if (data_length == 2)
-            {
-                return System.Convert.ToChar(apdu[2]).ToString();
-            }
-            else
-            {
-                string data = string.Empty;
-                for (int i = 2; i < apdu.Length; i++)
-                {
-                    data += System.Convert.ToChar(apdu[i]);
-                }
-                return data;
+                case 0:
+                    return string.Empty;
+                case 1:
+                    return Convert.ToChar(0x3F & apdu[1]).ToString();
+                case 2:
+                    return Convert.ToChar(apdu[2]).ToString();
+                default:
+                    var data = string.Empty;
+                    for (var i = 2; i < apdu.Length; i++)
+                        data += Convert.ToChar(apdu[i]);
+
+                    return data;
             }
         }
-        internal static int GetDataLength(byte[] data)
+
+        public static int GetDataLength(byte[] data)
         {
-            if (data.Length > 0)
-            {
-                if (data.Length == 1 && data[0] < 0x3F)
-                {
-                    return 1;
-                }
-                else if (data[0] < 0x3F)
-                {
-                    return data.Length;
-                }
-                else
-                {
-                    return data.Length + 1;
-                }
-            }
-            return 0;
+            if (data.Length <= 0)
+                return 0;
+
+            if (data.Length == 1 && data[0] < 0x3F)
+                return 1;
+
+            if (data[0] < 0x3F)
+                return data.Length;
+
+            return data.Length + 1;
         }
-        internal static void WriteData(byte[] dgram, byte[] data, int data_start)
+
+        public static void WriteData(byte[] datagram, byte[] data, int data_start)
         {
             if (data.Length == 1)
             {
                 if (data[0] < 0x3F)
                 {
-                    dgram[data_start] = (byte)(dgram[data_start] | data[0]);
+                    datagram[data_start] = (byte)(datagram[data_start] | data[0]);
                 }
                 else
                 {
-                    dgram[data_start + 1] = data[0];
+                    datagram[data_start + 1] = data[0];
                 }
             }
             else if (data.Length > 1)
             {
                 if (data[0] < 0x3F)
                 {
-                    dgram[data_start] = (byte)(dgram[data_start] | data[0]);
+                    datagram[data_start] = (byte)(datagram[data_start] | data[0]);
 
-                    for (int i = 1; i < data.Length; i++)
+                    for (var i = 1; i < data.Length; i++)
                     {
-                        dgram[data_start + i] = data[i];
+                        datagram[data_start + i] = data[i];
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < data.Length; i++)
+                    for (var i = 0; i < data.Length; i++)
                     {
-                        dgram[data_start + 1 + i] = data[i];
+                        datagram[data_start + 1 + i] = data[i];
                     }
                 }
             }
@@ -367,13 +369,14 @@ namespace KNXLib
             // UNKNOWN
             UNKNOWN
         }
-        public static SERVICE_TYPE GetServiceType(byte[] dgram)
+
+        public static SERVICE_TYPE GetServiceType(byte[] datagram)
         {
-            switch (dgram[2])
+            switch (datagram[2])
             {
                 case (0x02):
                     {
-                        switch (dgram[3])
+                        switch (datagram[3])
                         {
                             case (0x06):
                                 return SERVICE_TYPE.CONNECT_RESPONSE;
@@ -386,7 +389,7 @@ namespace KNXLib
                     break;
                 case (0x04):
                     {
-                        switch (dgram[3])
+                        switch (datagram[3])
                         {
                             case (0x20):
                                 return SERVICE_TYPE.TUNNELLING_REQUEST;
@@ -398,10 +401,12 @@ namespace KNXLib
             }
             return SERVICE_TYPE.UNKNOWN;
         }
-        public static int GetChannelID(byte[] dgram)
+
+        public static int GetChannelId(byte[] datagram)
         {
-            if (dgram.Length > 6)
-                return dgram[6];
+            if (datagram.Length > 6)
+                return datagram[6];
+
             return -1;
         }
 

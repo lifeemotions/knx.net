@@ -57,7 +57,7 @@
     <Compile Include="KnxConnectionRouting.cs" />
     <Compile Include="KnxConnection.cs" />
     <Compile Include="KnxDatagram.cs" />
-    <Compile Include="KNXHelper.cs" />
+    <Compile Include="KnxHelper.cs" />
     <Compile Include="KNXReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

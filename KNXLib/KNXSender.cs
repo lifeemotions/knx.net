@@ -52,7 +52,7 @@ namespace KNXLib
         protected byte[] CreateActionDatagramCommon(string destination_address, byte[] data, byte[] header)
         {
             int i = 0;
-            int data_length = KNXHelper.GetDataLength(data);
+            int data_length = KnxHelper.GetDataLength(data);
             // HEADER
             byte[] dgram = new byte[data_length + 10 + header.Length];
             for (i = 0; i < header.Length; i++)
@@ -128,7 +128,7 @@ namespace KNXLib
             }
             dgram[i++] = 0x00;
             dgram[i++] = 0xAC;
-            if (KNXHelper.IsAddressIndividual(destination_address))
+            if (KnxHelper.IsAddressIndividual(destination_address))
             {
                 dgram[i++] = 0x50;
             }
@@ -138,13 +138,13 @@ namespace KNXLib
             }
             dgram[i++] = 0x00;
             dgram[i++] = 0x00;
-            byte[] dst_address = KNXHelper.GetAddress(destination_address);
+            byte[] dst_address = KnxHelper.GetAddress(destination_address);
             dgram[i++] = dst_address[0];
             dgram[i++] = dst_address[1];
             dgram[i++] = (byte)(data_length);
             dgram[i++] = 0x00;
             dgram[i] = 0x80;
-            KNXHelper.WriteData(dgram, data, i);
+            KnxHelper.WriteData(dgram, data, i);
 
             return dgram;
         }
@@ -167,7 +167,7 @@ namespace KNXLib
             }
             dgram[cemi_start_pos + i++] = 0x00;
             dgram[cemi_start_pos + i++] = 0xAC;
-            if (KNXHelper.IsAddressIndividual(destination_address))
+            if (KnxHelper.IsAddressIndividual(destination_address))
             {
                 dgram[cemi_start_pos + i++] = 0x50;
             }
@@ -177,7 +177,7 @@ namespace KNXLib
             }
             dgram[cemi_start_pos + i++] = 0x00;
             dgram[cemi_start_pos + i++] = 0x00;
-            byte[] dst_address = KNXHelper.GetAddress(destination_address);
+            byte[] dst_address = KnxHelper.GetAddress(destination_address);
             dgram[cemi_start_pos + i++] = dst_address[0];
             dgram[cemi_start_pos + i++] = dst_address[1];
 
