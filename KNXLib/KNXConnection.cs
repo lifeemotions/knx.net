@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using KNXLib.Exceptions;
 using System.Threading;
+using KNXLib.DPT;
 
 namespace KNXLib
 {
@@ -440,26 +441,24 @@ namespace KNXLib
         }
         #endregion
 
-        #region DPT
-        public object fromDPT(string type, byte[] data)
+        public object FromDPT(string type, string data)
         {
-            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+            return DPTTranslator.Instance.FromDPT(type, data);
         }
 
-        public object fromDPT(string type, String data)
+        public object FromDPT(string type, byte[] data)
         {
-            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+            return DPTTranslator.Instance.FromDPT(type, data);
         }
 
-        public byte[] toDPT(string type, object value)
+        public byte[] ToDPT(string type, string value)
         {
-            return DPT.DPTTranslator.Instance.toDPT(type, value);
+            return DPTTranslator.Instance.ToDPT(type, value);
         }
 
-        public byte[] toDPT(string type, String value)
+        public byte[] ToDPT(string type, object value)
         {
-            return DPT.DPTTranslator.Instance.toDPT(type, value);
+            return DPTTranslator.Instance.ToDPT(type, value);
         }
-        #endregion
     }
 }

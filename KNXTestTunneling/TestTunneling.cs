@@ -30,7 +30,7 @@ namespace KNXTest
         {
             if (address.Equals("1/2/1") || address.Equals("1/2/2"))
             {
-                Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + _connection.fromDPT("9.001", state));
+                Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + _connection.FromDPT("9.001", state));
             }
             else if (
                 address.Equals("1/2/3") ||
