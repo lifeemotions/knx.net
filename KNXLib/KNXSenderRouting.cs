@@ -11,7 +11,7 @@ namespace KNXLib
     internal class KNXSenderRouting : KNXSender
     {
         #region constructor
-        internal KNXSenderRouting(KNXConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint, IPEndPoint remoteEndpoint)
+        internal KNXSenderRouting(KnxConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint, IPEndPoint remoteEndpoint)
             : base(connection)
         {
             this.LocalEndpoint = localEndpoint;

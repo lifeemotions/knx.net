@@ -16,7 +16,7 @@ namespace KNXTest
 
         private static void Main()
         {
-            _connection = new KNXConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
+            _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
             _connection.KnxConnectedDelegate += Connected;
             _connection.KnxDisconnectedDelegate += Disconnected;
             _connection.KnxEventDelegate += Event;

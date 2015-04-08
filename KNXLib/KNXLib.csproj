@@ -54,7 +54,7 @@
     <Compile Include="Exceptions\InvalidHostException.cs" />
     <Compile Include="KNXSender.cs" />
     <Compile Include="KNXReceiverRouting.cs" />
-    <Compile Include="KNXConnectionRouting.cs" />
+    <Compile Include="KnxConnectionRouting.cs" />
     <Compile Include="KnxConnection.cs" />
     <Compile Include="KNXDatagram.cs" />
     <Compile Include="KNXHelper.cs" />
