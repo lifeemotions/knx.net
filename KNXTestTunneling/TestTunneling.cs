@@ -11,7 +11,7 @@ namespace KNXTest
 
         private static void Main()
         {
-            _connection = new KNXConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671) { Debug = false };
+            _connection = new KnxConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671) { Debug = false };
             _connection.KnxConnectedDelegate += Connected;
             _connection.KnxDisconnectedDelegate += Disconnected;
             _connection.KnxEventDelegate += Event;

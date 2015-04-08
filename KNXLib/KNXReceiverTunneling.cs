@@ -11,7 +11,7 @@ namespace KNXLib
     internal class KNXReceiverTunneling : KNXReceiver
     {
         #region constructor
-        internal KNXReceiverTunneling(KNXConnectionTunneling connection, UdpClient udpClient, IPEndPoint localEndpoint)
+        internal KNXReceiverTunneling(KnxConnectionTunneling connection, UdpClient udpClient, IPEndPoint localEndpoint)
             : base(connection)
         {
             this.LocalEndpoint = localEndpoint;
@@ -46,11 +46,11 @@ namespace KNXLib
                 this._udpClient = value;
             }
         }
-        internal KNXConnectionTunneling KNXConnectionTunneling
+        internal KnxConnectionTunneling KNXConnectionTunneling
         {
             get
             {
-                return (KNXConnectionTunneling)base.KNXConnection;
+                return (KnxConnectionTunneling)base.KNXConnection;
             }
             set
             {

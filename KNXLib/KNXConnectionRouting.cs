@@ -45,15 +45,14 @@ namespace KNXLib
                 var ipv4Addresses =
                     Dns
                     .GetHostAddresses(Dns.GetHostName())
-                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
+                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork)
+                    .ToList(); // TODO: I can probably leave the ToList off, there are no closures below either
 
                 foreach (var localIp in ipv4Addresses)
                 {
-                    var ipToUse = localIp;
-
-                    var client = new UdpClient(new IPEndPoint(ipToUse, LocalEndpoint.Port));
+                    var client = new UdpClient(new IPEndPoint(localIp, LocalEndpoint.Port));
                     UdpClients.Add(client);
-                    client.JoinMulticastGroup(IpAddress, ipToUse);
+                    client.JoinMulticastGroup(IpAddress, localIp);
                 }
             }
             catch (SocketException)
