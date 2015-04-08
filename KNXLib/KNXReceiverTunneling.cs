@@ -182,7 +182,7 @@ namespace KNXLib
 
                 base.ProcessCEMI(datagram, cemi);
             }
-            ((KNXSenderTunneling)KNXConnectionTunneling.KNXSender).SendTunnelingAck(seqN);
+            ((KNXSenderTunneling)KNXConnectionTunneling.KnxSender).SendTunnelingAck(seqN);
         }
 
         private void ProcessDisconnectRequest(byte[] dgram)

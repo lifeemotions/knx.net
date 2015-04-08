@@ -7,21 +7,21 @@ namespace KNXTest
 {
     public class TestTunneling
     {
-        private static KNXConnection _connection;
+        private static KnxConnection _connection;
 
         private static void Main()
         {
             _connection = new KNXConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671) { Debug = false };
-            _connection.KNXConnectedDelegate += Connected;
-            _connection.KNXDisconnectedDelegate += Disconnected;
-            _connection.KNXEventDelegate += Event;
-            _connection.KNXStatusDelegate += Status;
+            _connection.KnxConnectedDelegate += Connected;
+            _connection.KnxDisconnectedDelegate += Disconnected;
+            _connection.KnxEventDelegate += Event;
+            _connection.KnxStatusDelegate += Status;
             _connection.Connect();
 
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
 
-            _connection.KNXDisconnectedDelegate -= Disconnected;
+            _connection.KnxDisconnectedDelegate -= Disconnected;
             _connection.Disconnect();
             Environment.Exit(0);
         }

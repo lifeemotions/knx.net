@@ -11,15 +11,15 @@ namespace KNXLib
     internal abstract class KNXSender
     {
         #region constructor
-        internal KNXSender(KNXConnection connection)
+        internal KNXSender(KnxConnection connection)
         {
             this.KNXConnection = connection;
         }
         #endregion
 
         #region variables
-        private KNXConnection _connection;
-        internal KNXConnection KNXConnection
+        private KnxConnection _connection;
+        internal KnxConnection KNXConnection
         {
             get
             {

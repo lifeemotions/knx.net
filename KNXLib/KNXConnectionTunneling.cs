@@ -9,13 +9,13 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KNXConnectionTunneling : KNXConnection
+    public class KNXConnectionTunneling : KnxConnection
     {
         #region constructor
         public KNXConnectionTunneling(String remoteIP, int remotePort, string localIP, int localPort)
             : base(remoteIP, remotePort)
         {
-            RemoteEndpoint = new IPEndPoint(IP, remotePort);
+            RemoteEndpoint = new IPEndPoint(IpAddress, remotePort);
             LocalEndpoint = new IPEndPoint(IPAddress.Parse(localIP), localPort);
 
             Initialize();
@@ -148,18 +148,18 @@ namespace KNXLib
                 throw new ConnectionErrorException(this.Host, this.Port);
             }
 
-            if (KNXReceiver == null || KNXSender == null)
+            if (KnxReceiver == null || KnxSender == null)
             {
-                KNXReceiver = new KNXReceiverTunneling(this, this.UdpClient, LocalEndpoint);
-                KNXSender = new KNXSenderTunneling(this, this.UdpClient, RemoteEndpoint);
+                KnxReceiver = new KNXReceiverTunneling(this, this.UdpClient, LocalEndpoint);
+                KnxSender = new KNXSenderTunneling(this, this.UdpClient, RemoteEndpoint);
             }
             else
             {
-                ((KNXReceiverTunneling)KNXReceiver).UdpClient = this.UdpClient;
-                ((KNXSenderTunneling)KNXSender).UdpClient = this.UdpClient;
+                ((KNXReceiverTunneling)KnxReceiver).UdpClient = this.UdpClient;
+                ((KNXSenderTunneling)KnxSender).UdpClient = this.UdpClient;
             }
 
-            KNXReceiver.Start();
+            KnxReceiver.Start();
 
             try
             {
@@ -177,7 +177,7 @@ namespace KNXLib
             {
                 this.TerminateStateRequest();
                 this.DisconnectRequest();
-                this.KNXReceiver.Stop();
+                this.KnxReceiver.Stop();
                 this.UdpClient.Close();
             }
             catch (Exception)
@@ -222,7 +222,7 @@ namespace KNXLib
             dgram[24] = 0x02;
             dgram[25] = 0x00;
 
-            ((KNXSenderTunneling)this.KNXSender).SendDataSingle(dgram);
+            ((KNXSenderTunneling)this.KnxSender).SendDataSingle(dgram);
         }
         #endregion
 
@@ -278,7 +278,7 @@ namespace KNXLib
 
             try
             {
-                this.KNXSender.SendData(dgram);
+                this.KnxSender.SendData(dgram);
             }
             catch (Exception)
             {
@@ -310,7 +310,7 @@ namespace KNXLib
             dgram[14] = (byte)(this.LocalEndpoint.Port >> 8);
             dgram[15] = (byte)(this.LocalEndpoint.Port);
 
-            this.KNXSender.SendData(dgram);
+            this.KnxSender.SendData(dgram);
         }
         #endregion
     }

@@ -8,7 +8,7 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KNXConnectionRouting : KNXConnection
+    public class KNXConnectionRouting : KnxConnection
     {
         #region constructor
         public KNXConnectionRouting()
@@ -29,7 +29,7 @@ namespace KNXLib
         public KNXConnectionRouting(String host, int port)
             : base(host, port)
         {
-            RemoteEndpoint = new IPEndPoint(IP, port);
+            RemoteEndpoint = new IPEndPoint(IpAddress, port);
             LocalEndpoint = new IPEndPoint(IPAddress.Any, port);
             Initialize();
         }
@@ -94,7 +94,7 @@ namespace KNXLib
 
                     UdpClient client = new UdpClient(new IPEndPoint(ipToUse, this.LocalEndpoint.Port));
                     this.UdpClients.Add(client);
-                    client.JoinMulticastGroup(IP, ipToUse);
+                    client.JoinMulticastGroup(IpAddress, ipToUse);
                 }
             }
             catch (SocketException)
@@ -102,20 +102,20 @@ namespace KNXLib
                 throw new ConnectionErrorException(this.Host, this.Port);
             }
 
-            KNXReceiver = new KNXReceiverRouting(this, this.UdpClients, LocalEndpoint);
-            KNXReceiver.Start();
+            KnxReceiver = new KNXReceiverRouting(this, this.UdpClients, LocalEndpoint);
+            KnxReceiver.Start();
 
-            KNXSender = new KNXSenderRouting(this, this.UdpClients, LocalEndpoint, RemoteEndpoint);
+            KnxSender = new KNXSenderRouting(this, this.UdpClients, LocalEndpoint, RemoteEndpoint);
 
             base.Connected();
         }
 
         public override void Disconnect()
         {
-            this.KNXReceiver.Stop();
+            this.KnxReceiver.Stop();
             foreach (UdpClient client in this.UdpClients)
             {
-                client.DropMulticastGroup(IP);
+                client.DropMulticastGroup(IpAddress);
                 client.Close();
             }
         }
