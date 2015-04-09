@@ -62,7 +62,7 @@ namespace KNXLib
 
             // TODO: Maybe if we have a base Connect helper which takes in a KnxReceiver and KnxSender,
             // we can make the property setters more restricted
-            KnxReceiver = new KNXReceiverRouting(this, UdpClients, LocalEndpoint);
+            KnxReceiver = new KnxReceiverRouting(this, UdpClients);
             KnxReceiver.Start();
 
             KnxSender = new KNXSenderRouting(this, UdpClients, LocalEndpoint, RemoteEndpoint);

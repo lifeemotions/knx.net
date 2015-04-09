@@ -49,7 +49,7 @@
     <Compile Include="Exceptions\InvalidKnxAddressException.cs" />
     <Compile Include="Exceptions\InvalidHostException.cs" />
     <Compile Include="KNXSender.cs" />
-    <Compile Include="KNXReceiverRouting.cs" />
+    <Compile Include="KnxReceiverRouting.cs" />
     <Compile Include="KnxConnectionRouting.cs" />
     <Compile Include="KnxConnection.cs" />
     <Compile Include="KnxDatagram.cs" />
