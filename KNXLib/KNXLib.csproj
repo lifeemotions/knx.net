@@ -44,7 +44,7 @@
     <Compile Include="KnxConnectionTunneling.cs" />
     <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
     <Compile Include="Exceptions\InvalidKnxDataException.cs" />
-    <Compile Include="KNXSenderRouting.cs" />
+    <Compile Include="KnxSenderRouting.cs" />
     <Compile Include="Exceptions\ConnectionErrorException.cs" />
     <Compile Include="Exceptions\InvalidKnxAddressException.cs" />
     <Compile Include="Exceptions\InvalidHostException.cs" />

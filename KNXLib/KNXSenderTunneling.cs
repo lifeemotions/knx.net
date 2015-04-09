@@ -65,12 +65,12 @@ namespace KNXLib
             this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
         }
 
-        public override void SendData(byte[] dgram)
+        public override void SendData(byte[] datagram)
         {
-            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
-            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
-            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
-            this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
+            this.UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            this.UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            this.UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            this.UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
         }
         internal void SendTunnelingAck(byte seq_number)
         {

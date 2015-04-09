@@ -9,7 +9,7 @@
 
         protected KnxConnection KnxConnection { get; set; }
 
-        public abstract void SendData(byte[] dgram);
+        public abstract void SendData(byte[] datagram);
 
         public void Action(string destinationAddress, byte[] data)
         {

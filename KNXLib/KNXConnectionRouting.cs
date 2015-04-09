@@ -65,7 +65,7 @@ namespace KNXLib
             KnxReceiver = new KnxReceiverRouting(this, UdpClients);
             KnxReceiver.Start();
 
-            KnxSender = new KNXSenderRouting(this, UdpClients, LocalEndpoint, RemoteEndpoint);
+            KnxSender = new KnxSenderRouting(this, UdpClients, RemoteEndpoint);
 
             Connected();
         }
