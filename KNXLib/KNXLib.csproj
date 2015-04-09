@@ -48,7 +48,7 @@
     <Compile Include="Exceptions\ConnectionErrorException.cs" />
     <Compile Include="Exceptions\InvalidKnxAddressException.cs" />
     <Compile Include="Exceptions\InvalidHostException.cs" />
-    <Compile Include="KNXSender.cs" />
+    <Compile Include="KnxSender.cs" />
     <Compile Include="KnxReceiverRouting.cs" />
     <Compile Include="KnxConnectionRouting.cs" />
     <Compile Include="KnxConnection.cs" />

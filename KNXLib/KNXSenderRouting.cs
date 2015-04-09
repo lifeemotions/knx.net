@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXSenderRouting : KNXSender
+    internal class KNXSenderRouting : KnxSender
     {
         #region constructor
         internal KNXSenderRouting(KnxConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint, IPEndPoint remoteEndpoint)
@@ -62,7 +62,7 @@ namespace KNXLib
         #endregion
 
         #region send
-        internal override void SendData(byte[] dgram)
+        public override void SendData(byte[] dgram)
         {
             foreach (UdpClient client in this.UdpClients)
             {
@@ -72,7 +72,7 @@ namespace KNXLib
         #endregion
 
         #region datagram processing
-        internal override byte[] CreateActionDatagram(string destination_address, byte[] data)
+        protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)
         {
             int data_length = KnxHelper.GetDataLength(data);
             // HEADER
@@ -85,12 +85,12 @@ namespace KNXLib
             dgram[4] = total_length[1];
             dgram[5] = total_length[0];
 
-            return base.CreateActionDatagramCommon(destination_address, data, dgram);
+            return base.CreateActionDatagramCommon(destinationAddress, data, dgram);
         }
         #endregion
 
         #region request status datagram processing
-        internal override byte[] CreateRequestStatusDatagram(string destination_address)
+        protected override byte[] CreateRequestStatusDatagram(string destinationAddress)
         {
             // TODO: Test this
 
@@ -103,7 +103,7 @@ namespace KNXLib
             dgram[04] = 0x00;
             dgram[05] = 0x11;
 
-            return base.CreateRequestStatusDatagramCommon(destination_address, dgram, 6);
+            return base.CreateRequestStatusDatagramCommon(destinationAddress, dgram, 6);
         }
         #endregion
     }

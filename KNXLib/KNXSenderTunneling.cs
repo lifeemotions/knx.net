@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXSenderTunneling : KNXSender
+    internal class KNXSenderTunneling : KnxSender
     {
         #region constructor
         internal KNXSenderTunneling(KnxConnectionTunneling connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
@@ -50,11 +50,11 @@ namespace KNXLib
         {
             get
             {
-                return (KnxConnectionTunneling)this.KNXConnection;
+                return (KnxConnectionTunneling)this.KnxConnection;
             }
             set
             {
-                this.KNXConnection = value;
+                this.KnxConnection = value;
             }
         }
         #endregion
@@ -64,7 +64,8 @@ namespace KNXLib
         {
             this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
         }
-        internal override void SendData(byte[] dgram)
+
+        public override void SendData(byte[] dgram)
         {
             this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
             this.UdpClient.Send(dgram, dgram.Length, RemoteEndpoint);
@@ -92,7 +93,8 @@ namespace KNXLib
         #endregion
 
         #region action datagram processing
-        internal override byte[] CreateActionDatagram(string destination_address, byte[] data)
+
+        protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)
         {
             lock (this.KNXConnectionTunneling.SequenceNumberLock)
             {
@@ -114,7 +116,7 @@ namespace KNXLib
                     dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
                     dgram[09] = 0x00;
 
-                    return base.CreateActionDatagramCommon(destination_address, data, dgram);
+                    return base.CreateActionDatagramCommon(destinationAddress, data, dgram);
                 }
                 catch (Exception)
                 {
@@ -126,7 +128,8 @@ namespace KNXLib
         #endregion
 
         #region request status datagram processing
-        internal override byte[] CreateRequestStatusDatagram(string destination_address)
+
+        protected override byte[] CreateRequestStatusDatagram(string destinationAddress)
         {
             lock (this.KNXConnectionTunneling.SequenceNumberLock)
             {
@@ -146,7 +149,7 @@ namespace KNXLib
                     dgram[08] = this.KNXConnectionTunneling.GenerateSequenceNumber();
                     dgram[09] = 0x00;
 
-                    return base.CreateRequestStatusDatagramCommon(destination_address, dgram, 10);
+                    return base.CreateRequestStatusDatagramCommon(destinationAddress, dgram, 10);
                 }
                 catch (Exception)
                 {

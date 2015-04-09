@@ -141,63 +141,63 @@ namespace KNXLib
         private void ConnectRequest()
         {
             // HEADER
-            var dgram = new byte[26];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x05;
-            dgram[04] = 0x00;
-            dgram[05] = 0x1A;
+            var datagram = new byte[26];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x05;
+            datagram[04] = 0x00;
+            datagram[05] = 0x1A;
 
-            dgram[06] = 0x08;
-            dgram[07] = 0x01;
-            dgram[08] = LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[09] = LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[10] = LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[11] = LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[12] = (byte)(LocalEndpoint.Port >> 8);
-            dgram[13] = (byte)(LocalEndpoint.Port);
-            dgram[14] = 0x08;
-            dgram[15] = 0x01;
-            dgram[16] = LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[17] = LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[18] = LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[19] = LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[20] = (byte)(LocalEndpoint.Port >> 8);
-            dgram[21] = (byte)(LocalEndpoint.Port);
-            dgram[22] = 0x04;
-            dgram[23] = 0x04;
-            dgram[24] = 0x02;
-            dgram[25] = 0x00;
+            datagram[06] = 0x08;
+            datagram[07] = 0x01;
+            datagram[08] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[09] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[12] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[13] = (byte)(LocalEndpoint.Port);
+            datagram[14] = 0x08;
+            datagram[15] = 0x01;
+            datagram[16] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[17] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[18] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[19] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[20] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[21] = (byte)(LocalEndpoint.Port);
+            datagram[22] = 0x04;
+            datagram[23] = 0x04;
+            datagram[24] = 0x02;
+            datagram[25] = 0x00;
 
-            ((KNXSenderTunneling)KnxSender).SendDataSingle(dgram);
+            ((KNXSenderTunneling)KnxSender).SendDataSingle(datagram);
         }
 
         private void StateRequest(object sender, ElapsedEventArgs e)
         {
             // HEADER
-            var dgram = new byte[16];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x07;
-            dgram[04] = 0x00;
-            dgram[05] = 0x10;
+            var datagram = new byte[16];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x07;
+            datagram[04] = 0x00;
+            datagram[05] = 0x10;
 
-            dgram[06] = ChannelId;
-            dgram[07] = 0x00;
-            dgram[08] = 0x08;
-            dgram[09] = 0x01;
-            dgram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = (byte)(LocalEndpoint.Port >> 8);
-            dgram[15] = (byte)(LocalEndpoint.Port);
+            datagram[06] = ChannelId;
+            datagram[07] = 0x00;
+            datagram[08] = 0x08;
+            datagram[09] = 0x01;
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[15] = (byte)(LocalEndpoint.Port);
 
             try
             {
-                KnxSender.SendData(dgram);
+                KnxSender.SendData(datagram);
             }
             catch
             {
@@ -208,26 +208,26 @@ namespace KNXLib
         private void DisconnectRequest()
         {
             // HEADER
-            var dgram = new byte[16];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x09;
-            dgram[04] = 0x00;
-            dgram[05] = 0x10;
+            var datagram = new byte[16];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x09;
+            datagram[04] = 0x00;
+            datagram[05] = 0x10;
 
-            dgram[06] = ChannelId;
-            dgram[07] = 0x00;
-            dgram[08] = 0x08;
-            dgram[09] = 0x01;
-            dgram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = (byte)(LocalEndpoint.Port >> 8);
-            dgram[15] = (byte)(LocalEndpoint.Port);
+            datagram[06] = ChannelId;
+            datagram[07] = 0x00;
+            datagram[08] = 0x08;
+            datagram[09] = 0x01;
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[15] = (byte)(LocalEndpoint.Port);
 
-            KnxSender.SendData(dgram);
+            KnxSender.SendData(datagram);
         }
     }
 }

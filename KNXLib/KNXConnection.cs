@@ -72,7 +72,7 @@ namespace KNXLib
 
         internal KnxReceiver KnxReceiver { get; set; }
 
-        internal KNXSender KnxSender { get; set; }
+        internal KnxSender KnxSender { get; set; }
 
         public bool ThreeLevelGroupAddressing { get; set; }
 

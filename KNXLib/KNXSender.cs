@@ -1,64 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
-    internal abstract class KNXSender
+    internal abstract class KnxSender
     {
-        #region constructor
-        internal KNXSender(KnxConnection connection)
+        protected KnxSender(KnxConnection connection)
         {
-            this.KNXConnection = connection;
-        }
-        #endregion
-
-        #region variables
-        private KnxConnection _connection;
-        internal KnxConnection KNXConnection
-        {
-            get
-            {
-                return this._connection;
-            }
-            set
-            {
-                this._connection = value;
-            }
-        }
-        #endregion
-
-        #region send
-        internal void Action(string destination_address, byte[] data)
-        {
-            SendData(CreateActionDatagram(destination_address, data));
-        }
-        internal void RequestStatus(string destination_address)
-        {
-            SendData(CreateRequestStatusDatagram(destination_address));
+            KnxConnection = connection;
         }
 
-        internal abstract void SendData(byte[] dgram);
-        #endregion
+        protected KnxConnection KnxConnection { get; set; }
 
-        #region action datagram processing
+        public abstract void SendData(byte[] dgram);
 
-        internal abstract byte[] CreateActionDatagram(string destination_address, byte[] data);
-
-        protected byte[] CreateActionDatagramCommon(string destination_address, byte[] data, byte[] header)
+        public void Action(string destinationAddress, byte[] data)
         {
-            int i = 0;
-            int data_length = KnxHelper.GetDataLength(data);
+            SendData(CreateActionDatagram(destinationAddress, data));
+        }
+
+        public void RequestStatus(string destinationAddress)
+        {
+            SendData(CreateRequestStatusDatagram(destinationAddress));
+        }
+
+        protected abstract byte[] CreateActionDatagram(string destinationAddress, byte[] data);
+
+        protected abstract byte[] CreateRequestStatusDatagram(string destinationAddress);
+
+        protected byte[] CreateActionDatagramCommon(string destinationAddress, byte[] data, byte[] header)
+        {
+            int i;
+            var dataLength = KnxHelper.GetDataLength(data);
+
             // HEADER
-            byte[] dgram = new byte[data_length + 10 + header.Length];
+            var datagram = new byte[dataLength + 10 + header.Length];
             for (i = 0; i < header.Length; i++)
-            {
-                dgram[i] = header[i];
-            }
+                datagram[i] = header[i];
 
             // CEMI (start at position 6)
             // +--------+--------+--------+--------+----------------+----------------+--------+----------------+
@@ -118,76 +93,62 @@ namespace KNXLib
             //                    information (APCI) and data passed as an argument from higher layers of
             //                    the KNX communication stack
             //
-            if (this._connection.ActionMessageCode != 0x00)
-            {
-                dgram[i++] = this._connection.ActionMessageCode;
-            }
-            else
-            {
-                dgram[i++] = 0x11;
-            }
-            dgram[i++] = 0x00;
-            dgram[i++] = 0xAC;
-            if (KnxHelper.IsAddressIndividual(destination_address))
-            {
-                dgram[i++] = 0x50;
-            }
-            else
-            {
-                dgram[i++] = 0xF0;
-            }
-            dgram[i++] = 0x00;
-            dgram[i++] = 0x00;
-            byte[] dst_address = KnxHelper.GetAddress(destination_address);
-            dgram[i++] = dst_address[0];
-            dgram[i++] = dst_address[1];
-            dgram[i++] = (byte)(data_length);
-            dgram[i++] = 0x00;
-            dgram[i] = 0x80;
-            KnxHelper.WriteData(dgram, data, i);
 
-            return dgram;
+            datagram[i++] =
+                KnxConnection.ActionMessageCode != 0x00
+                    ? KnxConnection.ActionMessageCode
+                    : (byte)0x11;
+
+            datagram[i++] = 0x00;
+            datagram[i++] = 0xAC;
+
+            datagram[i++] =
+                KnxHelper.IsAddressIndividual(destinationAddress)
+                    ? (byte)0x50
+                    : (byte)0xF0;
+
+            datagram[i++] = 0x00;
+            datagram[i++] = 0x00;
+            var dst_address = KnxHelper.GetAddress(destinationAddress);
+            datagram[i++] = dst_address[0];
+            datagram[i++] = dst_address[1];
+            datagram[i++] = (byte)dataLength;
+            datagram[i++] = 0x00;
+            datagram[i] = 0x80;
+
+            KnxHelper.WriteData(datagram, data, i);
+
+            return datagram;
         }
-        #endregion
 
-        #region request status datagram processing
-
-        internal abstract byte[] CreateRequestStatusDatagram(string destination_address);
-
-        protected byte[] CreateRequestStatusDatagramCommon(string destination_address, byte[] dgram, int cemi_start_pos)
+        protected byte[] CreateRequestStatusDatagramCommon(string destinationAddress, byte[] datagram, int cemi_start_pos)
         {
-            int i = 0;
-            if (this._connection.ActionMessageCode != 0x00)
-            {
-                dgram[cemi_start_pos + i++] = this._connection.ActionMessageCode;
-            }
-            else
-            {
-                dgram[cemi_start_pos + i++] = 0x11;
-            }
-            dgram[cemi_start_pos + i++] = 0x00;
-            dgram[cemi_start_pos + i++] = 0xAC;
-            if (KnxHelper.IsAddressIndividual(destination_address))
-            {
-                dgram[cemi_start_pos + i++] = 0x50;
-            }
-            else
-            {
-                dgram[cemi_start_pos + i++] = 0xF0;
-            }
-            dgram[cemi_start_pos + i++] = 0x00;
-            dgram[cemi_start_pos + i++] = 0x00;
-            byte[] dst_address = KnxHelper.GetAddress(destination_address);
-            dgram[cemi_start_pos + i++] = dst_address[0];
-            dgram[cemi_start_pos + i++] = dst_address[1];
+            var i = 0;
 
-            dgram[cemi_start_pos + i++] = 0x01;
-            dgram[cemi_start_pos + i++] = 0x00;
-            dgram[cemi_start_pos + i] = 0x00;
+            datagram[cemi_start_pos + i++] =
+                KnxConnection.ActionMessageCode != 0x00
+                    ? KnxConnection.ActionMessageCode
+                    : (byte)0x11;
 
-            return dgram;
+            datagram[cemi_start_pos + i++] = 0x00;
+            datagram[cemi_start_pos + i++] = 0xAC;
+
+            datagram[cemi_start_pos + i++] =
+                KnxHelper.IsAddressIndividual(destinationAddress)
+                    ? (byte)0x50
+                    : (byte)0xF0;
+
+            datagram[cemi_start_pos + i++] = 0x00;
+            datagram[cemi_start_pos + i++] = 0x00;
+            byte[] dst_address = KnxHelper.GetAddress(destinationAddress);
+            datagram[cemi_start_pos + i++] = dst_address[0];
+            datagram[cemi_start_pos + i++] = dst_address[1];
+
+            datagram[cemi_start_pos + i++] = 0x01;
+            datagram[cemi_start_pos + i++] = 0x00;
+            datagram[cemi_start_pos + i] = 0x00;
+
+            return datagram;
         }
-
-        #endregion
     }
 }
