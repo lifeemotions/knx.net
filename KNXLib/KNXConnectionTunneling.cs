@@ -73,12 +73,12 @@ namespace KNXLib
             if (KnxReceiver == null || KnxSender == null)
             {
                 KnxReceiver = new KnxReceiverTunneling(this, UdpClient, LocalEndpoint);
-                KnxSender = new KNXSenderTunneling(this, UdpClient, RemoteEndpoint);
+                KnxSender = new KnxSenderTunneling(this, UdpClient, RemoteEndpoint);
             }
             else
             {
                 ((KnxReceiverTunneling)KnxReceiver).UdpClient = UdpClient;
-                ((KNXSenderTunneling)KnxSender).UdpClient = UdpClient;
+                ((KnxSenderTunneling)KnxSender).UdpClient = UdpClient;
             }
 
             KnxReceiver.Start();
@@ -170,7 +170,7 @@ namespace KNXLib
             datagram[24] = 0x02;
             datagram[25] = 0x00;
 
-            ((KNXSenderTunneling)KnxSender).SendDataSingle(datagram);
+            ((KnxSenderTunneling)KnxSender).SendDataSingle(datagram);
         }
 
         private void StateRequest(object sender, ElapsedEventArgs e)

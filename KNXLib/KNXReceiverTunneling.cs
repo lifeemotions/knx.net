@@ -124,7 +124,7 @@ namespace KNXLib
                 ProcessCEMI(knxDatagram, cemi);
             }
 
-            ((KNXSenderTunneling)KnxConnectionTunneling.KnxSender).SendTunnelingAck(sequenceNumber);
+            ((KnxSenderTunneling)KnxConnectionTunneling.KnxSender).SendTunnelingAck(sequenceNumber);
         }
 
         private void ProcessDisconnectRequest(byte[] datagram)

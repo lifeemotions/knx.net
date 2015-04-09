@@ -39,7 +39,7 @@
     <Compile Include="DPT\DPT.cs" />
     <Compile Include="DPT\DPTTemperature.cs" />
     <Compile Include="DPT\DPTTranslator.cs" />
-    <Compile Include="KNXSenderTunneling.cs" />
+    <Compile Include="KnxSenderTunneling.cs" />
     <Compile Include="KnxReceiverTunneling.cs" />
     <Compile Include="KnxConnectionTunneling.cs" />
     <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
