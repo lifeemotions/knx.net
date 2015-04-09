@@ -2,20 +2,21 @@
 
 namespace KNXLib.Exceptions
 {
-    public class ConnectionErrorException : Exception
+    internal class ConnectionErrorException : Exception
     {
-        private readonly string _host;
-        private readonly int _port;
-
-        public ConnectionErrorException(string host, int port)
+        public ConnectionErrorException(KnxConnectionConfiguration configuration)
+            : base(string.Format("ConnectionErrorException: Error connecting to {0}:{1}", configuration.Host, configuration.Port))
         {
-            _host = host;
-            _port = port;
+        }
+
+        public ConnectionErrorException(KnxConnectionConfiguration configuration, Exception innerException)
+            : base(string.Format("ConnectionErrorException: Error connecting to {0}:{1}", configuration.Host, configuration.Port), innerException)
+        {
         }
 
         public override string ToString()
         {
-            return string.Format("ConnectionErrorException: Error connecting to {0}:{1}", _host, _port);
+            return Message;
         }
     }
 }
