@@ -1,4 +1,5 @@
-# KNX.net
+KNX.net
+=======
 
 KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
 
@@ -13,11 +14,12 @@ The following datapoints are available in the API:
 * byte (dimmers, temperature difference, RGB)
 * 9.001 (temperatures)
 
-There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from [OpenRemote](http://www.openremote.org) Knowlodge Base.
+There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from [OpenRemote](http://www.openremote.org) Knowledge Base.
 
-# Examples
+Examples
+--------
 
-## Connecting using Routing (turn off and on a light)
+### Connecting using Routing (turn off and on a light)
 
 ```csharp
 static void Main(string[] args)
@@ -36,7 +38,7 @@ static void Event(string address, string state)
 }
 ```
 
-## Working with 9.001 datapoints
+### Working with 9.001 datapoints
 
 Sending an action
 
@@ -50,7 +52,7 @@ Converting status from event
 float temp = (float)connection.fromDPT("9.001", state);
 ```
 
-## Connecting using Tunneling
+### Connecting using Tunneling
 
 The only difference is how the connection object is created
 
