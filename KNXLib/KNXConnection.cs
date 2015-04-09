@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using KNXLib.DPT;
@@ -25,50 +24,21 @@ namespace KNXLib
         private readonly object _connectedLock = new object();
         private bool _isConnected;
 
-        protected KnxConnection()
-        {
-            // TODO: What is this, why is it 0x00 for parameterless ctor, but not for host/port ctor?
-            ActionMessageCode = 0x00;
-        }
-
-        protected KnxConnection(string host)
-        {
-            // TODO: Why does this ctor exist?
-        }
-
         protected KnxConnection(string host, int port)
         {
-            Host = host;
-            Port = port;
+            ConnectionConfiguration = new KnxConnectionConfiguration(host, port);
+
+            ActionMessageCode = 0x00;
             ThreeLevelGroupAddressing = true;
             Debug = false;
-
-            IpAddress = null;
-            try
-            {
-                IpAddress = IPAddress.Parse(host);
-            }
-            catch
-            {
-                try
-                {
-                    IpAddress = Dns.GetHostEntry(host).AddressList[0];
-                }
-                catch (SocketException)
-                {
-                }
-            }
-
-            if (IpAddress == null)
-                throw new InvalidHostException(host);
         }
 
-        // TODO: Refactor these out into KnxConnectionConfiguration or something
-        public string Host { get; private set; }
+        protected KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
 
-        public int Port { get; private set; }
-
-        internal IPAddress IpAddress { get; set; }
+        protected IPEndPoint RemoteEndpoint
+        {
+            get { return ConnectionConfiguration.EndPoint; }
+        }
 
         internal KnxReceiver KnxReceiver { get; set; }
 
@@ -97,8 +67,7 @@ namespace KNXLib
                 //ignore
             }
 
-            if (Debug)
-                Console.WriteLine("KNX is connected. Unlocking send - {0} free locks", SemaphoreCount());
+            Log("KNX is connected. Unlocking send - {0} free locks", SemaphoreCount());
 
             lock (_connectedLock)
             {
@@ -131,8 +100,7 @@ namespace KNXLib
                 //ignore
             }
 
-            if (Debug)
-                Console.WriteLine("KNX is disconnected. Send locked - {0} free locks", SemaphoreCount());
+            Log("KNX is disconnected. Send locked - {0} free locks", SemaphoreCount());
         }
 
         public void Event(string address, string state)
@@ -147,8 +115,7 @@ namespace KNXLib
                 //ignore
             }
 
-            if (Debug)
-                Console.WriteLine("Device {0} has status {1}", address, state);
+            Log("Device {0} has status {1}", address, state);
         }
 
         public void Status(string address, string state)
@@ -163,8 +130,7 @@ namespace KNXLib
                 //ignore
             }
 
-            if (Debug)
-                Console.WriteLine("Device {0} has status {1}", address, state);
+            Log("Device {0} has status {1}", address, state);
         }
 
         // TODO: Might be good to refactor this out
@@ -237,8 +203,7 @@ namespace KNXLib
 
         public void Action(string address, byte[] data)
         {
-            if (Debug)
-                Console.WriteLine("Sending {0} to {1}.", data, address);
+            Log("Sending {0} to {1}.", data, address);
 
             try
             {
@@ -250,15 +215,13 @@ namespace KNXLib
                 SendUnlockPause();
             }
 
-            if (Debug)
-                Console.WriteLine("Sent");
+            Log("Sent {0} to {1}.", data, address);
         }
 
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
         public void RequestStatus(string address)
         {
-            if (Debug)
-                Console.WriteLine("Sending request status to {0}.", address);
+           Log("Sending request status to {0}.", address);
 
             try
             {
@@ -270,8 +233,13 @@ namespace KNXLib
                 SendUnlockPause();
             }
 
+            Log("Sent request status to {0}.", address);
+        }
+
+        private void Log(string message, params object[] arg)
+        {
             if (Debug)
-                Console.WriteLine("Sent");
+                Console.WriteLine(message, arg);
         }
 
         // TODO: Not sure if these DPT methods make much sense on connection, unless we want to hide the helper classes

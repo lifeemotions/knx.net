@@ -8,35 +8,34 @@ namespace KNXLib
 {
     public class KnxConnectionRouting : KnxConnection
     {
+        private const string DefaultMulticastAddress = "224.0.23.12";
+        private const int DefaultMulticastPort = 3671;
+
         public KnxConnectionRouting()
-            : this("224.0.23.12", 3671)
+            : this(DefaultMulticastAddress, DefaultMulticastPort)
         {
         }
 
-        // TOOD: Is this a magic IP Address in KNX spec? Or just some test value?
         public KnxConnectionRouting(int port)
-            : this("224.0.23.12", port)
+            : this(DefaultMulticastAddress, port)
         {
         }
 
         public KnxConnectionRouting(string host)
-            : this(host, 3671)
+            : this(host, DefaultMulticastPort)
         {
         }
 
         public KnxConnectionRouting(string host, int port)
             : base(host, port)
         {
-            RemoteEndpoint = new IPEndPoint(IpAddress, port);
             LocalEndpoint = new IPEndPoint(IPAddress.Any, port);
             UdpClients = new List<UdpClient>();
         }
 
-        private IList<UdpClient> UdpClients { get; set; }
-
         private IPEndPoint LocalEndpoint { get; set; }
 
-        private IPEndPoint RemoteEndpoint { get; set; }
+        private IList<UdpClient> UdpClients { get; set; }
 
         public override void Connect()
         {
@@ -45,19 +44,18 @@ namespace KNXLib
                 var ipv4Addresses =
                     Dns
                     .GetHostAddresses(Dns.GetHostName())
-                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork)
-                    .ToList(); // TODO: I can probably leave the ToList off, there are no closures below either
+                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
 
                 foreach (var localIp in ipv4Addresses)
                 {
                     var client = new UdpClient(new IPEndPoint(localIp, LocalEndpoint.Port));
                     UdpClients.Add(client);
-                    client.JoinMulticastGroup(IpAddress, localIp);
+                    client.JoinMulticastGroup(ConnectionConfiguration.IpAddress, localIp);
                 }
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
-                throw new ConnectionErrorException(Host, Port);
+                throw new ConnectionErrorException(ConnectionConfiguration, ex);
             }
 
             // TODO: Maybe if we have a base Connect helper which takes in a KnxReceiver and KnxSender,
@@ -75,7 +73,7 @@ namespace KNXLib
             KnxReceiver.Stop();
             foreach (var client in UdpClients)
             {
-                client.DropMulticastGroup(IpAddress);
+                client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();
             }
         }

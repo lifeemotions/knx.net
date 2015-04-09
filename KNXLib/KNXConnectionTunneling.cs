@@ -12,7 +12,6 @@ namespace KNXLib
         public KnxConnectionTunneling(string remoteIpAddress, int remotePort, string localIpAddress, int localPort)
             : base(remoteIpAddress, remotePort)
         {
-            RemoteEndpoint = new IPEndPoint(IpAddress, remotePort);
             LocalEndpoint = new IPEndPoint(IPAddress.Parse(localIpAddress), localPort);
 
             ChannelId = 0x00;
@@ -24,8 +23,6 @@ namespace KNXLib
         private UdpClient UdpClient { get; set; }
 
         private IPEndPoint LocalEndpoint { get; set; }
-
-        private IPEndPoint RemoteEndpoint { get; set; }
 
         internal byte ChannelId { get; set; }
 
@@ -65,9 +62,9 @@ namespace KNXLib
                     Client = { DontFragment = true, SendBufferSize = 0 }
                 };
             }
-            catch (SocketException)
+            catch (SocketException ex)
             {
-                throw new ConnectionErrorException(Host, Port);
+                throw new ConnectionErrorException(ConnectionConfiguration, ex);
             }
 
             if (KnxReceiver == null || KnxSender == null)
