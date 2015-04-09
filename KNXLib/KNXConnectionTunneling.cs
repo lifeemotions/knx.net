@@ -72,12 +72,12 @@ namespace KNXLib
 
             if (KnxReceiver == null || KnxSender == null)
             {
-                KnxReceiver = new KNXReceiverTunneling(this, UdpClient, LocalEndpoint);
+                KnxReceiver = new KnxReceiverTunneling(this, UdpClient, LocalEndpoint);
                 KnxSender = new KNXSenderTunneling(this, UdpClient, RemoteEndpoint);
             }
             else
             {
-                ((KNXReceiverTunneling)KnxReceiver).UdpClient = UdpClient;
+                ((KnxReceiverTunneling)KnxReceiver).UdpClient = UdpClient;
                 ((KNXSenderTunneling)KnxSender).UdpClient = UdpClient;
             }
 
