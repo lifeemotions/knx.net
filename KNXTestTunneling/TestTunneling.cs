@@ -1,40 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
+using KNXLib;
 
 namespace KNXTest
 {
-    class TestTunneling
+    public class TestTunneling
     {
+        private static KnxConnection _connection;
 
-        private static KNXLib.KNXConnection connection = null;
-        static void Main(string[] args)
+        private static void Main()
         {
-            connection = new KNXLib.KNXConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671);
-            connection.Debug = false;
-            connection.Connect();
-            connection.KNXConnectedDelegate += new KNXLib.KNXConnection.KNXConnected(Connected);
-            connection.KNXDisconnectedDelegate += new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
-            connection.KNXEventDelegate += new KNXLib.KNXConnection.KNXEvent(Event);
-            connection.KNXStatusDelegate += new KNXLib.KNXConnection.KNXStatus(Status);
-
+            _connection = new KnxConnectionTunneling("10.0.2.183", 3671, "10.0.0.186", 3671) { Debug = false };
+            _connection.KnxConnectedDelegate += Connected;
+            _connection.KnxDisconnectedDelegate += Disconnected;
+            _connection.KnxEventDelegate += Event;
+            _connection.KnxStatusDelegate += Status;
+            _connection.Connect();
 
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
-            connection.KNXDisconnectedDelegate -= new KNXLib.KNXConnection.KNXDisconnected(Disconnected);
-            connection.Disconnect();
-            System.Environment.Exit(0);
+
+            _connection.KnxDisconnectedDelegate -= Disconnected;
+            _connection.Disconnect();
+            Environment.Exit(0);
         }
 
-        static void Event(string address, string state)
+        private static void Event(string address, string state)
         {
             if (address.Equals("1/2/1") || address.Equals("1/2/2"))
             {
-                Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + connection.fromDPT("9.001", state));
+                Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + _connection.FromDPT("9.001", state));
             }
-            else if(
+            else if (
                 address.Equals("1/2/3") ||
                 address.Equals("1/2/4") ||
                 address.Equals("1/2/5") ||
@@ -53,7 +51,7 @@ namespace KNXTest
                 address.Equals("1/2/17") ||
                 address.Equals("1/2/18"))
             {
-                string data = string.Empty;
+                var data = string.Empty;
 
                 if (state.Length == 1)
                 {
@@ -61,35 +59,37 @@ namespace KNXTest
                 }
                 else
                 {
-                    byte[] bytes = new byte[state.Length];
-                    for (int i = 0; i < state.Length; i++)
+                    var bytes = new byte[state.Length];
+                    for (var i = 0; i < state.Length; i++)
                     {
-                        bytes[i] = System.Convert.ToByte(state[i]);
+                        bytes[i] = Convert.ToByte(state[i]);
                     }
-                    for (int i = 0; i < state.Length; i++)
-                    {
-                        data += state[i].ToString();
-                    }
+
+                    data = state.Aggregate(data, (current, t) => current + t.ToString());
                 }
+
                 Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + data);
             }
         }
-        static void Status(string address, string state)
+
+        private static void Status(string address, string state)
         {
             Console.WriteLine("New Status: device " + address + " has status " + state);
         }
-        static void Connected()
+
+        private static void Connected()
         {
             Console.WriteLine("Connected!");
         }
-        static void Disconnected()
+
+        private static void Disconnected()
         {
             Console.WriteLine("Disconnected! Reconnecting");
-            if (connection != null)
-            {
-                Thread.Sleep(1000);
-                connection.Connect();
-            }
+            if (_connection == null)
+                return;
+
+            Thread.Sleep(1000);
+            _connection.Connect();
         }
     }
 }

@@ -2,18 +2,18 @@
 
 namespace KNXLib.Exceptions
 {
-    public class InvalidHostException : System.Exception
+    public class InvalidHostException : Exception
     {
-        private string host;
+        private readonly string _host;
 
         public InvalidHostException(string host)
         {
-            this.host = host;
+            _host = host;
         }
 
         public override string ToString()
         {
-            return "InvalidHostException: Host " + host + " is invalid.";
+            return string.Format("InvalidHostException: Host {0} is invalid.", _host);
         }
     }
 }

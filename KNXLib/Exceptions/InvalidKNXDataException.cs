@@ -2,18 +2,18 @@
 
 namespace KNXLib.Exceptions
 {
-    public class InvalidKNXDataException : System.Exception
+    public class InvalidKnxDataException : Exception
     {
-        private string data;
+        private readonly string _data;
 
-        public InvalidKNXDataException(string data)
+        public InvalidKnxDataException(string data)
         {
-            this.data = data;
+            _data = data;
         }
 
         public override string ToString()
         {
-            return "InvalidKNXDataException: Data " + data + " is invalid.";
+            return string.Format("InvalidKnxDataException: Data {0} is invalid.", _data);
         }
     }
 }

@@ -1,362 +1,213 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using KNXLib.Exceptions;
 using System.Threading;
+using KNXLib.DPT;
+using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public abstract class KNXConnection
+    public abstract class KnxConnection
     {
-        #region constructor
-        public KNXConnection()
+        public delegate void KnxConnected();
+        public KnxConnected KnxConnectedDelegate = null;
+
+        public delegate void KnxDisconnected();
+        public KnxDisconnected KnxDisconnectedDelegate = null;
+
+        public delegate void KnxEvent(string address, string state);
+        public KnxEvent KnxEventDelegate = null;
+
+        public delegate void KnxStatus(string address, string state);
+        public KnxStatus KnxStatusDelegate = null;
+
+        private readonly object _connectedLock = new object();
+        private bool _isConnected;
+
+        protected KnxConnection()
         {
-            this._actionMessageCode = 0x00;
+            // TODO: What is this, why is it 0x00 for parameterless ctor, but not for host/port ctor?
+            ActionMessageCode = 0x00;
         }
 
-        public KNXConnection(String host)
+        protected KnxConnection(string host)
         {
+            // TODO: Why does this ctor exist?
         }
 
-        public KNXConnection(String host, int port)
+        protected KnxConnection(string host, int port)
         {
-            this.Initialize();
-            this.Host = host;
-            this.Port = port;
+            Host = host;
+            Port = port;
+            ThreeLevelGroupAddressing = true;
+            Debug = false;
 
-            IP = null;
+            IpAddress = null;
             try
             {
-                IP = IPAddress.Parse(host);
+                IpAddress = IPAddress.Parse(host);
             }
-            catch (Exception)
+            catch
             {
                 try
                 {
-                    IP = Dns.GetHostEntry(host).AddressList[0];
+                    IpAddress = Dns.GetHostEntry(host).AddressList[0];
                 }
                 catch (SocketException)
                 {
                 }
             }
-            if (IP == null)
+
+            if (IpAddress == null)
                 throw new InvalidHostException(host);
         }
 
-        private void Initialize()
-        {
-            this.ThreeLevelGroupAddressing = true;
-            this.Debug = false;
-        }
-        #endregion
+        // TODO: Refactor these out into KnxConnectionConfiguration or something
+        public string Host { get; private set; }
 
-        #region variables
-        private string _host;
-        public string Host
-        {
-            get
-            {
-                return this._host;
-            }
-            internal set
-            {
-                this._host = value;
-            }
-        }
+        public int Port { get; private set; }
 
-        private int _port;
-        public int Port
-        {
-            get
-            {
-                return this._port;
-            }
-            internal set
-            {
-                this._port = value;
-            }
-        }
+        internal IPAddress IpAddress { get; set; }
 
-        private IPAddress _ip = null;
-        internal IPAddress IP
-        {
-            get
-            {
-                return this._ip;
-            }
-            set
-            {
-                this._ip = value;
-            }
-        }
+        internal KnxReceiver KnxReceiver { get; set; }
 
-        private KNXReceiver _KNXReceiver = null;
-        internal KNXReceiver KNXReceiver
-        {
-            get
-            {
-                return this._KNXReceiver;
-            }
-            set
-            {
-                this._KNXReceiver = value;
-            }
-        }
+        internal KnxSender KnxSender { get; set; }
 
-        private KNXSender _KNXSender = null;
-        internal KNXSender KNXSender
-        {
-            get
-            {
-                return this._KNXSender;
-            }
-            set
-            {
-                this._KNXSender = value;
-            }
-        }
+        public bool ThreeLevelGroupAddressing { get; set; }
 
-        private bool _threeLevelGroupAddressing;
-        public bool ThreeLevelGroupAddressing
-        {
-            get
-            {
-                return this._threeLevelGroupAddressing;
-            }
-            set
-            {
-                this._threeLevelGroupAddressing = value;
-            }
-        }
+        public bool Debug { get; set; }
 
-        private bool _debug;
-        public bool Debug
-        {
-            get
-            {
-                return this._debug;
-            }
-            set
-            {
-                this._debug = value;
-            }
-        }
-
-        private byte _actionMessageCode;
-        public byte ActionMessageCode
-        {
-            get
-            {
-                return this._actionMessageCode;
-            }
-            set
-            {
-                this._actionMessageCode = value;
-            }
-        }
-        #endregion
-
-        #region connection
+        public byte ActionMessageCode { get; set; }
 
         public abstract void Connect();
 
         public abstract void Disconnect();
 
-        #endregion
-
-        #region events
-        public delegate void KNXConnected();
-        public KNXConnected KNXConnectedDelegate = null;
-        public delegate void KNXDisconnected();
-        public KNXDisconnected KNXDisconnectedDelegate = null;
-        public delegate void KNXEvent(string address, string state);
-        public KNXEvent KNXEventDelegate = null;
-        public delegate void KNXStatus(string address, string state);
-        public KNXStatus KNXStatusDelegate = null;
-
-        private object _connectedKey = new object();
-        private bool _connected = false;
+        // TODO: Could we refactor connection handling out, weird to have these public too, feels like only inheritors should call it
         public virtual void Connected()
         {
             try
             {
-                if (KNXConnectedDelegate != null)
-                    KNXConnectedDelegate();
+                if (KnxConnectedDelegate != null)
+                    KnxConnectedDelegate();
             }
-            catch (Exception)
+            catch
             {
                 //ignore
             }
 
-            if (this.Debug)
-            {
-                Console.WriteLine("KNX is connected. Unlocking send - " + SemaphoreCount() + " free locks");
-            }
+            if (Debug)
+                Console.WriteLine("KNX is connected. Unlocking send - {0} free locks", SemaphoreCount());
 
-            lock (_connectedKey)
+            lock (_connectedLock)
             {
-                if (_connected == false)
-                {
-                    _connected = true;
-                    this.SendUnlock();
-                }
+                if (_isConnected)
+                    return;
+
+                _isConnected = true;
+                SendUnlock();
             }
         }
+
         public virtual void Disconnected()
         {
-            lock (_connectedKey)
+            lock (_connectedLock)
             {
-                if (_connected == true)
+                if (_isConnected)
                 {
-                    this.SendLock();
-                    _connected = false;
+                    SendLock();
+                    _isConnected = false;
                 }
             }
 
             try
             {
-                if (KNXDisconnectedDelegate != null)
-                    KNXDisconnectedDelegate();
+                if (KnxDisconnectedDelegate != null)
+                    KnxDisconnectedDelegate();
             }
-            catch (Exception)
+            catch
             {
                 //ignore
             }
 
-            if (this.Debug)
-            {
-                Console.WriteLine("KNX is disconnected. Send locked - " + SemaphoreCount() + " free locks");
-            }
+            if (Debug)
+                Console.WriteLine("KNX is disconnected. Send locked - {0} free locks", SemaphoreCount());
         }
 
         public void Event(string address, string state)
         {
             try
             {
-                if (KNXEventDelegate != null)
-                    KNXEventDelegate(address, state);
+                if (KnxEventDelegate != null)
+                    KnxEventDelegate(address, state);
             }
-            catch (Exception)
+            catch
             {
                 //ignore
             }
 
-            if (this.Debug)
-            {
-                Console.WriteLine("Device " + address + " has status " + state);
-            }
+            if (Debug)
+                Console.WriteLine("Device {0} has status {1}", address, state);
         }
+
         public void Status(string address, string state)
         {
             try
             {
-                if (KNXStatusDelegate != null)
-                    KNXStatusDelegate(address, state);
+                if (KnxStatusDelegate != null)
+                    KnxStatusDelegate(address, state);
             }
-            catch (Exception)
+            catch
             {
                 //ignore
             }
 
-            if (this.Debug)
-            {
-                Console.WriteLine("Device " + address + " has status " + state);
-            }
+            if (Debug)
+                Console.WriteLine("Device {0} has status {1}", address, state);
         }
-        #endregion
 
-        #region locks
-        private SemaphoreSlim _lockSend = new SemaphoreSlim(0);
-        private void SendLock()
-        {
-            _lockSend.Wait();
-        }
-        private void SendUnlock()
-        {
-            _lockSend.Release();
-        }
-        private int SemaphoreCount()
-        {
-            return _lockSend.CurrentCount;
-        }
-        private void SendUnlockPause()
-        {
-            Thread t = new Thread(new ThreadStart(SendUnlockPauseThread));
-            t.IsBackground = true;
-            t.Start();
-        }
-        private void SendUnlockPauseThread()
-        {
-            Thread.Sleep(200);
-            _lockSend.Release();
-        }
-        #endregion
-
-        #region actions
+        // TODO: Might be good to refactor this out
         public void Action(string address, bool data)
         {
-            byte[] val = null;
+            byte[] val;
+
             try
             {
-                val = new byte[] { Convert.ToByte(data) };
+                val = new[] { Convert.ToByte(data) };
             }
-            catch (Exception)
+            catch
             {
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
             }
 
             if (val == null)
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
 
-            if (Debug)
-                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            try
-            {
-                SendLock();
-                this.KNXSender.Action(address, val);
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
-            if (Debug)
-                Console.WriteLine("Sent");
+            Action(address, val);
         }
+
         public void Action(string address, string data)
         {
-            byte[] val = null;
+            byte[] val;
             try
             {
-                val = System.Text.Encoding.ASCII.GetBytes(data);
+                val = Encoding.ASCII.GetBytes(data);
             }
-            catch (Exception)
+            catch
             {
-                throw new InvalidKNXDataException(data);
+                throw new InvalidKnxDataException(data);
             }
 
             if (val == null)
-                throw new InvalidKNXDataException(data);
+                throw new InvalidKnxDataException(data);
 
-            if (Debug)
-                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            try
-            {
-                SendLock();
-                this.KNXSender.Action(address, val);
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
-            if (Debug)
-                Console.WriteLine("Sent");
+            Action(address, val);
         }
+
         public void Action(string address, int data)
         {
-            byte[] val = new byte[2];
+            var val = new byte[2];
             if (data <= 255)
             {
                 val[0] = 0x00;
@@ -367,99 +218,111 @@ namespace KNXLib
                 val[0] = (byte)data;
                 val[1] = (byte)(data >> 8);
             }
-            else // allowing only positive integers less than 65535 (2 bytes), maybe it is incorrect...???
-                throw new InvalidKNXDataException(data.ToString());
+            else
+            {
+                // allowing only positive integers less than 65535 (2 bytes), maybe it is incorrect...???
+                throw new InvalidKnxDataException(data.ToString());
+            }
 
             if (val == null)
-                throw new InvalidKNXDataException(data.ToString());
+                throw new InvalidKnxDataException(data.ToString());
 
-            if (Debug)
-                Console.WriteLine("Sending " + val.ToString() + " to " + address + ".");
-            try
-            {
-                SendLock();
-                this.KNXSender.Action(address, val);
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
-            if (Debug)
-                Console.WriteLine("Sent");
+            Action(address, val);
         }
+
         public void Action(string address, byte data)
         {
-            if (Debug)
-                Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
-            try
-            {
-                SendLock();
-                this.KNXSender.Action(address, new byte[] { 0x00, data });
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
-            if (Debug)
-                Console.WriteLine("Sent");
+            Action(address, new byte[] { 0x00, data });
         }
+
         public void Action(string address, byte[] data)
         {
             if (Debug)
-                Console.WriteLine("Sending " + data.ToString() + " to " + address + ".");
+                Console.WriteLine("Sending {0} to {1}.", data, address);
+
             try
             {
                 SendLock();
-                this.KNXSender.Action(address, data);
+                KnxSender.Action(address, data);
             }
             finally
             {
                 SendUnlockPause();
             }
+
             if (Debug)
                 Console.WriteLine("Sent");
         }
-        #endregion
 
-        #region status
+        // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
         public void RequestStatus(string address)
         {
             if (Debug)
-                Console.WriteLine("Sending request status to " + address + ".");
+                Console.WriteLine("Sending request status to {0}.", address);
+
             try
             {
                 SendLock();
-                this.KNXSender.RequestStatus(address);
+                KnxSender.RequestStatus(address);
             }
             finally
             {
                 SendUnlockPause();
             }
+
             if (Debug)
                 Console.WriteLine("Sent");
         }
-        #endregion
 
-        #region DPT
-        public object fromDPT(string type, byte[] data)
+        // TODO: Not sure if these DPT methods make much sense on connection, unless we want to hide the helper classes
+        public object FromDPT(string type, string data)
         {
-            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+            return DPTTranslator.Instance.FromDPT(type, data);
         }
 
-        public object fromDPT(string type, String data)
+        public object FromDPT(string type, byte[] data)
         {
-            return DPT.DPTTranslator.Instance.fromDPT(type, data);
+            return DPTTranslator.Instance.FromDPT(type, data);
         }
 
-        public byte[] toDPT(string type, object value)
+        public byte[] ToDPT(string type, string value)
         {
-            return DPT.DPTTranslator.Instance.toDPT(type, value);
+            return DPTTranslator.Instance.ToDPT(type, value);
         }
 
-        public byte[] toDPT(string type, String value)
+        public byte[] ToDPT(string type, object value)
         {
-            return DPT.DPTTranslator.Instance.toDPT(type, value);
+            return DPTTranslator.Instance.ToDPT(type, value);
         }
-        #endregion
+
+        // TODO: Refactor this out
+        private readonly SemaphoreSlim _lockSend = new SemaphoreSlim(0);
+
+        private void SendLock()
+        {
+            _lockSend.Wait();
+        }
+
+        private void SendUnlock()
+        {
+            _lockSend.Release();
+        }
+
+        private int SemaphoreCount()
+        {
+            return _lockSend.CurrentCount;
+        }
+
+        private void SendUnlockPause()
+        {
+            var t = new Thread(SendUnlockPauseThread) { IsBackground = true };
+            t.Start();
+        }
+
+        private void SendUnlockPauseThread()
+        {
+            Thread.Sleep(200);
+            _lockSend.Release();
+        }
     }
 }

@@ -1,79 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace KNXLib
 {
-    internal abstract class KNXReceiver
+    internal abstract class KnxReceiver
     {
-        #region constructor
-        internal KNXReceiver(KNXConnection connection)
+        protected KnxReceiver(KnxConnection connection)
         {
-            this.KNXConnection = connection;
-        }
-        #endregion
-
-        #region variables
-        private KNXConnection _connection;
-        internal KNXConnection KNXConnection
-        {
-            get
-            {
-                return this._connection;
-            }
-            set
-            {
-                this._connection = value;
-            }
+            KnxConnection = connection;
         }
 
-        private Thread _receiverThread;
-        private Thread ReceiverThread
-        {
-            get
-            {
-                return this._receiverThread;
-            }
-            set
-            {
-                this._receiverThread = value;
-            }
-        }
-        #endregion
+        // TODO: It is strange you can set this, since you expect it to come over the ctor
+        public KnxConnection KnxConnection { get; set; }
 
-        #region start / stop
-        internal void Start()
+        private Thread ReceiverThread { get; set; }
+
+        public abstract void ReceiverThreadFlow();
+        public abstract void ProcessDatagram(byte[] datagram);
+
+        public void Start()
         {
-            ReceiverThread = new Thread(this.ReceiverThreadFlow);
-            ReceiverThread.IsBackground = true;
+            ReceiverThread = new Thread(ReceiverThreadFlow) { IsBackground = true };
             ReceiverThread.Start();
         }
-        internal void Stop()
+
+        public void Stop()
         {
             try
             {
                 if (ReceiverThread.ThreadState.Equals(ThreadState.Running))
                     ReceiverThread.Abort();
             }
-            catch (Exception)
+            catch
             {
                 Thread.ResetAbort();
             }
         }
-        #endregion
 
-        #region thread
-        internal abstract void ReceiverThreadFlow();
-        #endregion
-
-        #region datagram processing
-        internal abstract void ProcessDatagram(byte[] dgram);
-
-        internal void ProcessCEMI(KNXDatagram datagram, byte[] cemi)
+        public void ProcessCEMI(KnxDatagram datagram, byte[] cemi)
         {
             try
             {
@@ -136,36 +100,35 @@ namespace KNXLib
                 //                    the KNX communication stack
                 //
                 datagram.message_code = cemi[0];
-                datagram.aditional_info_length = (int)cemi[1];
+                datagram.aditional_info_length = cemi[1];
+
                 if (datagram.aditional_info_length > 0)
                 {
                     datagram.aditional_info = new byte[datagram.aditional_info_length];
-                    for (int i = 0; i < datagram.aditional_info_length; i++)
+                    for (var i = 0; i < datagram.aditional_info_length; i++)
                     {
                         datagram.aditional_info[i] = cemi[2 + i];
                     }
                 }
+
                 datagram.control_field_1 = cemi[2 + datagram.aditional_info_length];
                 datagram.control_field_2 = cemi[3 + datagram.aditional_info_length];
-                datagram.source_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
-                if (KNXHelper.GetKNXDestinationAddressType(datagram.control_field_2).Equals(KNXHelper.KNXDestinationAddressType.INDIVIDUAL))
-                {
-                    datagram.destination_address = KNXHelper.GetIndividualAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] });
-                }
-                else
-                {
-                    datagram.destination_address = KNXHelper.GetGroupAddress(new byte[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KNXConnection.ThreeLevelGroupAddressing);
-                }
+                datagram.source_address = KnxHelper.GetIndividualAddress(new[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
 
-                datagram.data_length = (int)cemi[8 + datagram.aditional_info_length];
+                datagram.destination_address =
+                    KnxHelper.GetKnxDestinationAddressType(datagram.control_field_2).Equals(KnxHelper.KnxDestinationAddressType.INDIVIDUAL)
+                        ? KnxHelper.GetIndividualAddress(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] })
+                        : KnxHelper.GetGroupAddress(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KnxConnection.ThreeLevelGroupAddressing);
+
+                datagram.data_length = cemi[8 + datagram.aditional_info_length];
                 datagram.apdu = new byte[datagram.data_length + 1];
-                for (int i = 0; i < datagram.apdu.Length; i++)
-                {
-                    datagram.apdu[i] = cemi[9 + i + datagram.aditional_info_length];
-                }
-                datagram.data = KNXHelper.GetData(datagram.data_length, datagram.apdu);
 
-                if (KNXConnection.Debug)
+                for (var i = 0; i < datagram.apdu.Length; i++)
+                    datagram.apdu[i] = cemi[9 + i + datagram.aditional_info_length];
+
+                datagram.data = KnxHelper.GetData(datagram.data_length, datagram.apdu);
+
+                if (KnxConnection.Debug)
                 {
                     Console.WriteLine("-----------------------------------------------------------------------------------------------------");
                     Console.WriteLine(BitConverter.ToString(cemi));
@@ -176,10 +139,10 @@ namespace KNXLib
 
                     Console.WriteLine("Event Message Code: " + datagram.message_code.ToString("x"));
                     Console.WriteLine("Event Aditional Info Length: " + datagram.aditional_info_length);
+
                     if (datagram.aditional_info_length > 0)
-                    {
                         Console.WriteLine("Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
-                    }
+
                     Console.WriteLine("Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
                     Console.WriteLine("Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
                     Console.WriteLine("Event Source Address: " + datagram.source_address);
@@ -190,21 +153,25 @@ namespace KNXLib
                     Console.WriteLine("-----------------------------------------------------------------------------------------------------");
                 }
 
-                if (datagram.message_code == 0x29)
+                if (datagram.message_code != 0x29)
+                    return;
+
+                var type = datagram.apdu[1] >> 4;
+
+                switch (type)
                 {
-                    int type = ((int)datagram.apdu[1]) >> 4;
-                    if (type == 8)
-                        this.KNXConnection.Event(datagram.destination_address, datagram.data);
-                    else if (type == 4)// || type == 0)
-                        this.KNXConnection.Status(datagram.destination_address, datagram.data);
+                    case 8:
+                        KnxConnection.Event(datagram.destination_address, datagram.data);
+                        break;
+                    case 4:
+                        KnxConnection.Status(datagram.destination_address, datagram.data);
+                        break;
                 }
             }
-            catch (Exception)
+            catch
             {
                 // ignore, missing warning information
             }
         }
-        #endregion
-
     }
 }

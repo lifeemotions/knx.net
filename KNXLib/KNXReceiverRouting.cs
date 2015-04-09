@@ -1,94 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace KNXLib
 {
-    internal class KNXReceiverRouting : KNXReceiver
+    internal class KnxReceiverRouting : KnxReceiver
     {
-        #region constructor
-        internal KNXReceiverRouting(KNXConnectionRouting connection, IList<UdpClient> udpClients, IPEndPoint localEndpoint)
+        internal KnxReceiverRouting(KnxConnection connection, IList<UdpClient> udpClients)
             : base(connection)
         {
-            this.LocalEndpoint = localEndpoint;
-            this.UdpClients = udpClients;
-        }
-        #endregion
-
-        #region variables
-        private IPEndPoint _localEndpoint;
-        private IPEndPoint LocalEndpoint
-        {
-            get
-            {
-                return this._localEndpoint;
-            }
-            set
-            {
-                this._localEndpoint = value;
-            }
+            UdpClients = udpClients;
         }
 
-        private IList<UdpClient> _udpClients;
-        private IList<UdpClient> UdpClients
-        {
-            get
-            {
-                return this._udpClients;
-            }
-            set
-            {
-                this._udpClients = value;
-            }
-        }
-        #endregion
+        private IList<UdpClient> UdpClients { get; set; }
 
-        #region thread
-        internal override void ReceiverThreadFlow()
+        public override void ReceiverThreadFlow()
         {
             try
             {
-                foreach (UdpClient client in this.UdpClients)
-                {
-                    client.BeginReceive(OnReceive, new object[] {client, client.Client.LocalEndPoint});
-                }
-                //byte[] dgram;
+                foreach (var client in UdpClients)
+                    client.BeginReceive(OnReceive, new object[] { client });
+
+                // just wait to be aborted
                 while (true)
-                {
-                    // just wait to be aborted
                     Thread.Sleep(60000);
-                }
             }
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
             }
-            catch (Exception)
+            catch
             {
                 // ignore exception and exit
             }
         }
-        #endregion
-
-        #region Async receive
 
         private void OnReceive(IAsyncResult result)
         {
-            IPEndPoint ep = null;
+            IPEndPoint endPoint = null;
             var args = (object[])result.AsyncState;
             var session = (UdpClient)args[0];
-            var local = (IPEndPoint)args[1];
 
             try
             {
-                byte[] dgram = session.EndReceive(result, ref ep);
-                ProcessDatagram(dgram);
+                var datagram = session.EndReceive(result, ref endPoint);
+                ProcessDatagram(datagram);
 
-                //We make the next call to the begin receive
+                // We make the next call to the begin receive
                 session.BeginReceive(OnReceive, args);
             }
             catch (ObjectDisposedException)
@@ -97,35 +57,33 @@ namespace KNXLib
             }
         }
 
-        #endregion
-
-        #region datagram processing
-        internal override void ProcessDatagram(byte[] dgram)
+        public override void ProcessDatagram(byte[] datagram)
         {
             try
             {
-                ProcessDatagramHeaders(dgram);
+                ProcessDatagramHeaders(datagram);
             }
-            catch (Exception)
+            catch
             {
                 // ignore, missing warning information
             }
         }
 
-        private void ProcessDatagramHeaders(byte[] dgram)
+        private void ProcessDatagramHeaders(byte[] datagram)
         {
             // HEADER
-            KNXDatagram datagram = new KNXDatagram();
-            datagram.header_length = (int)dgram[0];
-            datagram.protocol_version = dgram[1];
-            datagram.service_type = new byte[] { dgram[2], dgram[3] };
-            datagram.total_length = (int)dgram[4] + (int)dgram[5];
+            var knxDatagram = new KnxDatagram
+            {
+                header_length = datagram[0],
+                protocol_version = datagram[1],
+                service_type = new[] { datagram[2], datagram[3] },
+                total_length = datagram[4] + datagram[5]
+            };
 
-            byte[] cemi = new byte[dgram.Length - 6];
-            Array.Copy(dgram, 6, cemi, 0, dgram.Length - 6);
+            var cemi = new byte[datagram.Length - 6];
+            Array.Copy(datagram, 6, cemi, 0, datagram.Length - 6);
 
-            base.ProcessCEMI(datagram, cemi);
+            ProcessCEMI(knxDatagram, cemi);
         }
-        #endregion
     }
 }

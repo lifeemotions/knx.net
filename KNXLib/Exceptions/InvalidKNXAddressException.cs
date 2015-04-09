@@ -2,18 +2,18 @@
 
 namespace KNXLib.Exceptions
 {
-    public class InvalidKNXAddressException : System.Exception
+    public class InvalidKnxAddressException : Exception
     {
-        private string address;
+        private readonly string _address;
 
-        public InvalidKNXAddressException(string address)
+        public InvalidKnxAddressException(string address)
         {
-            this.address = address;
+            _address = address;
         }
 
         public override string ToString()
         {
-            return "InvalidKNXAddressException: Address " + address + " is invalid.";
+            return string.Format("InvalidKnxAddressException: Address {0} is invalid.", _address);
         }
     }
 }

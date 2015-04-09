@@ -1,125 +1,83 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KNXConnectionRouting : KNXConnection
+    public class KnxConnectionRouting : KnxConnection
     {
-        #region constructor
-        public KNXConnectionRouting()
+        public KnxConnectionRouting()
             : this("224.0.23.12", 3671)
         {
         }
 
-        public KNXConnectionRouting(int port)
+        // TOOD: Is this a magic IP Address in KNX spec? Or just some test value?
+        public KnxConnectionRouting(int port)
             : this("224.0.23.12", port)
         {
         }
 
-        public KNXConnectionRouting(String host)
+        public KnxConnectionRouting(string host)
             : this(host, 3671)
         {
         }
 
-        public KNXConnectionRouting(String host, int port)
+        public KnxConnectionRouting(string host, int port)
             : base(host, port)
         {
-            RemoteEndpoint = new IPEndPoint(IP, port);
+            RemoteEndpoint = new IPEndPoint(IpAddress, port);
             LocalEndpoint = new IPEndPoint(IPAddress.Any, port);
-            Initialize();
+            UdpClients = new List<UdpClient>();
         }
 
-        private void Initialize()
-        {
-            this.UdpClients = new List<UdpClient>();
-        }
-        #endregion
+        private IList<UdpClient> UdpClients { get; set; }
 
-        #region variables
-        private IList<UdpClient> _udpClients;
-        private IList<UdpClient> UdpClients
-        {
-            get
-            {
-                return this._udpClients;
-            }
-            set
-            {
-                this._udpClients = value;
-            }
-        }
+        private IPEndPoint LocalEndpoint { get; set; }
 
-        private IPEndPoint _localEndpoint;
-        private IPEndPoint LocalEndpoint
-        {
-            get
-            {
-                return this._localEndpoint;
-            }
-            set
-            {
-                this._localEndpoint = value;
-            }
-        }
-
-        private IPEndPoint _remoteEndpoint;
-        private IPEndPoint RemoteEndpoint
-        {
-            get
-            {
-                return this._remoteEndpoint;
-            }
-            set
-            {
-                this._remoteEndpoint = value;
-            }
-        }
-        #endregion
-
-        #region connection
+        private IPEndPoint RemoteEndpoint { get; set; }
 
         public override void Connect()
         {
             try
             {
+                var ipv4Addresses =
+                    Dns
+                    .GetHostAddresses(Dns.GetHostName())
+                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork)
+                    .ToList(); // TODO: I can probably leave the ToList off, there are no closures below either
 
-                foreach (IPAddress localIp in Dns.GetHostAddresses(Dns.GetHostName()).Where(i => i.AddressFamily == AddressFamily.InterNetwork))
+                foreach (var localIp in ipv4Addresses)
                 {
-                    IPAddress ipToUse = localIp;
-
-                    UdpClient client = new UdpClient(new IPEndPoint(ipToUse, this.LocalEndpoint.Port));
-                    this.UdpClients.Add(client);
-                    client.JoinMulticastGroup(IP, ipToUse);
+                    var client = new UdpClient(new IPEndPoint(localIp, LocalEndpoint.Port));
+                    UdpClients.Add(client);
+                    client.JoinMulticastGroup(IpAddress, localIp);
                 }
             }
             catch (SocketException)
             {
-                throw new ConnectionErrorException(this.Host, this.Port);
+                throw new ConnectionErrorException(Host, Port);
             }
 
-            KNXReceiver = new KNXReceiverRouting(this, this.UdpClients, LocalEndpoint);
-            KNXReceiver.Start();
+            // TODO: Maybe if we have a base Connect helper which takes in a KnxReceiver and KnxSender,
+            // we can make the property setters more restricted
+            KnxReceiver = new KnxReceiverRouting(this, UdpClients);
+            KnxReceiver.Start();
 
-            KNXSender = new KNXSenderRouting(this, this.UdpClients, LocalEndpoint, RemoteEndpoint);
+            KnxSender = new KnxSenderRouting(this, UdpClients, RemoteEndpoint);
 
-            base.Connected();
+            Connected();
         }
 
         public override void Disconnect()
         {
-            this.KNXReceiver.Stop();
-            foreach (UdpClient client in this.UdpClients)
+            KnxReceiver.Stop();
+            foreach (var client in UdpClients)
             {
-                client.DropMulticastGroup(IP);
+                client.DropMulticastGroup(IpAddress);
                 client.Close();
             }
         }
-
-        #endregion
     }
 }

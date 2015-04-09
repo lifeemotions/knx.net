@@ -1,171 +1,93 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Timers;
 using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KNXConnectionTunneling : KNXConnection
+    public class KnxConnectionTunneling : KnxConnection
     {
-        #region constructor
-        public KNXConnectionTunneling(String remoteIP, int remotePort, string localIP, int localPort)
-            : base(remoteIP, remotePort)
-        {
-            RemoteEndpoint = new IPEndPoint(IP, remotePort);
-            LocalEndpoint = new IPEndPoint(IPAddress.Parse(localIP), localPort);
+        private readonly Timer _stateRequestTimer;
 
-            Initialize();
+        public KnxConnectionTunneling(string remoteIpAddress, int remotePort, string localIpAddress, int localPort)
+            : base(remoteIpAddress, remotePort)
+        {
+            RemoteEndpoint = new IPEndPoint(IpAddress, remotePort);
+            LocalEndpoint = new IPEndPoint(IPAddress.Parse(localIpAddress), localPort);
+
+            ChannelId = 0x00;
+            SequenceNumberLock = new object();
+            _stateRequestTimer = new Timer(60000) { AutoReset = true }; // same time as ETS with group monitor open
+            _stateRequestTimer.Elapsed += StateRequest;
         }
 
-        private void Initialize()
-        {
-            this.ChannelId = 0x00;
-            this.SequenceNumberLock = new object();
-            stateRequestTimer = new Timer(60000); // same time as ETS with group monitor open
-            stateRequestTimer.AutoReset = true;
-            stateRequestTimer.Elapsed += new ElapsedEventHandler(StateRequest);
-        }
-        #endregion
+        private UdpClient UdpClient { get; set; }
 
-        #region variables
-        private UdpClient _udpClient;
-        private UdpClient UdpClient
-        {
-            get
-            {
-                return this._udpClient;
-            }
-            set
-            {
-                this._udpClient = value;
-            }
-        }
+        private IPEndPoint LocalEndpoint { get; set; }
 
-        private IPEndPoint _localEndpoint;
-        private IPEndPoint LocalEndpoint
-        {
-            get
-            {
-                return this._localEndpoint;
-            }
-            set
-            {
-                this._localEndpoint = value;
-            }
-        }
+        private IPEndPoint RemoteEndpoint { get; set; }
 
-        private IPEndPoint _remoteEndpoint;
-        private IPEndPoint RemoteEndpoint
-        {
-            get
-            {
-                return this._remoteEndpoint;
-            }
-            set
-            {
-                this._remoteEndpoint = value;
-            }
-        }
+        internal byte ChannelId { get; set; }
 
-        private byte _channelId;
-        internal byte ChannelId
-        {
-            get
-            {
-                return _channelId;
-            }
-            set
-            {
-                this._channelId = value;
-            }
-        }
+        internal byte SequenceNumber { get; set; }
 
-        private byte _sequenceNumber;
-        internal byte SequenceNumber
-        {
-            get
-            {
-                return this._sequenceNumber;
-            }
-            set
-            {
-                this._sequenceNumber = value;
-            }
-        }
-
-        private object _sequenceNumberLock;
-        internal object SequenceNumberLock
-        {
-            get
-            {
-                return this._sequenceNumberLock;
-            }
-            set
-            {
-                this._sequenceNumberLock = value;
-            }
-        }
+        internal object SequenceNumberLock { get; set; }
 
         internal byte GenerateSequenceNumber()
         {
-            return this._sequenceNumber++;
+            return SequenceNumber++;
         }
+
         internal void RevertSingleSequenceNumber()
         {
-            this._sequenceNumber--;
+            SequenceNumber--;
         }
-        #endregion
-
-        #region connection
 
         public override void Connect()
         {
             try
             {
-                if (this.UdpClient != null)
+                if (UdpClient != null)
                 {
                     try
                     {
-                        this.UdpClient.Close();
-                        this.UdpClient.Client.Dispose();
+                        UdpClient.Close();
+                        UdpClient.Client.Dispose();
                     }
-                    catch (Exception)
+                    catch
                     {
                         // ignore
                     }
                 }
-                this.UdpClient = new UdpClient(LocalEndpoint);
-                this.UdpClient.Client.DontFragment = true;
-                //this.UdpClient.Client.NoDelay = true;
-                this.UdpClient.Client.SendBufferSize = 0;
+
+                UdpClient = new UdpClient(LocalEndpoint)
+                {
+                    Client = { DontFragment = true, SendBufferSize = 0 }
+                };
             }
             catch (SocketException)
             {
-                throw new ConnectionErrorException(this.Host, this.Port);
+                throw new ConnectionErrorException(Host, Port);
             }
 
-            if (KNXReceiver == null || KNXSender == null)
+            if (KnxReceiver == null || KnxSender == null)
             {
-                KNXReceiver = new KNXReceiverTunneling(this, this.UdpClient, LocalEndpoint);
-                KNXSender = new KNXSenderTunneling(this, this.UdpClient, RemoteEndpoint);
+                KnxReceiver = new KnxReceiverTunneling(this, UdpClient, LocalEndpoint);
+                KnxSender = new KnxSenderTunneling(this, UdpClient, RemoteEndpoint);
             }
             else
             {
-                ((KNXReceiverTunneling)KNXReceiver).UdpClient = this.UdpClient;
-                ((KNXSenderTunneling)KNXSender).UdpClient = this.UdpClient;
+                ((KnxReceiverTunneling)KnxReceiver).UdpClient = UdpClient;
+                ((KnxSenderTunneling)KnxSender).UdpClient = UdpClient;
             }
 
-            KNXReceiver.Start();
+            KnxReceiver.Start();
 
             try
             {
                 ConnectRequest();
             }
-            catch (Exception)
+            catch
             {
                 // ignore
             }
@@ -175,143 +97,137 @@ namespace KNXLib
         {
             try
             {
-                this.TerminateStateRequest();
-                this.DisconnectRequest();
-                this.KNXReceiver.Stop();
-                this.UdpClient.Close();
+                TerminateStateRequest();
+                DisconnectRequest();
+                KnxReceiver.Stop();
+                UdpClient.Close();
             }
-            catch (Exception)
+            catch
             {
                 // ignore
             }
+
             base.Disconnected();
         }
 
-        #endregion
-
-        #region connect request
-        internal void ConnectRequest()
-        {
-            // HEADER
-            byte[] dgram = new byte[26];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x05;
-            dgram[04] = 0x00;
-            dgram[05] = 0x1A;
-
-            dgram[06] = 0x08;
-            dgram[07] = 0x01;
-            dgram[08] = this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[09] = this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[10] = this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[11] = this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[12] = (byte)(this.LocalEndpoint.Port >> 8);
-            dgram[13] = (byte)(this.LocalEndpoint.Port);
-            dgram[14] = 0x08;
-            dgram[15] = 0x01;
-            dgram[16] = this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[17] = this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[18] = this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[19] = this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[20] = (byte)(this.LocalEndpoint.Port >> 8);
-            dgram[21] = (byte)(this.LocalEndpoint.Port);
-            dgram[22] = 0x04;
-            dgram[23] = 0x04;
-            dgram[24] = 0x02;
-            dgram[25] = 0x00;
-
-            ((KNXSenderTunneling)this.KNXSender).SendDataSingle(dgram);
-        }
-        #endregion
-
-        #region events
         public override void Connected()
         {
             base.Connected();
 
-            this.InitializeStateRequest();
+            InitializeStateRequest();
         }
+
         public override void Disconnected()
         {
             base.Disconnected();
 
-            this.TerminateStateRequest();
+            TerminateStateRequest();
         }
-        #endregion
 
-        #region state request
-        private Timer stateRequestTimer;
         private void InitializeStateRequest()
         {
-            stateRequestTimer.Enabled = true;
+            _stateRequestTimer.Enabled = true;
         }
+
         private void TerminateStateRequest()
         {
-            if (stateRequestTimer == null)
+            if (_stateRequestTimer == null)
                 return;
 
-            stateRequestTimer.Enabled = false;
+            _stateRequestTimer.Enabled = false;
         }
-        private void StateRequest(object sender, System.Timers.ElapsedEventArgs e)
+
+        // TODO: I wonder if we can extract all these types of requests
+        private void ConnectRequest()
         {
             // HEADER
-            byte[] dgram = new byte[16];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x07;
-            dgram[04] = 0x00;
-            dgram[05] = 0x10;
+            var datagram = new byte[26];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x05;
+            datagram[04] = 0x00;
+            datagram[05] = 0x1A;
 
-            dgram[06] = this.ChannelId;
-            dgram[07] = 0x00;
-            dgram[08] = 0x08;
-            dgram[09] = 0x01;
-            dgram[10] = this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = (byte)(this.LocalEndpoint.Port >> 8);
-            dgram[15] = (byte)(this.LocalEndpoint.Port);
+            datagram[06] = 0x08;
+            datagram[07] = 0x01;
+            datagram[08] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[09] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[12] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[13] = (byte)(LocalEndpoint.Port);
+            datagram[14] = 0x08;
+            datagram[15] = 0x01;
+            datagram[16] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[17] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[18] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[19] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[20] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[21] = (byte)(LocalEndpoint.Port);
+            datagram[22] = 0x04;
+            datagram[23] = 0x04;
+            datagram[24] = 0x02;
+            datagram[25] = 0x00;
+
+            ((KnxSenderTunneling)KnxSender).SendDataSingle(datagram);
+        }
+
+        private void StateRequest(object sender, ElapsedEventArgs e)
+        {
+            // HEADER
+            var datagram = new byte[16];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x07;
+            datagram[04] = 0x00;
+            datagram[05] = 0x10;
+
+            datagram[06] = ChannelId;
+            datagram[07] = 0x00;
+            datagram[08] = 0x08;
+            datagram[09] = 0x01;
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[15] = (byte)(LocalEndpoint.Port);
 
             try
             {
-                this.KNXSender.SendData(dgram);
+                KnxSender.SendData(datagram);
             }
-            catch (Exception)
+            catch
             {
                 // ignore
             }
         }
-        #endregion
 
-        #region disconnect request
-        internal void DisconnectRequest()
+        private void DisconnectRequest()
         {
             // HEADER
-            byte[] dgram = new byte[16];
-            dgram[00] = 0x06;
-            dgram[01] = 0x10;
-            dgram[02] = 0x02;
-            dgram[03] = 0x09;
-            dgram[04] = 0x00;
-            dgram[05] = 0x10;
+            var datagram = new byte[16];
+            datagram[00] = 0x06;
+            datagram[01] = 0x10;
+            datagram[02] = 0x02;
+            datagram[03] = 0x09;
+            datagram[04] = 0x00;
+            datagram[05] = 0x10;
 
-            dgram[06] = this.ChannelId;
-            dgram[07] = 0x00;
-            dgram[08] = 0x08;
-            dgram[09] = 0x01;
-            dgram[10] = this.LocalEndpoint.Address.GetAddressBytes()[0];
-            dgram[11] = this.LocalEndpoint.Address.GetAddressBytes()[1];
-            dgram[12] = this.LocalEndpoint.Address.GetAddressBytes()[2];
-            dgram[13] = this.LocalEndpoint.Address.GetAddressBytes()[3];
-            dgram[14] = (byte)(this.LocalEndpoint.Port >> 8);
-            dgram[15] = (byte)(this.LocalEndpoint.Port);
+            datagram[06] = ChannelId;
+            datagram[07] = 0x00;
+            datagram[08] = 0x08;
+            datagram[09] = 0x01;
+            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
+            datagram[15] = (byte)(LocalEndpoint.Port);
 
-            this.KNXSender.SendData(dgram);
+            KnxSender.SendData(datagram);
         }
-        #endregion
     }
 }

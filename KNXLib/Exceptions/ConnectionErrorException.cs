@@ -2,20 +2,20 @@
 
 namespace KNXLib.Exceptions
 {
-    public class ConnectionErrorException : System.Exception
+    public class ConnectionErrorException : Exception
     {
-        private string host;
-        private int port;
+        private readonly string _host;
+        private readonly int _port;
 
         public ConnectionErrorException(string host, int port)
         {
-            this.host = host;
-            this.port = port;
+            _host = host;
+            _port = port;
         }
 
         public override string ToString()
         {
-            return "ConnectionErrorException: Error connecting to " + host + ":" + port;
+            return string.Format("ConnectionErrorException: Error connecting to {0}:{1}", _host, _port);
         }
     }
 }

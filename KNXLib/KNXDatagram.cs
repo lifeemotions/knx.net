@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
-    public class KNXDatagram
+    internal class KnxDatagram
     {
         // HEADER
-        internal int header_length;
-        internal byte protocol_version;
-        internal byte[] service_type;
-        internal int total_length;
+        public int header_length;
+        public byte protocol_version;
+        public byte[] service_type;
+        public int total_length;
 
         // CONNECTION
-        internal byte channel_id;
-        internal byte status;
+        public byte channel_id;
+        public byte status;
 
         // CEMI
-        internal byte message_code;
-        internal int aditional_info_length;
-        internal byte[] aditional_info;
-        internal byte control_field_1;
-        internal byte control_field_2;
-        internal string source_address;
-        internal string destination_address;
-        internal int data_length;
-        internal byte[] apdu;
-        internal string data;
+        public byte message_code;
+        public int aditional_info_length;
+        public byte[] aditional_info;
+        public byte control_field_1;
+        public byte control_field_2;
+        public string source_address;
+        public string destination_address;
+        public int data_length;
+        public byte[] apdu;
+        public string data;
     }
 }

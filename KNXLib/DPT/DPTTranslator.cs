@@ -1,100 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace KNXLib.DPT
 {
-    public class DPTTranslator
+    internal sealed class DPTTranslator
     {
-        #region Singleton
         private static readonly DPTTranslator instance = new DPTTranslator();
+        private readonly IDictionary<string, DPT> _dpts = new Dictionary<string, DPT>();
+
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
+        static DPTTranslator()
+        {
+        }
 
         private DPTTranslator()
         {
-            this.Initialize();
+            // TODO: Should we provide an extension point for users to add their own DPTs?
+            DPT dpt = new DPTTemperature();
+            _dpts.Add(dpt.Id, dpt);
         }
 
         public static DPTTranslator Instance
         {
-            get
-            {
-                return instance;
-            }
-        }
-        #endregion
-
-        private IDictionary<string, DPT> dpts = new Dictionary<string, DPT>();
-
-        private void Initialize()
-        {
-            DPT dpt;
-
-            dpt = new DPTTemperature();
-            dpts.Add(dpt.ID, dpt);
+            get { return instance; }
         }
 
-        public object fromDPT(string type, byte[] data)
+        public object FromDPT(string type, string data)
         {
             try
             {
-                if (dpts.ContainsKey(type))
-                {
-                    DPT dpt = dpts[type];
-                    return dpt.fromDPT(data);
-                }
+                DPT dpt;
+                if (_dpts.TryGetValue(type, out dpt))
+                    return dpt.FromDPT(data);
             }
-            catch (Exception)
+            catch (Exception) // TODO: Not clear why you would want to supress all exceptions?
             {
             }
+
             return null;
         }
 
-        public object fromDPT(string type, String data)
+        public object FromDPT(string type, byte[] data)
         {
             try
             {
-                if (dpts.ContainsKey(type))
-                {
-                    DPT dpt = dpts[type];
-                    return dpt.fromDPT(data);
-                }
+                DPT dpt;
+                if (_dpts.TryGetValue(type, out dpt))
+                    return dpt.FromDPT(data);
             }
-            catch (Exception)
+            catch (Exception) // TODO: Not clear why you would want to supress all exceptions?
             {
             }
+
             return null;
         }
 
-        public byte[] toDPT(string type, object value)
+        public byte[] ToDPT(string type, string value)
         {
             try
             {
-                if (dpts.ContainsKey(type))
-                {
-                    DPT dpt = dpts[type];
-                    return dpt.toDPT(value);
-                }
+                DPT dpt;
+                if (_dpts.TryGetValue(type, out dpt))
+                    return dpt.ToDPT(value);
             }
-            catch (Exception)
+            catch (Exception) // TODO: Not clear why you would want to supress all exceptions?
             {
             }
+
             return null;
         }
 
-        public byte[] toDPT(string type, String value)
+        public byte[] ToDPT(string type, object value)
         {
             try
             {
-                if (dpts.ContainsKey(type))
-                {
-                    DPT dpt = dpts[type];
-                    return dpt.toDPT(value);
-                }
+                DPT dpt;
+                if (_dpts.TryGetValue(type, out dpt))
+                    return dpt.ToDPT(value);
             }
-            catch (Exception)
+            catch (Exception) // TODO: Not clear why you would want to supress all exceptions?
             {
             }
+
             return null;
         }
     }
