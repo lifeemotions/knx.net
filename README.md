@@ -1,4 +1,4 @@
-KNX.net
+KNX.net ![build status](https://travis-ci.org/lifeemotions/knx.net.svg?branch=master)
 =======
 
 KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
