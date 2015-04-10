@@ -7,21 +7,20 @@ namespace KNXLib
 {
     internal class KnxSenderRouting : KnxSender
     {
+        private readonly IList<UdpClient> _udpClients;
+        private readonly IPEndPoint _remoteEndpoint;
+
         internal KnxSenderRouting(KnxConnection connection, IList<UdpClient> udpClients, IPEndPoint remoteEndpoint)
             : base(connection)
         {
-            RemoteEndpoint = remoteEndpoint;
-            UdpClients = udpClients;
+            _udpClients = udpClients;
+            _remoteEndpoint = remoteEndpoint;
         }
-
-        private IPEndPoint RemoteEndpoint { get; set; }
-
-        private IList<UdpClient> UdpClients { get; set; }
 
         public override void SendData(byte[] datagram)
         {
-            foreach (var client in UdpClients)
-                client.Send(datagram, datagram.Length, RemoteEndpoint);
+            foreach (var client in _udpClients)
+                client.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
         protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)

@@ -5,31 +5,29 @@ namespace KNXLib
 {
     internal abstract class KnxReceiver
     {
+        private Thread _receiverThread;
+
         protected KnxReceiver(KnxConnection connection)
         {
             KnxConnection = connection;
         }
 
-        // TODO: It is strange you can set this, since you expect it to come over the ctor
-        public KnxConnection KnxConnection { get; set; }
-
-        private Thread ReceiverThread { get; set; }
+        protected KnxConnection KnxConnection { get; private set; }
 
         public abstract void ReceiverThreadFlow();
-        public abstract void ProcessDatagram(byte[] datagram);
 
         public void Start()
         {
-            ReceiverThread = new Thread(ReceiverThreadFlow) { IsBackground = true };
-            ReceiverThread.Start();
+            _receiverThread = new Thread(ReceiverThreadFlow) { IsBackground = true };
+            _receiverThread.Start();
         }
 
         public void Stop()
         {
             try
             {
-                if (ReceiverThread.ThreadState.Equals(ThreadState.Running))
-                    ReceiverThread.Abort();
+                if (_receiverThread.ThreadState.Equals(ThreadState.Running))
+                    _receiverThread.Abort();
             }
             catch
             {
@@ -37,7 +35,7 @@ namespace KNXLib
             }
         }
 
-        public void ProcessCEMI(KnxDatagram datagram, byte[] cemi)
+        protected void ProcessCEMI(KnxDatagram datagram, byte[] cemi)
         {
             try
             {

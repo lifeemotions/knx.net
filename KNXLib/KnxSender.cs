@@ -7,7 +7,7 @@
             KnxConnection = connection;
         }
 
-        protected KnxConnection KnxConnection { get; set; }
+        protected KnxConnection KnxConnection { get; private set; }
 
         public abstract void SendData(byte[] datagram);
 

@@ -52,10 +52,12 @@ namespace KNXTest
             Console.ReadLine();
             _connection.Action("2/1/1", false);
             Thread.Sleep(200);
+
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - true");
             Console.ReadLine();
             _connection.Action("2/1/1", true);
             Thread.Sleep(200);
+
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
             _connection.Action("2/2/1", true);
@@ -68,14 +70,17 @@ namespace KNXTest
             Console.ReadLine();
             _connection.Action("2/3/1", 0x00);
             Thread.Sleep(200);
+
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \xFF");
             Console.ReadLine();
             _connection.Action("2/3/1", 0xFF);
             Thread.Sleep(200);
+
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x80");
             Console.ReadLine();
             _connection.Action("2/3/1", 0x80);
             Thread.Sleep(200);
+
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
             _connection.Action("2/2/1", true);
@@ -86,27 +91,27 @@ namespace KNXTest
         {
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 28ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDPT("9.001", 28.0f));
+            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 28.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 27ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDPT("9.001", 27.0f));
+            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 27.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 26ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDPT("9.001", 26.0f));
+            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 26.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 25ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDPT("9.001", 25.0f));
+            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 25.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 24ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDPT("9.001", 24.0f));
+            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 24.0f));
             Thread.Sleep(200);
         }
 
@@ -114,7 +119,7 @@ namespace KNXTest
         {
             if (Temperatures.Contains(address))
             {
-                var temp = (float)_connection.FromDPT("9.001", state);
+                var temp = (float)_connection.FromDataPoint("9.001", state);
                 Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
             }
             else if (Lights.Contains(address))

@@ -7,24 +7,28 @@ namespace KNXLib
 {
     internal class KnxReceiverTunneling : KnxReceiver
     {
+        private UdpClient _udpClient;
         private IPEndPoint _localEndpoint;
+
         private readonly object _rxSequenceNumberLock = new object();
+        private byte _rxSequenceNumber;
 
         internal KnxReceiverTunneling(KnxConnection connection, UdpClient udpClient, IPEndPoint localEndpoint)
             : base(connection)
         {
+            _udpClient = udpClient;
             _localEndpoint = localEndpoint;
-            UdpClient = udpClient;
         }
-
-        public UdpClient UdpClient { get; set; }
 
         private KnxConnectionTunneling KnxConnectionTunneling
         {
             get { return (KnxConnectionTunneling)KnxConnection; }
         }
 
-        private byte RXSequenceNumber { get; set; }
+        public void SetClient(UdpClient client)
+        {
+            _udpClient = client;
+        }
 
         public override void ReceiverThreadFlow()
         {
@@ -32,7 +36,7 @@ namespace KNXLib
             {
                 while (true)
                 {
-                    var datagram = UdpClient.Receive(ref _localEndpoint);
+                    var datagram = _udpClient.Receive(ref _localEndpoint);
                     ProcessDatagram(datagram);
                 }
             }
@@ -50,7 +54,7 @@ namespace KNXLib
             }
         }
 
-        public override void ProcessDatagram(byte[] datagram)
+        private void ProcessDatagram(byte[] datagram)
         {
             try
             {
@@ -109,10 +113,10 @@ namespace KNXLib
             var process = true;
             lock (_rxSequenceNumberLock)
             {
-                if (sequenceNumber <= RXSequenceNumber)
+                if (sequenceNumber <= _rxSequenceNumber)
                     process = false;
 
-                RXSequenceNumber = sequenceNumber;
+                _rxSequenceNumber = sequenceNumber;
             }
 
             if (process)
@@ -135,7 +139,7 @@ namespace KNXLib
 
             Stop();
             KnxConnection.Disconnected();
-            UdpClient.Close();
+            _udpClient.Close();
         }
 
         private void ProcessTunnelingAck(byte[] datagram)
@@ -188,7 +192,7 @@ namespace KNXLib
             else
             {
                 KnxConnectionTunneling.ChannelId = knxDatagram.channel_id;
-                KnxConnectionTunneling.SequenceNumber = 0x00;
+                KnxConnectionTunneling.ResetSequenceNumber();
 
                 KnxConnectionTunneling.Connected();
             }

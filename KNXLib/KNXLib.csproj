@@ -71,10 +71,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DPT\DPT.cs" />
-    <Compile Include="DPT\DPTTemperature.cs" />
-    <Compile Include="DPT\DPTTranslator.cs" />
+    <Compile Include="DPT\DataPoint.cs" />
+    <Compile Include="DPT\Temperature.cs" />
+    <Compile Include="DPT\DataPointTranslator.cs" />
     <Compile Include="KnxConnectionConfiguration.cs" />
+    <Compile Include="KnxLockManager.cs" />
     <Compile Include="KnxSenderTunneling.cs" />
     <Compile Include="KnxReceiverTunneling.cs" />
     <Compile Include="KnxConnectionTunneling.cs" />

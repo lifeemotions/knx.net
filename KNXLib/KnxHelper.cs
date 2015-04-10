@@ -262,9 +262,9 @@ namespace KNXLib
         // +--------+--------+--------+--------+--------+--------+--------+--------++--------+----....
         // +                            B  Y  T  E    2                            ||       B Y T E  3
         // +-----------------------------------------------------------------------++-------------....
-        public static string GetData(int data_length, byte[] apdu)
+        public static string GetData(int dataLength, byte[] apdu)
         {
-            switch (data_length)
+            switch (dataLength)
             {
                 case 0:
                     return string.Empty;
@@ -295,35 +295,35 @@ namespace KNXLib
             return data.Length + 1;
         }
 
-        public static void WriteData(byte[] datagram, byte[] data, int data_start)
+        public static void WriteData(byte[] datagram, byte[] data, int dataStart)
         {
             if (data.Length == 1)
             {
                 if (data[0] < 0x3F)
                 {
-                    datagram[data_start] = (byte)(datagram[data_start] | data[0]);
+                    datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
                 }
                 else
                 {
-                    datagram[data_start + 1] = data[0];
+                    datagram[dataStart + 1] = data[0];
                 }
             }
             else if (data.Length > 1)
             {
                 if (data[0] < 0x3F)
                 {
-                    datagram[data_start] = (byte)(datagram[data_start] | data[0]);
+                    datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
 
                     for (var i = 1; i < data.Length; i++)
                     {
-                        datagram[data_start + i] = data[i];
+                        datagram[dataStart + i] = data[i];
                     }
                 }
                 else
                 {
                     for (var i = 0; i < data.Length; i++)
                     {
-                        datagram[data_start + 1 + i] = data[i];
+                        datagram[dataStart + 1 + i] = data[i];
                     }
                 }
             }
