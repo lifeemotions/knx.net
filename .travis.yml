@@ -1,5 +1,6 @@
 language: csharp
 solution: KNX.net.sln
+sudo: required
 before_script:
   - chmod a+x travis-install-eibd.sh
   - ./travis-install-eibd.sh
