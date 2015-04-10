@@ -4,7 +4,7 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
-    public class KnxConnectionConfiguration
+    internal class KnxConnectionConfiguration
     {
         public KnxConnectionConfiguration(string host, int port)
         {

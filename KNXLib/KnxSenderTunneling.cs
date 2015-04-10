@@ -6,33 +6,37 @@ namespace KNXLib
 {
     internal class KnxSenderTunneling : KnxSender
     {
+        private UdpClient _udpClient;
+        private readonly IPEndPoint _remoteEndpoint;
+
         internal KnxSenderTunneling(KnxConnection connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
             : base(connection)
         {
-            RemoteEndpoint = remoteEndpoint;
-            UdpClient = udpClient;
+            _udpClient = udpClient;
+            _remoteEndpoint = remoteEndpoint;
         }
-
-        private IPEndPoint RemoteEndpoint { get; set; }
-
-        public UdpClient UdpClient { get; set; }
 
         private KnxConnectionTunneling KnxConnectionTunneling
         {
             get { return (KnxConnectionTunneling)KnxConnection; }
         }
 
+        public void SetClient(UdpClient client)
+        {
+            _udpClient = client;
+        }
+
         public void SendDataSingle(byte[] datagram)
         {
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
         public override void SendData(byte[] datagram)
         {
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
         public void SendTunnelingAck(byte sequenceNumber)
@@ -51,7 +55,7 @@ namespace KNXLib
             datagram[08] = sequenceNumber;
             datagram[09] = 0x00;
 
-            UdpClient.Send(datagram, datagram.Length, RemoteEndpoint);
+            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
         protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)

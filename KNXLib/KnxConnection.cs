@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Text;
-using System.Threading;
 using KNXLib.DPT;
 using KNXLib.Exceptions;
 
@@ -16,13 +15,12 @@ namespace KNXLib
         public KnxDisconnected KnxDisconnectedDelegate = null;
 
         public delegate void KnxEvent(string address, string state);
-        public KnxEvent KnxEventDelegate = null;
+        public KnxEvent KnxEventDelegate = (address, state) => { };
 
         public delegate void KnxStatus(string address, string state);
-        public KnxStatus KnxStatusDelegate = null;
+        public KnxStatus KnxStatusDelegate = (address, state) => { };
 
-        private readonly object _connectedLock = new object();
-        private bool _isConnected;
+        private readonly KnxLockManager _lockManager = new KnxLockManager();
 
         protected KnxConnection(string host, int port)
         {
@@ -33,7 +31,7 @@ namespace KNXLib
             Debug = false;
         }
 
-        protected KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
+        internal KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
 
         protected IPEndPoint RemoteEndpoint
         {
@@ -67,28 +65,14 @@ namespace KNXLib
                 //ignore
             }
 
-            Log("KNX is connected. Unlocking send - {0} free locks", SemaphoreCount());
+            Log("KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
 
-            lock (_connectedLock)
-            {
-                if (_isConnected)
-                    return;
-
-                _isConnected = true;
-                SendUnlock();
-            }
+            _lockManager.UnlockConnection();
         }
 
         public virtual void Disconnected()
         {
-            lock (_connectedLock)
-            {
-                if (_isConnected)
-                {
-                    SendLock();
-                    _isConnected = false;
-                }
-            }
+            _lockManager.LockConnection();
 
             try
             {
@@ -100,30 +84,28 @@ namespace KNXLib
                 //ignore
             }
 
-            Log("KNX is disconnected. Send locked - {0} free locks", SemaphoreCount());
+            Log("KNX is disconnected. Send locked - {0} free locks", _lockManager.LockCount);
         }
 
-        public void Event(string address, string state)
+        internal void Event(string address, string state)
         {
             try
             {
-                if (KnxEventDelegate != null)
-                    KnxEventDelegate(address, state);
+                KnxEventDelegate(address, state);
             }
             catch
             {
                 //ignore
             }
 
-            Log("Device {0} has status {1}", address, state);
+            Log("Device {0} sent event {1}", address, state);
         }
 
-        public void Status(string address, string state)
+        internal void Status(string address, string state)
         {
             try
             {
-                if (KnxStatusDelegate != null)
-                    KnxStatusDelegate(address, state);
+                KnxStatusDelegate(address, state);
             }
             catch
             {
@@ -205,15 +187,7 @@ namespace KNXLib
         {
             Log("Sending {0} to {1}.", data, address);
 
-            try
-            {
-                SendLock();
-                KnxSender.Action(address, data);
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
+            _lockManager.PerformLockedOperation(() => KnxSender.Action(address, data));
 
             Log("Sent {0} to {1}.", data, address);
         }
@@ -221,17 +195,9 @@ namespace KNXLib
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
         public void RequestStatus(string address)
         {
-           Log("Sending request status to {0}.", address);
+            Log("Sending request status to {0}.", address);
 
-            try
-            {
-                SendLock();
-                KnxSender.RequestStatus(address);
-            }
-            finally
-            {
-                SendUnlockPause();
-            }
+            _lockManager.PerformLockedOperation(() => KnxSender.RequestStatus(address));
 
             Log("Sent request status to {0}.", address);
         }
@@ -243,54 +209,24 @@ namespace KNXLib
         }
 
         // TODO: Not sure if these DPT methods make much sense on connection, unless we want to hide the helper classes
-        public object FromDPT(string type, string data)
+        public object FromDataPoint(string type, string data)
         {
-            return DPTTranslator.Instance.FromDPT(type, data);
+            return DataPointTranslator.Instance.FromDataPoint(type, data);
         }
 
-        public object FromDPT(string type, byte[] data)
+        public object FromDataPoint(string type, byte[] data)
         {
-            return DPTTranslator.Instance.FromDPT(type, data);
+            return DataPointTranslator.Instance.FromDataPoint(type, data);
         }
 
-        public byte[] ToDPT(string type, string value)
+        public byte[] ToDataPoint(string type, string value)
         {
-            return DPTTranslator.Instance.ToDPT(type, value);
+            return DataPointTranslator.Instance.ToDataPoint(type, value);
         }
 
-        public byte[] ToDPT(string type, object value)
+        public byte[] ToDataPoint(string type, object value)
         {
-            return DPTTranslator.Instance.ToDPT(type, value);
-        }
-
-        // TODO: Refactor this out
-        private readonly SemaphoreSlim _lockSend = new SemaphoreSlim(0);
-
-        private void SendLock()
-        {
-            _lockSend.Wait();
-        }
-
-        private void SendUnlock()
-        {
-            _lockSend.Release();
-        }
-
-        private int SemaphoreCount()
-        {
-            return _lockSend.CurrentCount;
-        }
-
-        private void SendUnlockPause()
-        {
-            var t = new Thread(SendUnlockPauseThread) { IsBackground = true };
-            t.Start();
-        }
-
-        private void SendUnlockPauseThread()
-        {
-            Thread.Sleep(200);
-            _lockSend.Release();
+            return DataPointTranslator.Instance.ToDataPoint(type, value);
         }
     }
 }

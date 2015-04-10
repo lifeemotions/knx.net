@@ -7,12 +7,15 @@ namespace KNXLib
 {
     public class KnxConnectionTunneling : KnxConnection
     {
+        private readonly IPEndPoint _localEndpoint;
         private readonly Timer _stateRequestTimer;
+        private UdpClient _udpClient;
+        private byte _sequenceNumber;
 
         public KnxConnectionTunneling(string remoteIpAddress, int remotePort, string localIpAddress, int localPort)
             : base(remoteIpAddress, remotePort)
         {
-            LocalEndpoint = new IPEndPoint(IPAddress.Parse(localIpAddress), localPort);
+            _localEndpoint = new IPEndPoint(IPAddress.Parse(localIpAddress), localPort);
 
             ChannelId = 0x00;
             SequenceNumberLock = new object();
@@ -20,36 +23,35 @@ namespace KNXLib
             _stateRequestTimer.Elapsed += StateRequest;
         }
 
-        private UdpClient UdpClient { get; set; }
-
-        private IPEndPoint LocalEndpoint { get; set; }
-
         internal byte ChannelId { get; set; }
-
-        internal byte SequenceNumber { get; set; }
 
         internal object SequenceNumberLock { get; set; }
 
         internal byte GenerateSequenceNumber()
         {
-            return SequenceNumber++;
+            return _sequenceNumber++;
         }
 
         internal void RevertSingleSequenceNumber()
         {
-            SequenceNumber--;
+            _sequenceNumber--;
+        }
+
+        internal void ResetSequenceNumber()
+        {
+            _sequenceNumber = 0x00;
         }
 
         public override void Connect()
         {
             try
             {
-                if (UdpClient != null)
+                if (_udpClient != null)
                 {
                     try
                     {
-                        UdpClient.Close();
-                        UdpClient.Client.Dispose();
+                        _udpClient.Close();
+                        _udpClient.Client.Dispose();
                     }
                     catch
                     {
@@ -57,7 +59,7 @@ namespace KNXLib
                     }
                 }
 
-                UdpClient = new UdpClient(LocalEndpoint)
+                _udpClient = new UdpClient(_localEndpoint)
                 {
                     Client = { DontFragment = true, SendBufferSize = 0 }
                 };
@@ -69,13 +71,13 @@ namespace KNXLib
 
             if (KnxReceiver == null || KnxSender == null)
             {
-                KnxReceiver = new KnxReceiverTunneling(this, UdpClient, LocalEndpoint);
-                KnxSender = new KnxSenderTunneling(this, UdpClient, RemoteEndpoint);
+                KnxReceiver = new KnxReceiverTunneling(this, _udpClient, _localEndpoint);
+                KnxSender = new KnxSenderTunneling(this, _udpClient, RemoteEndpoint);
             }
             else
             {
-                ((KnxReceiverTunneling)KnxReceiver).UdpClient = UdpClient;
-                ((KnxSenderTunneling)KnxSender).UdpClient = UdpClient;
+                ((KnxReceiverTunneling)KnxReceiver).SetClient(_udpClient);
+                ((KnxSenderTunneling)KnxSender).SetClient(_udpClient);
             }
 
             KnxReceiver.Start();
@@ -97,7 +99,7 @@ namespace KNXLib
                 TerminateStateRequest();
                 DisconnectRequest();
                 KnxReceiver.Stop();
-                UdpClient.Close();
+                _udpClient.Close();
             }
             catch
             {
@@ -148,20 +150,20 @@ namespace KNXLib
 
             datagram[06] = 0x08;
             datagram[07] = 0x01;
-            datagram[08] = LocalEndpoint.Address.GetAddressBytes()[0];
-            datagram[09] = LocalEndpoint.Address.GetAddressBytes()[1];
-            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[2];
-            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[3];
-            datagram[12] = (byte)(LocalEndpoint.Port >> 8);
-            datagram[13] = (byte)(LocalEndpoint.Port);
+            datagram[08] = _localEndpoint.Address.GetAddressBytes()[0];
+            datagram[09] = _localEndpoint.Address.GetAddressBytes()[1];
+            datagram[10] = _localEndpoint.Address.GetAddressBytes()[2];
+            datagram[11] = _localEndpoint.Address.GetAddressBytes()[3];
+            datagram[12] = (byte)(_localEndpoint.Port >> 8);
+            datagram[13] = (byte)_localEndpoint.Port;
             datagram[14] = 0x08;
             datagram[15] = 0x01;
-            datagram[16] = LocalEndpoint.Address.GetAddressBytes()[0];
-            datagram[17] = LocalEndpoint.Address.GetAddressBytes()[1];
-            datagram[18] = LocalEndpoint.Address.GetAddressBytes()[2];
-            datagram[19] = LocalEndpoint.Address.GetAddressBytes()[3];
-            datagram[20] = (byte)(LocalEndpoint.Port >> 8);
-            datagram[21] = (byte)(LocalEndpoint.Port);
+            datagram[16] = _localEndpoint.Address.GetAddressBytes()[0];
+            datagram[17] = _localEndpoint.Address.GetAddressBytes()[1];
+            datagram[18] = _localEndpoint.Address.GetAddressBytes()[2];
+            datagram[19] = _localEndpoint.Address.GetAddressBytes()[3];
+            datagram[20] = (byte)(_localEndpoint.Port >> 8);
+            datagram[21] = (byte)_localEndpoint.Port;
             datagram[22] = 0x04;
             datagram[23] = 0x04;
             datagram[24] = 0x02;
@@ -185,12 +187,12 @@ namespace KNXLib
             datagram[07] = 0x00;
             datagram[08] = 0x08;
             datagram[09] = 0x01;
-            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
-            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
-            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
-            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
-            datagram[15] = (byte)(LocalEndpoint.Port);
+            datagram[10] = _localEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(_localEndpoint.Port >> 8);
+            datagram[15] = (byte)_localEndpoint.Port;
 
             try
             {
@@ -217,12 +219,12 @@ namespace KNXLib
             datagram[07] = 0x00;
             datagram[08] = 0x08;
             datagram[09] = 0x01;
-            datagram[10] = LocalEndpoint.Address.GetAddressBytes()[0];
-            datagram[11] = LocalEndpoint.Address.GetAddressBytes()[1];
-            datagram[12] = LocalEndpoint.Address.GetAddressBytes()[2];
-            datagram[13] = LocalEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte)(LocalEndpoint.Port >> 8);
-            datagram[15] = (byte)(LocalEndpoint.Port);
+            datagram[10] = _localEndpoint.Address.GetAddressBytes()[0];
+            datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
+            datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
+            datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
+            datagram[14] = (byte)(_localEndpoint.Port >> 8);
+            datagram[15] = (byte)_localEndpoint.Port;
 
             KnxSender.SendData(datagram);
         }

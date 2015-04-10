@@ -8,19 +8,19 @@ namespace KNXLib
 {
     internal class KnxReceiverRouting : KnxReceiver
     {
+        private readonly IList<UdpClient> _udpClients;
+
         internal KnxReceiverRouting(KnxConnection connection, IList<UdpClient> udpClients)
             : base(connection)
         {
-            UdpClients = udpClients;
+            _udpClients = udpClients;
         }
-
-        private IList<UdpClient> UdpClients { get; set; }
 
         public override void ReceiverThreadFlow()
         {
             try
             {
-                foreach (var client in UdpClients)
+                foreach (var client in _udpClients)
                     client.BeginReceive(OnReceive, new object[] { client });
 
                 // just wait to be aborted
@@ -57,7 +57,7 @@ namespace KNXLib
             }
         }
 
-        public override void ProcessDatagram(byte[] datagram)
+        private void ProcessDatagram(byte[] datagram)
         {
             try
             {
