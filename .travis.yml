@@ -4,3 +4,9 @@ sudo: required
 before_script:
   - chmod a+x travis-install-eibd.sh
   - ./travis-install-eibd.sh
+install:
+  - nuget restore KNX.net.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release KNX.net.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./KNXLibTests/bin/Release/KNXLibTests.dll

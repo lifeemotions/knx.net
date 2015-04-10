@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXTestRouting", "KNXTest\K
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXTestTunneling", "KNXTestTunneling\KNXTestTunneling.csproj", "{AE4B122B-6ADD-4727-991D-712672AF012D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KNXLibTests", "KNXLibTests\KNXLibTests.csproj", "{90D08CB2-37FE-450A-82C0-063E0B4802EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,14 @@ Global
 		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|x64.Build.0 = Release|x64
 		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|x86.ActiveCfg = Release|x86
 		{AE4B122B-6ADD-4727-991D-712672AF012D}.Release|x86.Build.0 = Release|x86
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Release|x64.ActiveCfg = Release|Any CPU
+		{90D08CB2-37FE-450A-82C0-063E0B4802EC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

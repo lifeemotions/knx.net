@@ -2,7 +2,7 @@
 
 namespace KNXLib.DPT
 {
-    internal sealed class DataPointTranslator
+    public sealed class DataPointTranslator
     {
         private static readonly DataPointTranslator instance = new DataPointTranslator();
         private readonly IDictionary<string, DataPoint> _dataPoints = new Dictionary<string, DataPoint>();
