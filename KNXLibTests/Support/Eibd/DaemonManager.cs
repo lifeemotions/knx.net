@@ -5,8 +5,8 @@ namespace KNXLibTests.Support.Eibd
     internal class DaemonManager
     {
         private const string EibdExecutable = @"eibd";
-        private const string EibdExecutableRoutingParameters = @"-c -d -D -R -S -u ip:";
-        private const string EibdExecutableTunnelingParameters = @"-c -d -D -T -S -u ip:";
+        private const string EibdExecutableRoutingParameters = @"-c -D -R -S -u ip:";
+        private const string EibdExecutableTunnelingParameters = @"-c -D -T -S -u ip:";
 
         private static Process EibdProcess { get; set; }
 

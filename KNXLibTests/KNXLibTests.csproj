@@ -49,10 +49,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Integration\Routing\ActionFeedback.cs" />
+    <Compile Include="Integration\Tunneling\ActionFeedback.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\Eibd\DaemonManager.cs" />
-    <Compile Include="Support\Eibd\SendAction.cs" />
+    <Compile Include="Support\Eibd\GroupWrite.cs" />
+    <Compile Include="Support\Eibd\GroupResponse.cs" />
+    <Compile Include="Support\Eibd\VBusMonitorManager.cs" />
     <Compile Include="Support\Os\Tools.cs" />
     <Compile Include="Unit\DataPoint\Temperature.cs" />
   </ItemGroup>
@@ -66,7 +68,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Integration\Tunneling\" />
+    <Folder Include="Integration\Routing\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

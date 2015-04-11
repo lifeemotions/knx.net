@@ -264,6 +264,7 @@ namespace KNXLib
         // +-----------------------------------------------------------------------++-------------....
         public static string GetData(int dataLength, byte[] apdu)
         {
+            
             switch (dataLength)
             {
                 case 0:

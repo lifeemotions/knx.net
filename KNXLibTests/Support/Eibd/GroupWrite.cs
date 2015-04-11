@@ -2,8 +2,9 @@
 
 namespace KNXLibTests.Support.Eibd
 {
-    internal class SendAction
+    internal class GroupWrite
     {
+        // groupswrite only allows 1 byte APDU, for bigger APDU, groupwrite must be used
         private const string GroupWriteExecutable = @"groupswrite";
         private const string GroupWriteParameters = @"local:/tmp/eib {0} {1}";
 
@@ -12,7 +13,7 @@ namespace KNXLibTests.Support.Eibd
             return Os.Tools.ExistsOnPath(GroupWriteExecutable);
         }
 
-        public bool Send(string groupAddress, string value)
+        public static bool Send(string groupAddress, string value)
         {
             var filename = Os.Tools.GetFullPath(GroupWriteExecutable);
             if (string.IsNullOrWhiteSpace(filename))

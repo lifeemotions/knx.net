@@ -9,4 +9,4 @@ install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release KNX.net.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./KNXLibTests/bin/Release/KNXLibTests.dll
+  - mono --runtime=v4.0.30319 ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./KNXLibTests/bin/Release/KNXLibTests.dll
