@@ -40,7 +40,7 @@ namespace KNXLibTests.Integration.Tunneling
         private ManualResetEventSlim ResetEvent { get; set; }
         private const string LightOnOffAddress = "5/0/2";
         private const bool LightOnOffActionStatus = true;
-        private const int Timeout = 500;
+        private const int Timeout = 2000;
 
         [Category("KNXLib.Integration.Tunneling.ActionFeedback"), Test, Platform(Exclude = "Win")]
         public void TunnelingActionFeedbackTest()

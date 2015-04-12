@@ -5,7 +5,7 @@ namespace KNXLibTests.Support.Eibd
     internal class GroupResponse
     {
         // groupsresponse only allows 1 byte APDU, for bigger APDU, groupresponse must be used
-        private const string GroupResponseExecutable = @"groupsresponse";
+        private const string GroupResponseExecutable = @"groupresponse";
         private const string GroupResponseParameters = @"local:/tmp/eib {0} {1}";
 
         public static bool IsGroupResponseAvailable()

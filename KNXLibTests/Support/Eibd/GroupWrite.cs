@@ -5,7 +5,7 @@ namespace KNXLibTests.Support.Eibd
     internal class GroupWrite
     {
         // groupswrite only allows 1 byte APDU, for bigger APDU, groupwrite must be used
-        private const string GroupWriteExecutable = @"groupswrite";
+        private const string GroupWriteExecutable = @"groupwrite";
         private const string GroupWriteParameters = @"local:/tmp/eib {0} {1}";
 
         public static bool IsGroupWriteAvailable()
