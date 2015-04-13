@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("KNXLibTests")]
 
 namespace KNXLib.DPT
 {
-    public sealed class DataPointTranslator
+    internal sealed class DataPointTranslator
     {
         private static readonly DataPointTranslator instance = new DataPointTranslator();
         private readonly IDictionary<string, DataPoint> _dataPoints = new Dictionary<string, DataPoint>();
