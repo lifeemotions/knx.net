@@ -2,11 +2,14 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using KNXLib.Logging;
 
 namespace KNXLib
 {
     internal class KnxReceiverTunneling : KnxReceiver
     {
+        private static readonly ILog Logger = LogProvider.For<KnxReceiverTunneling>();
+
         private UdpClient _udpClient;
         private IPEndPoint _localEndpoint;
 
@@ -77,16 +80,14 @@ namespace KNXLib
                         break;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.Write(e.Message);
-                Console.Write(e.ToString());
-                Console.Write(e.StackTrace);
-                if (e.InnerException != null)
+                if (Logger.IsErrorEnabled())
                 {
-                    Console.Write(e.InnerException.Message);
-                    Console.Write(e.ToString());
-                    Console.Write(e.InnerException.StackTrace);
+                    Logger.ErrorException("Failed to process datagram.", ex);
+
+                    if (ex.InnerException != null)
+                        Logger.ErrorException("Failed to process datagram.", ex.InnerException);
                 }
 
                 // ignore, missing warning information
@@ -165,8 +166,7 @@ namespace KNXLib
             if (response != 0x21)
                 return;
 
-            if (KnxConnection.Debug)
-                Console.WriteLine("KnxReceiverTunneling: Received connection state response - No active connection with channel ID {0}", knxDatagram.channel_id);
+            Logger.Debug(() => string.Format("KnxReceiverTunneling: Received connection state response - No active connection with channel ID {0}", knxDatagram.channel_id));
 
             KnxConnection.Disconnect();
         }
@@ -186,8 +186,7 @@ namespace KNXLib
 
             if (knxDatagram.channel_id == 0x00 && knxDatagram.status == 0x24)
             {
-                if (KnxConnection.Debug)
-                    Console.WriteLine("KnxReceiverTunneling: Received connect response - No more connections available");
+                Logger.Debug(() => "KnxReceiverTunneling: Received connect response - No more connections available");
             }
             else
             {

@@ -46,15 +46,15 @@ namespace KNXLibTests.Integration.Tunneling
         public void TunnelingActionFeedbackTest()
         {
             ResetEvent = new ManualResetEventSlim();
-            KnxConnection _connection;
 
-            _connection = new KnxConnectionTunneling("127.0.0.1", 3671, "127.0.0.1", 3672) { Debug = false };
+            KnxConnection connection = new KnxConnectionTunneling("127.0.0.1", 3671, "127.0.0.1", 3672);
 
-            _connection.KnxEventDelegate += Event;
+            connection.KnxEventDelegate += Event;
 
-            _connection.Connect();
+            connection.Connect();
 
-            _connection.Action(LightOnOffAddress, true);
+            connection.Action(LightOnOffAddress, true);
+
             if (!ResetEvent.Wait(Timeout))
                 Assert.Fail("Didn't receive feedback from the action");
         }

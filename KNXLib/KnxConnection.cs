@@ -3,16 +3,19 @@ using System.Net;
 using System.Text;
 using KNXLib.DPT;
 using KNXLib.Exceptions;
+using KNXLib.Logging;
 
 namespace KNXLib
 {
     public abstract class KnxConnection
     {
+        private static readonly ILog Logger = LogProvider.For<KnxConnection>();
+
         public delegate void KnxConnected();
-        public KnxConnected KnxConnectedDelegate = null;
+        public KnxConnected KnxConnectedDelegate = () => { };
 
         public delegate void KnxDisconnected();
-        public KnxDisconnected KnxDisconnectedDelegate = null;
+        public KnxDisconnected KnxDisconnectedDelegate = () => { };
 
         public delegate void KnxEvent(string address, string state);
         public KnxEvent KnxEventDelegate = (address, state) => { };
@@ -28,7 +31,6 @@ namespace KNXLib
 
             ActionMessageCode = 0x00;
             ThreeLevelGroupAddressing = true;
-            Debug = false;
         }
 
         internal KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
@@ -44,8 +46,6 @@ namespace KNXLib
 
         public bool ThreeLevelGroupAddressing { get; set; }
 
-        public bool Debug { get; set; }
-
         public byte ActionMessageCode { get; set; }
 
         public abstract void Connect();
@@ -57,15 +57,14 @@ namespace KNXLib
         {
             try
             {
-                if (KnxConnectedDelegate != null)
-                    KnxConnectedDelegate();
+                Logger.Debug(() => "KNX is connected.");
+
+                KnxConnectedDelegate();
             }
             catch
             {
                 //ignore
             }
-
-            Log("KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
 
             _lockManager.UnlockConnection();
         }
@@ -76,43 +75,42 @@ namespace KNXLib
 
             try
             {
-                if (KnxDisconnectedDelegate != null)
-                    KnxDisconnectedDelegate();
+                Logger.Debug(() => "KNX is disconnected.");
+
+                KnxDisconnectedDelegate();
             }
             catch
             {
                 //ignore
             }
-
-            Log("KNX is disconnected. Send locked - {0} free locks", _lockManager.LockCount);
         }
 
         internal void Event(string address, string state)
         {
             try
             {
+                Logger.Debug(() => string.Format("Device {0} sent event {1}", address, state));
+
                 KnxEventDelegate(address, state);
             }
             catch
             {
                 //ignore
             }
-
-            Log("Device {0} sent event {1}", address, state);
         }
 
         internal void Status(string address, string state)
         {
             try
             {
+                Logger.Debug(() => string.Format("Device {0} has status {1}", address, state));
+
                 KnxStatusDelegate(address, state);
             }
             catch
             {
                 //ignore
             }
-
-            Log("Device {0} has status {1}", address, state);
         }
 
         // TODO: Might be good to refactor this out
@@ -185,27 +183,21 @@ namespace KNXLib
 
         public void Action(string address, byte[] data)
         {
-            Log("Sending {0} to {1}.", data, address);
+            Logger.Debug(() => string.Format("Sending {0} to {1}.", data, address));
 
             _lockManager.PerformLockedOperation(() => KnxSender.Action(address, data));
 
-            Log("Sent {0} to {1}.", data, address);
+            Logger.Debug(() => string.Format("Sent {0} to {1}.", data, address));
         }
 
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
         public void RequestStatus(string address)
         {
-            Log("Sending request status to {0}.", address);
+            Logger.Debug(() => string.Format("Sending request status to {0}.", address));
 
             _lockManager.PerformLockedOperation(() => KnxSender.RequestStatus(address));
 
-            Log("Sent request status to {0}.", address);
-        }
-
-        private void Log(string message, params object[] arg)
-        {
-            if (Debug)
-                Console.WriteLine(message, arg);
+            Logger.Debug(() => string.Format("Sent request status to {0}.", address));
         }
 
         // TODO: Not sure if these DPT methods make much sense on connection, unless we want to hide the helper classes

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using KNXLib;
+using Serilog;
 
 namespace KNXTest
 {
@@ -16,7 +17,12 @@ namespace KNXTest
 
         private static void Main()
         {
-            _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.ColoredConsole()
+                .CreateLogger();
+
+            _connection = new KnxConnectionRouting { ActionMessageCode = 0x29 };
             _connection.KnxConnectedDelegate += Connected;
             _connection.KnxDisconnectedDelegate += Disconnected;
             _connection.KnxEventDelegate += Event;
@@ -120,31 +126,31 @@ namespace KNXTest
             if (Temperatures.Contains(address))
             {
                 var temp = (float)_connection.FromDataPoint("9.001", state);
-                Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
+                Log.Information("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
             }
             else if (Lights.Contains(address))
             {
-                Console.WriteLine("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
+                Log.Information("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
             }
             else
             {
-                Console.WriteLine("New Event: device " + address + " has status " + state);
+                Log.Information("New Event: device " + address + " has status " + state);
             }
         }
 
         private static void Status(string address, string state)
         {
-            Console.WriteLine("New Status: device " + address + " has status " + state);
+            Log.Information("New Status: device " + address + " has status " + state);
         }
 
         private static void Connected()
         {
-            Console.WriteLine("Connected!");
+            Log.Information("Connected!");
         }
 
         private static void Disconnected()
         {
-            Console.WriteLine("Disconnected! Reconnecting");
+            Log.Information("Disconnected! Reconnecting");
             if (_connection == null)
                 return;
 
