@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Threading;
+using KNXLib.Logging;
 
 namespace KNXLib
 {
     internal class KnxLockManager
     {
+        private static readonly ILog Logger = LogProvider.For<KnxLockManager>();
+
         private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(0);
         private readonly object _connectedLock = new object();
         private bool _isConnected;
-
-        public int LockCount
-        {
-            get { return _sendLock.CurrentCount; }
-        }
 
         public void LockConnection()
         {
             lock (_connectedLock)
             {
+                Logger.Debug(() => string.Format("KNX is disconnected. Send locked - {0} free locks", _sendLock.CurrentCount));
+
                 if (!_isConnected)
                     return;
 
@@ -30,6 +30,8 @@ namespace KNXLib
         {
             lock (_connectedLock)
             {
+                Logger.Debug(() => string.Format("Unlocking send - {0} free locks", _sendLock.CurrentCount));
+
                 if (_isConnected)
                     return;
 

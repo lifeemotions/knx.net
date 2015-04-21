@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Threading;
+using KNXLib.Logging;
 
 namespace KNXLib
 {
     internal abstract class KnxReceiver
     {
+        private static readonly ILog Logger = LogProvider.For<KnxReceiver>();
+
         private Thread _receiverThread;
 
         protected KnxReceiver(KnxConnection connection)
@@ -126,29 +129,29 @@ namespace KNXLib
 
                 datagram.data = KnxHelper.GetData(datagram.data_length, datagram.apdu);
 
-                if (KnxConnection.Debug)
+                if (Logger.IsDebugEnabled())
                 {
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
-                    Console.WriteLine(BitConverter.ToString(cemi));
-                    Console.WriteLine("Event Header Length: " + datagram.header_length);
-                    Console.WriteLine("Event Protocol Version: " + datagram.protocol_version.ToString("x"));
-                    Console.WriteLine("Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
-                    Console.WriteLine("Event Total Length: " + datagram.total_length);
+                    Logger.Debug(new string('-', 80));
+                    Logger.Debug(BitConverter.ToString(cemi));
+                    Logger.Debug("Event Header Length: " + datagram.header_length);
+                    Logger.Debug("Event Protocol Version: " + datagram.protocol_version.ToString("x"));
+                    Logger.Debug("Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
+                    Logger.Debug("Event Total Length: " + datagram.total_length);
 
-                    Console.WriteLine("Event Message Code: " + datagram.message_code.ToString("x"));
-                    Console.WriteLine("Event Aditional Info Length: " + datagram.aditional_info_length);
+                    Logger.Debug("Event Message Code: " + datagram.message_code.ToString("x"));
+                    Logger.Debug("Event Aditional Info Length: " + datagram.aditional_info_length);
 
                     if (datagram.aditional_info_length > 0)
-                        Console.WriteLine("Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
+                        Logger.Debug("Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
 
-                    Console.WriteLine("Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
-                    Console.WriteLine("Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
-                    Console.WriteLine("Event Source Address: " + datagram.source_address);
-                    Console.WriteLine("Event Destination Address: " + datagram.destination_address);
-                    Console.WriteLine("Event Data Length: " + datagram.data_length);
-                    Console.WriteLine("Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
-                    Console.WriteLine("Event Data: " + datagram.data);
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                    Logger.Debug("Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
+                    Logger.Debug("Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
+                    Logger.Debug("Event Source Address: " + datagram.source_address);
+                    Logger.Debug("Event Destination Address: " + datagram.destination_address);
+                    Logger.Debug("Event Data Length: " + datagram.data_length);
+                    Logger.Debug("Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
+                    Logger.Debug("Event Data: " + datagram.data);
+                    Logger.Debug(new string('-', 80));
                 }
 
                 if (datagram.message_code != 0x29)
