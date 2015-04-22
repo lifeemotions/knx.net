@@ -24,14 +24,15 @@ Examples
 ```csharp
 static void Main(string[] args)
 {
-  var connection = new KNXConnectionRouting();
+  var connection = new KnxConnectionRouting();
   connection.Connect();
-  connection.KNXEventDelegate += new KNXConnection.KNXEvent(Event);
+  connection.KnxEventDelegate += new KnxConnection.KnxEvent(Event);
   connection.Action("5/0/2", false);
   Thread.Sleep(5000);
   connection.Action("5/0/2", true);
   Thread.Sleep(5000);
 }
+
 static void Event(string address, string state)
 {
   Console.WriteLine("New Event: device " + address + " has status " + state);
@@ -43,13 +44,13 @@ static void Event(string address, string state)
 Sending an action
 
 ```csharp
-connection.Action("1/1/16", connection.toDPT("9.001", 24.0f));
+connection.Action("1/1/16", connection.ToDataPoint("9.001", 24.0f));
 ```
 
 Converting status from event
 
 ```csharp
-float temp = (float)connection.fromDPT("9.001", state);
+float temp = (float)connection.FromDataPoint("9.001", state);
 ```
 
 ### Connecting using Tunneling
@@ -57,5 +58,5 @@ float temp = (float)connection.fromDPT("9.001", state);
 The only difference is how the connection object is created
 
 ```csharp
-connection = new KNXConnectionTunneling(remoteIP, remotePort, localIP, localPort);
+connection = new KnxConnectionTunneling(remoteIP, remotePort, localIP, localPort);
 ```
