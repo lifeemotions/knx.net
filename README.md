@@ -1,4 +1,4 @@
-KNX.net ![build status](https://travis-ci.org/lifeemotions/knx.net.svg?branch=master)
+KNX.net [![Travis build status](https://travis-ci.org/lifeemotions/knx.net.png?branch=master)](https://travis-ci.org/lifeemotions/knx.net) [![NuGet Status](http://img.shields.io/nuget/v/KNX.net.svg?style=flat)](https://www.nuget.org/packages/KNX.net/)
 =======
 
 KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
