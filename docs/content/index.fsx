@@ -24,15 +24,17 @@ Introduction
 KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET
 
 This API allows to connect in both modes:
-* Tunneling
-* Routing
+
+  - Tunneling
+  - Routing
 
 After connecting you will be able to send actions to the bus and receive messages from it.
 
 The following datapoints are available in the API:
-* bit (lights, buttons)
-* byte (dimmers, temperature difference, RGB)
-* 9.001 (temperatures)
+
+  - bit (lights, buttons)
+  - byte (dimmers, temperature difference, RGB)
+  - 9.001 (temperatures)
 
 There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from [OpenRemote](http://www.openremote.org) Knowledge Base.
 
