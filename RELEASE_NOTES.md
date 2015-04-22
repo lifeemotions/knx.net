@@ -1,3 +1,7 @@
+### 1.0.3 - April 22 2015
+* Fix NuGet dependencies
+* Add LibLog to License
+
 ### 1.0.2 - April 18 2015
 * Add LibLog to make it easier for consumers to integrate their logging
 

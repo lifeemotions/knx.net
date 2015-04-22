@@ -1,11 +1,11 @@
 source https://nuget.org/api/v2
 
 nuget FSharp.Formatting 2.8.0
-nuget LibLog 4.2.2 framework: >= net40
+nuget LibLog
 nuget NUnit
 nuget NUnit.Runners
 nuget FAKE
-nuget Serilog 1.5.1 framework: >= net40
+nuget Serilog
 nuget SourceLink.Fake
 nuget FSharpVSPowerTools.Core 1.7.0
 

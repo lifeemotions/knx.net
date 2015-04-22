@@ -1,8 +1,10 @@
 type project
+id
+    KNX.net
 owners
     life.emotions
 authors
-    life.emotions exira
+    life.emotions
 projectUrl
     https://github.com/lifeemotions/knx.net
 iconUrl
