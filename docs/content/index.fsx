@@ -4,44 +4,86 @@
 #I "../../bin"
 
 (**
-knx.net
+knx.net [![Travis build status](https://travis-ci.org/lifeemotions/knx.net.png?branch=master)](https://travis-ci.org/lifeemotions/knx.net) [![NuGet Status](http://img.shields.io/nuget/v/KNX.net.svg?style=flat)](https://www.nuget.org/packages/KNX.net/)
 ======================
-
-Documentation
 
 <div class="row">
   <div class="span1"></div>
   <div class="span6">
     <div class="well well-small" id="nuget">
-      The KNX.net library can be <a href="https://nuget.org/packages/KNX.net">installed from NuGet</a>:
+      The knx.net library can be <a href="https://nuget.org/packages/KNX.net">installed from NuGet</a>:
       <pre>PM> Install-Package KNX.net</pre>
     </div>
   </div>
   <div class="span1"></div>
 </div>
 
+Introduction
+------------
+
+KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET
+
+This API allows to connect in both modes:
+* Tunneling
+* Routing
+
+After connecting you will be able to send actions to the bus and receive messages from it.
+
+The following datapoints are available in the API:
+* bit (lights, buttons)
+* byte (dimmers, temperature difference, RGB)
+* 9.001 (temperatures)
+
+There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from [OpenRemote](http://www.openremote.org) Knowledge Base.
+
 Example
 -------
 
-This example demonstrates using a function defined in this sample library.
+This example demonstrates turning off and on a light using Routing
 
 *)
-#r "KNX.net.dll"
-open KNX.net
+static void Main(string[] args)
+{
+  var connection = new KnxConnectionRouting();
+  connection.Connect();
+  connection.KnxEventDelegate += new KnxConnection.KnxEvent(Event);
+  connection.Action("5/0/2", false);
+  Thread.Sleep(5000);
+  connection.Action("5/0/2", true);
+  Thread.Sleep(5000);
+}
 
-printfn "hello = %i" <| Library.hello 0
-
+static void Event(string address, string state)
+{
+  Console.WriteLine("New Event: device " + address + " has status " + state);
+}
 (**
-Some more info
 
-Samples & documentation
------------------------
+Working with 9.001 datapoints
+-------
 
- * [Tutorial](tutorial.html) contains a further explanation of this sample library.
+Sending an action
+*)
+connection.Action("1/1/16", connection.ToDataPoint("9.001", 24.0f));
+(**
 
- * [API Reference](reference/index.html) contains automatically generated documentation for all types, modules
-   and functions in the library. This includes additional brief samples on using most of the
-   functions.
+Converting status from event
+*)
+float temp = (float)connection.FromDataPoint("9.001", state);
+(**
+
+Connecting using Tunneling
+-------
+
+The only difference is how the connection object is created
+*)
+connection = new KnxConnectionTunneling(remoteIP, remotePort, localIP, localPort);
+(**
+
+Documentation
+-------------
+
+ * [API Reference](reference/index.html) contains automatically generated documentation for the library.
 
 Contributing and copyright
 --------------------------
