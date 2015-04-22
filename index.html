@@ -2,8 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-    <title>knx.net
-</title>
+    <title>knx.net</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="KNX.net provides a KNX API for .NET"/>
     <meta name="author" content="lifeemotions"/>
@@ -24,7 +23,7 @@
     <div class="container">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li><a href="http://fsharp.org">fsharp.org</a></li>
+          <li><a href="http://www.life-emotions.pt/">life-emotions.pt</a></li>
           <li><a href="http://github.com/lifeemotions/knx.net">github page</a></li>
         </ul>
         <h3 class="muted"><a href="/knx.net/index.html">KNX.net</a></h3>
@@ -33,51 +32,126 @@
       <div class="row">
         <div class="span9" id="main">
           
-<h1><a name="knx-net" class="anchor" href="#knx-net">knx.net</a></h1>
-
-<p>Documentation</p>
+<h1><a name="knx-net" class="anchor" href="#knx-net">knx.net <a href="https://travis-ci.org/lifeemotions/knx.net"><img src="https://travis-ci.org/lifeemotions/knx.net.png?branch=master" alt="Travis build status" /></a> <a href="https://www.nuget.org/packages/KNX.net/"><img src="http://img.shields.io/nuget/v/KNX.net.svg?style=flat" alt="NuGet Status" /></a></a></h1>
 
 <div class="row">
   <div class="span1"></div>
   <div class="span6">
     <div class="well well-small" id="nuget">
-      The KNX.net library can be <a href="https://nuget.org/packages/KNX.net">installed from NuGet</a>:
+      The knx.net library can be <a href="https://nuget.org/packages/KNX.net">installed from NuGet</a>:
       <pre>PM> Install-Package KNX.net</pre>
     </div>
   </div>
   <div class="span1"></div>
 </div>
 
+<h2><a name="Introduction" class="anchor" href="#Introduction">Introduction</a></h2>
+
+<p>KNX.net provides a <a href="http://en.wikipedia.org/wiki/KNX_%28standard%29">KNX</a> API for .NET</p>
+
+<p>This API allows to connect in both modes:
+<em> Tunneling
+</em> Routing</p>
+
+<p>After connecting you will be able to send actions to the bus and receive messages from it.</p>
+
+<p>The following datapoints are available in the API:
+<em> bit (lights, buttons)
+</em> byte (dimmers, temperature difference, RGB)
+* 9.001 (temperatures)</p>
+
+<p>There may be some bugs on the implementation as I don't have access to KNX documentation, many information about the protocol is from <a href="http://www.openremote.org">OpenRemote</a> Knowledge Base.</p>
+
 <h2><a name="Example" class="anchor" href="#Example">Example</a></h2>
 
-<p>This example demonstrates using a function defined in this sample library.</p>
+<p>This example demonstrates turning off and on a light using Routing</p>
 
 <table class="pre"><tr><td class="lines"><pre class="fssnip">
-<span class="l">1: </span>
-<span class="l">2: </span>
-<span class="l">3: </span>
-<span class="l">4: </span>
+<span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
 </pre>
 </td>
 <td class="snippet"><pre class="fssnip">
-<span class="prep">#r</span> <span class="s">&quot;KNX.net.dll&quot;</span>
-<span class="k">open</span> <span class="i">KNX</span><span class="o">.</span><span class="i">net</span>
+<span class="k">static</span> <span class="k">void</span> <span class="i">Main</span>(<span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">string</span>[] <span class="i">args</span>)
+{
+  <span class="i">var</span> <span class="i">connection</span> <span class="o">=</span> <span class="k">new</span> <span class="i">KnxConnectionRouting</span>();
+  <span class="i">connection</span><span class="o">.</span><span class="i">Connect</span>();
+  <span class="i">connection</span><span class="o">.</span><span class="i">KnxEventDelegate</span> <span class="o">+=</span> <span class="k">new</span> <span class="i">KnxConnection</span><span class="o">.</span><span class="i">KnxEvent</span>(<span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Event</span>);
+  <span class="i">connection</span><span class="o">.</span><span class="i">Action</span>(<span class="s">&quot;5/0/2&quot;</span>, <span class="k">false</span>);
+  <span class="i">Thread</span><span class="o">.</span><span class="i">Sleep</span>(<span class="n">5000</span>);
+  <span class="i">connection</span><span class="o">.</span><span class="i">Action</span>(<span class="s">&quot;5/0/2&quot;</span>, <span class="k">true</span>);
+  <span class="i">Thread</span><span class="o">.</span><span class="i">Sleep</span>(<span class="n">5000</span>);
+}
 
-<span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="f">printfn</span> <span class="s">&quot;hello = </span><span class="pf">%i</span><span class="s">&quot;</span> <span class="o">&lt;|</span> <span class="i">Library</span><span class="o">.</span><span class="i">hello</span> <span class="n">0</span>
+<span class="k">static</span> <span class="k">void</span> <span onmouseout="hideTip(event, 'fs2', 3)" onmouseover="showTip(event, 'fs2', 3)" class="i">Event</span>(<span onmouseout="hideTip(event, 'fs1', 4)" onmouseover="showTip(event, 'fs1', 4)" class="i">string</span> <span class="i">address</span>, <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">string</span> <span class="i">state</span>)
+{
+  <span class="i">Console</span><span class="o">.</span><span class="i">WriteLine</span>(<span class="s">&quot;New Event: device &quot;</span> <span class="o">+</span> <span class="i">address</span> <span class="o">+</span> <span class="s">&quot; has status &quot;</span> <span class="o">+</span> <span class="i">state</span>);
+}
 </pre>
 </td>
 </tr>
 </table>
 
-<p>Some more info</p>
+<h2><a name="Working-with-9-001-datapoints" class="anchor" href="#Working-with-9-001-datapoints">Working with 9.001 datapoints</a></h2>
 
-<h2><a name="Samples-amp-documentation" class="anchor" href="#Samples-amp-documentation">Samples &amp; documentation</a></h2>
+<p>Sending an action</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="i">connection</span><span class="o">.</span><span class="i">Action</span>(<span class="s">&quot;1/1/16&quot;</span>, <span class="i">connection</span><span class="o">.</span><span class="i">ToDataPoint</span>(<span class="s">&quot;9.001&quot;</span>, <span class="n">24.0f</span>));
+</pre>
+</td>
+</tr>
+</table>
+
+<p>Converting status from event</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">float</span> <span class="i">temp</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs3', 7)" onmouseover="showTip(event, 'fs3', 7)" class="i">float</span>)<span class="i">connection</span><span class="o">.</span><span class="i">FromDataPoint</span>(<span class="s">&quot;9.001&quot;</span>, <span class="i">state</span>);
+</pre>
+</td>
+</tr>
+</table>
+
+<h2><a name="Connecting-using-Tunneling" class="anchor" href="#Connecting-using-Tunneling">Connecting using Tunneling</a></h2>
+
+<p>The only difference is how the connection object is created</p>
+
+<table class="pre"><tr><td class="lines"><pre class="fssnip">
+<span class="l">1: </span>
+</pre>
+</td>
+<td class="snippet"><pre class="fssnip">
+<span class="i">connection</span> <span class="o">=</span> <span class="k">new</span> <span class="i">KnxConnectionTunneling</span>(<span class="i">remoteIP</span>, <span class="i">remotePort</span>, <span class="i">localIP</span>, <span class="i">localPort</span>);
+</pre>
+</td>
+</tr>
+</table>
+
+<h2><a name="Documentation" class="anchor" href="#Documentation">Documentation</a></h2>
 
 <ul>
-<li><p><a href="tutorial.html">Tutorial</a> contains a further explanation of this sample library.</p></li>
-<li><p><a href="reference/index.html">API Reference</a> contains automatically generated documentation for all types, modules
-and functions in the library. This includes additional brief samples on using most of the
-functions.</p></li>
+<li><a href="reference/index.html">API Reference</a> contains automatically generated documentation for the library.</li>
 </ul>
 
 <h2><a name="Contributing-and-copyright" class="anchor" href="#Contributing-and-copyright">Contributing and copyright</a></h2>
@@ -91,7 +165,9 @@ also want to read the <a href="https://github.com/lifeemotions/knx.net/blob/mast
 redistribution for both commercial and non-commercial purposes. For more information see the
 <a href="https://github.com/lifeemotions/knx.net/blob/master/LICENSE.txt">License file</a> in the GitHub repository.</p>
 
-<div class="tip" id="fs1">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
+<div class="tip" id="fs1">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs2">Multiple items<br />module Event<br /><br />from Microsoft.FSharp.Control<br /><br />--------------------<br />type Event&lt;&#39;T&gt; =<br />&#160;&#160;new : unit -&gt; Event&lt;&#39;T&gt;<br />&#160;&#160;member Trigger : arg:&#39;T -&gt; unit<br />&#160;&#160;member Publish : IEvent&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Control.Event&lt;_&gt;<br /><br />--------------------<br />type Event&lt;&#39;Delegate,&#39;Args (requires delegate and &#39;Delegate :&gt; Delegate)&gt; =<br />&#160;&#160;new : unit -&gt; Event&lt;&#39;Delegate,&#39;Args&gt;<br />&#160;&#160;member Trigger : sender:obj * args:&#39;Args -&gt; unit<br />&#160;&#160;member Publish : IEvent&lt;&#39;Delegate,&#39;Args&gt;<br /><br />Full name: Microsoft.FSharp.Control.Event&lt;_,_&gt;<br /><br />--------------------<br />new : unit -&gt; Event&lt;&#39;T&gt;<br /><br />--------------------<br />new : unit -&gt; Event&lt;&#39;Delegate,&#39;Args&gt;</div>
+<div class="tip" id="fs3">Multiple items<br />val float : value:&#39;T -&gt; float (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.float<br /><br />--------------------<br />type float = System.Double<br /><br />Full name: Microsoft.FSharp.Core.float<br /><br />--------------------<br />type float&lt;&#39;Measure&gt; = float<br /><br />Full name: Microsoft.FSharp.Core.float&lt;_&gt;</div>
 
         </div>
         <div class="span3">
