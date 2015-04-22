@@ -1,0 +1,21 @@
+type project
+owners
+    life.emotions
+authors
+    life.emotions exira
+projectUrl
+    https://github.com/lifeemotions/knx.net
+iconUrl
+    https://raw.githubusercontent.com/lifeemotions/knx.net/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/lifeemotions/knx.net/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    knx .net home-automation
+summary
+    KNX.net provides a KNX API for .NET
+description
+    KNX.net provides a KNX API for .NET, providing Tunneling and Routing modes.

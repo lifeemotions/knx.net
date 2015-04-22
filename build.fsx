@@ -38,7 +38,7 @@ let summary = "KNX.net provides a KNX API for .NET"
 let description = "KNX.net provides a KNX API for .NET, providing Tunneling and Routing modes."
 
 // List of author names (for NuGet package)
-let authors = [ "lifeemotions" ]
+let authors = [ "life.emotions" ]
 
 // Tags for your project (for NuGet package)
 let tags = "knx .net home-automation"
