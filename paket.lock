@@ -6,8 +6,8 @@ NUGET
     FSharp.Formatting (2.8.0)
       FSharp.Compiler.Service (>= 0.0.86)
       FSharpVSPowerTools.Core (>= 1.7.0)
-    FSharpVSPowerTools.Core (1.8.0)
-      FSharp.Compiler.Service (>= 0.0.87)
+    FSharpVSPowerTools.Core (1.7.0)
+      FSharp.Compiler.Service (>= 0.0.81)
     LibLog (4.2.2) - framework: >= net40
     Microsoft.Bcl (1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)

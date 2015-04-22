@@ -7,5 +7,6 @@ nuget NUnit.Runners
 nuget FAKE
 nuget Serilog 1.5.1 framework: >= net40
 nuget SourceLink.Fake
+nuget FSharpVSPowerTools.Core 1.7.0
 
 github fsharp/FAKE modules/Octokit/Octokit.fsx
