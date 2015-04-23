@@ -75,5 +75,18 @@ namespace KNXLib
                 client.Close();
             }
         }
+
+        public override void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Disconnect();   
+            }            
+        }
     }
 }

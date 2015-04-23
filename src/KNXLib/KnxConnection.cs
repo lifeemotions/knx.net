@@ -7,7 +7,7 @@ using KNXLib.Logging;
 
 namespace KNXLib
 {
-    public abstract class KnxConnection
+    public abstract class KnxConnection : IDisposable
     {
         private static readonly ILog Logger = LogProvider.For<KnxConnection>();
 
@@ -220,5 +220,8 @@ namespace KNXLib
         {
             return DataPointTranslator.Instance.ToDataPoint(type, value);
         }
+
+        public abstract void Dispose();
+        protected abstract void Dispose(bool disposing);
     }
 }
