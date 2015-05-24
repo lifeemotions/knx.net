@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B89118A5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notes", "notes", "{2DA39BD6-01AA-49A3-A16A-5A7618D55FE5}"
 	ProjectSection(SolutionItems) = preProject
+		notes\BUILD_WEBSITE.txt = notes\BUILD_WEBSITE.txt
 		notes\DEPLOY_NUGET_PACKAGE.txt = notes\DEPLOY_NUGET_PACKAGE.txt
 	EndProjectSection
 EndProject

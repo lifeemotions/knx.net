@@ -1,3 +1,9 @@
+# site ignore directories
+site/build
+site/output
+site/src/ref
+node_modules
+
 #OS junk files
 [Tt]humbs.db
 *.DS_Store

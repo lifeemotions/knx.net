@@ -130,7 +130,7 @@ gulp.task('download-owner-logo',  function() {
     .pipe(rename({
       dirname: '',
       basename: 'logo',
-        extname: '.png'
+      extname: '.png'
     }))
     .pipe(gulp.dest("ref/"));
 });
