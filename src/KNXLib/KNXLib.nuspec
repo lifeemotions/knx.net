@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://lifeemotions.github.io/knx.net/license.html</licenseUrl>
+    <projectUrl>http://lifeemotions.github.io/knx.net/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Added 3 bit with control datapoint for dimming and blinds control.</releaseNotes>
+    <copyright>Copyright 2012</copyright>
+    <tags>knx .net c#</tags>
+  </metadata>
+</package>
