@@ -28,7 +28,7 @@ gulp.task('copy-files-nupkg', ['copy-files-nupkg-xml',
                                'copy-files-nupkg-nuspec']);
 
 gulp.task('copy-files-nupkg-xml', function() {
-  return gulp.src('../build/extract/lib/**/*.xml')
+  return gulp.src(['../build/extract/lib/**/*.xml', '../build/extract/lib/**/*.XML'])
     .pipe(xml2json({
       explicitArray: false,
     }))
@@ -86,7 +86,7 @@ gulp.task('download-license-github', function() {
     .pipe(rename({
       dirname: '',
       basename: 'license',
-        extname: '.txt'
+      extname: '.txt'
     }))
     .pipe(gulp.dest("ref/"));
 });

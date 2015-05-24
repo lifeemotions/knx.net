@@ -6,7 +6,7 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>http://lifeemotions.github.io/knx.net/license.html</licenseUrl>
+    <licenseUrl>http://lifeemotions.github.io/knx.net/ref/license.txt</licenseUrl>
     <projectUrl>http://lifeemotions.github.io/knx.net/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
