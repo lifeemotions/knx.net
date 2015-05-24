@@ -71,6 +71,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />
     <Compile Include="DPT\Temperature.cs" />
     <Compile Include="DPT\DataPointTranslator.cs" />
