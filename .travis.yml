@@ -1,11 +1,12 @@
 language: csharp
-
-sudo: required  # use the new container-based Travis infrastructure
-
+solution: KNX.net.sln
+sudo: required
 before_script:
- - chmod +x build.sh
- - chmod a+x travis-install-eibd.sh
- - ./travis-install-eibd.sh
-
+  - chmod a+x travis-install-eibd.sh
+  - ./travis-install-eibd.sh
+install:
+  - nuget restore KNX.net.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
- - ./build.sh All
+  - xbuild /p:Configuration=Release KNX.net.sln
+  - mono --runtime=v4.0.30319 ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./KNXLibTests/bin/Release/KNXLibTests.dll
