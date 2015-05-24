@@ -2,7 +2,7 @@
 {
     public abstract class DataPoint
     {
-        public abstract string Id { get; }
+        public abstract string[] Ids { get; }
 
         public abstract object FromDataPoint(string data);
 

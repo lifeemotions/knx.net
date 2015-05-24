@@ -5,9 +5,9 @@ namespace KNXLib.DPT
 {
     internal sealed class Temperature : DataPoint
     {
-        public override string Id
+        public override string[] Ids
         {
-            get { return "9.001"; }
+            get { return new[] { "9.001" }; }
         }
 
         public override object FromDataPoint(string data)
@@ -23,11 +23,11 @@ namespace KNXLib.DPT
         {
             // DPT bits high byte: MEEEEMMM, low byte: MMMMMMMM
             // left align all mantissa bits
-            Int32 v = ((data[0] & 0x80) << 24) | ((data[0] & 0x7) << 28) | (data[1] << 20);
+            int v = ((data[0] & 0x80) << 24) | ((data[0] & 0x7) << 28) | (data[1] << 20);
 
             // normalize
             v >>= 20;
-            Int32 exp = (data[0] & 0x78) >> 3;
+            int exp = (data[0] & 0x78) >> 3;
             return (float)((1 << exp) * v * 0.01);
         }
 
@@ -44,7 +44,7 @@ namespace KNXLib.DPT
                 return null;
 
             // encoding: value = (0.01*M)*2^E
-            var v = (value / 2f) * 100.0f;
+            float v = (value / 2f) * 100.0f;
             var e = 1;
             for (; v < -2048.0f; v /= 2)
                 e++;

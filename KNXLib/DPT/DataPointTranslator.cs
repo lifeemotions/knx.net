@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace KNXLib.DPT
 {
     internal sealed class DataPointTranslator
     {
-        private static readonly DataPointTranslator instance = new DataPointTranslator();
+        public static readonly DataPointTranslator Instance = new DataPointTranslator();
         private readonly IDictionary<string, DataPoint> _dataPoints = new Dictionary<string, DataPoint>();
 
         // Explicit static constructor to tell C# compiler
@@ -15,14 +17,20 @@ namespace KNXLib.DPT
 
         private DataPointTranslator()
         {
-            // TODO: Should we provide an extension point for users to add their own DPTs?
-            DataPoint dataPoint = new Temperature();
-            _dataPoints.Add(dataPoint.Id, dataPoint);
-        }
+            Type type = typeof(DataPoint);
+            IEnumerable<Type> types = AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(s => s.GetTypes())
+                            .Where(p => type.IsAssignableFrom(p) && p != type);
 
-        public static DataPointTranslator Instance
-        {
-            get { return instance; }
+            foreach (Type t in types)
+            {
+                DataPoint dp = (DataPoint)Activator.CreateInstance(t);
+
+                foreach (string id in dp.Ids)
+                {
+                    _dataPoints.Add(id, dp);
+                }
+            }
         }
 
         public object FromDataPoint(string type, string data)

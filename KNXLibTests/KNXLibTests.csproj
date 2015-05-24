@@ -57,6 +57,7 @@
     <Compile Include="Support\Eibd\VBusMonitorManager.cs" />
     <Compile Include="Support\Os\Tools.cs" />
     <Compile Include="Unit\DataPoint\Temperature.cs" />
+    <Compile Include="Unit\DataPoint\ThreeBitWithControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
