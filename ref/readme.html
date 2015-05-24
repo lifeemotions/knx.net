@@ -1,0 +1,43 @@
+<h1 id="knx-net-build-status-https-travis-ci-org-lifeemotions-knx-net-svg-branch-master-nuget-status-http-img-shields-io-nuget-v-knx-net-svg-style-flat-">KNX.net <img src="https://travis-ci.org/lifeemotions/knx.net.svg?branch=master" alt="build status"> <img src="http://img.shields.io/nuget/v/KNX.net.svg?style=flat" alt="nuget status"></h1>
+<p>KNX.net provides a <a href="http://en.wikipedia.org/wiki/KNX_%28standard%29">KNX</a> API for C#</p>
+<p>This API allows to connect in both modes:</p>
+<ul>
+<li>Tunneling</li>
+<li>Routing</li>
+</ul>
+<p>After connecting you will be able to send actions to the bus and receive messages from it.</p>
+<p>The following datapoints are available in the API:</p>
+<ul>
+<li>bit (lights, buttons)</li>
+<li>byte (dimmers, temperature difference, RGB)</li>
+<li>9.001 (temperatures)</li>
+</ul>
+<p>There may be some bugs on the implementation as I don&#39;t have access to KNX documentation, many information about the protocol is from <a href="http://www.openremote.org">OpenRemote</a> Knowledge Base.</p>
+<h2 id="examples">Examples</h2>
+<h3 id="connecting-using-routing-turn-off-and-on-a-light-">Connecting using Routing (turn off and on a light)</h3>
+<pre><code class="hljs csharp"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Main</span>(<span class="hljs-params"><span class="hljs-keyword">string</span>[] args</span>)
+</span>{
+  <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> KNXConnectionRouting();
+  connection.Connect();
+  connection.KNXEventDelegate += <span class="hljs-keyword">new</span> KNXConnection.KNXEvent(Event);
+  connection.Action(<span class="hljs-string">"5/0/2"</span>, <span class="hljs-keyword">false</span>);
+  Thread.Sleep(<span class="hljs-number">5000</span>);
+  connection.Action(<span class="hljs-string">"5/0/2"</span>, <span class="hljs-keyword">true</span>);
+  Thread.Sleep(<span class="hljs-number">5000</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">Event</span>(<span class="hljs-params"><span class="hljs-keyword">string</span> address, <span class="hljs-keyword">string</span> state</span>)
+</span>{
+  Console.WriteLine(<span class="hljs-string">"New Event: device "</span> + address + <span class="hljs-string">" has status "</span> + state);
+}
+</code></pre>
+<h3 id="working-with-9-001-datapoints">Working with 9.001 datapoints</h3>
+<p>Sending an action</p>
+<pre><code class="hljs csharp">connection.Action(<span class="hljs-string">"1/1/16"</span>, connection.toDPT(<span class="hljs-string">"9.001"</span>, <span class="hljs-number">24.0</span>f));
+</code></pre>
+<p>Converting status from event</p>
+<pre><code class="hljs csharp"><span class="hljs-keyword">float</span> temp = (<span class="hljs-keyword">float</span>)connection.fromDPT(<span class="hljs-string">"9.001"</span>, state);
+</code></pre>
+<h3 id="connecting-using-tunneling">Connecting using Tunneling</h3>
+<p>The only difference is how the connection object is created</p>
+<pre><code class="hljs csharp">connection = <span class="hljs-keyword">new</span> KNXConnectionTunneling(remoteIP, remotePort, localIP, localPort);
+</code></pre>
