@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DPT\ThreeBitWithControl.cs" />
+    <Compile Include="Log\Logger.cs" />
     <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />
     <Compile Include="DPT\Temperature.cs" />
