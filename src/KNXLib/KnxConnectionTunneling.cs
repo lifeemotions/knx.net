@@ -109,14 +109,14 @@ namespace KNXLib
             base.Disconnected();
         }
 
-        public override void Connected()
+        internal override void Connected()
         {
             base.Connected();
 
             InitializeStateRequest();
         }
 
-        public override void Disconnected()
+        internal override void Disconnected()
         {
             base.Disconnected();
 

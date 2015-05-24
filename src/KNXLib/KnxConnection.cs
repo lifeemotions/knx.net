@@ -22,6 +22,11 @@ namespace KNXLib
 
         private readonly KnxLockManager _lockManager = new KnxLockManager();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
         protected KnxConnection(string host, int port)
         {
             ConnectionConfiguration = new KnxConnectionConfiguration(host, port);
@@ -33,6 +38,9 @@ namespace KNXLib
 
         internal KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected IPEndPoint RemoteEndpoint
         {
             get { return ConnectionConfiguration.EndPoint; }
@@ -42,18 +50,35 @@ namespace KNXLib
 
         internal KnxSender KnxSender { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ThreeLevelGroupAddressing { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Debug { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public byte ActionMessageCode { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public abstract void Connect();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public abstract void Disconnect();
 
-        // TODO: Could we refactor connection handling out, weird to have these public too, feels like only inheritors should call it
-        public virtual void Connected()
+        /// <summary>
+        /// 
+        /// </summary>
+        internal virtual void Connected()
         {
             try
             {
@@ -70,7 +95,10 @@ namespace KNXLib
             _lockManager.UnlockConnection();
         }
 
-        public virtual void Disconnected()
+        /// <summary>
+        /// 
+        /// </summary>
+        internal virtual void Disconnected()
         {
             _lockManager.LockConnection();
 
@@ -116,6 +144,12 @@ namespace KNXLib
         }
 
         // TODO: Might be good to refactor this out
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <exception cref="InvalidKnxDataException"></exception>
         public void Action(string address, bool data)
         {
             byte[] val;
@@ -135,6 +169,12 @@ namespace KNXLib
             Action(address, val);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <exception cref="InvalidKnxDataException"></exception>
         public void Action(string address, string data)
         {
             byte[] val;
@@ -153,6 +193,12 @@ namespace KNXLib
             Action(address, val);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
+        /// <exception cref="InvalidKnxDataException"></exception>
         public void Action(string address, int data)
         {
             var val = new byte[2];
@@ -178,11 +224,21 @@ namespace KNXLib
             Action(address, val);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
         public void Action(string address, byte data)
         {
             Action(address, new byte[] { 0x00, data });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <param name="data"></param>
         public void Action(string address, byte[] data)
         {
             Log("Sending {0} to {1}.", data, address);
@@ -193,6 +249,10 @@ namespace KNXLib
         }
 
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
         public void RequestStatus(string address)
         {
             Log("Sending request status to {0}.", address);
@@ -209,21 +269,45 @@ namespace KNXLib
         }
 
         // TODO: Not sure if these DPT methods make much sense on connection, unless we want to hide the helper classes
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public object FromDataPoint(string type, string data)
         {
             return DataPointTranslator.Instance.FromDataPoint(type, data);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public object FromDataPoint(string type, byte[] data)
         {
             return DataPointTranslator.Instance.FromDataPoint(type, data);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public byte[] ToDataPoint(string type, string value)
         {
             return DataPointTranslator.Instance.ToDataPoint(type, value);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public byte[] ToDataPoint(string type, object value)
         {
             return DataPointTranslator.Instance.ToDataPoint(type, value);
