@@ -17,7 +17,7 @@ The following datapoints are available in the API:
 | `3.008` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control dimming (steps) [`0` stops] |
 | `5.001` | `int`, `float`, `long`, `double`, `decimal` | `[0,100]`       | `decimal`   | `[0,100]`       | Percentage (%)                      |
 | `5.003` | `int`, `float`, `long`, `double`, `decimal` | `[0,360]`       | `decimal`   | `[0,360]`       | Angle (°)                           |
-| `5.004` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Percentage [0,255] (%)              |
+| `5.004` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Percentage `[0,255]` (%)          |
 | `5.010` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Counter Pulses                      |
 | `6.001` | `int`, `float`, `long`, `double`, `decimal` | `[-128,127]`    | `int`       | `[-128,127]`    | Percentage (%)                      |
 | `6.010` | `int`, `float`, `long`, `double`, `decimal` | `[-128,127]`    | `int`       | `[-128,127]`    | Counter Pulses                      |
@@ -98,7 +98,7 @@ connection = new KNXConnectionTunneling(remoteIP, remotePort, localIP, localPort
 ### Notes
 
 If connecting in routing mode:
-* make sure the system firewall allows incoming connections to the routing port ()if not specified when connecting, default is `3671`)
+* make sure the system firewall allows incoming connections to the routing port (if not specified when connecting, default is `3671`)
 
 If connecting in tunneling mode:
 * make sure the system firewall allows incoming connections to the specified `localPort`
