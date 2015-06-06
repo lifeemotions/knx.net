@@ -16,7 +16,7 @@ namespace KNXLibTests.Unit.DataPoint
         {
         }
 
-        [Category("KNXLib.Unit.DataPoint.Temperature"), Test]
+        [Category("KNXLib.Unit.DataPoint.9.xxx"), Test]
         public void DataPointTemperatureTest()
         {
             var dptType = "9.001";
@@ -33,7 +33,7 @@ namespace KNXLibTests.Unit.DataPoint
             var temp36Bytes = new byte[] { 15, 43 };
             var temp0Float = 0f;
             var temp0Bytes = new byte[] { 8, 0 };
-
+            
             Assert.AreEqual(temp23Float, DataPointTranslator.Instance.FromDataPoint(dptType, temp23Bytes));
             Assert.AreEqual(temp19Float, DataPointTranslator.Instance.FromDataPoint(dptType, temp19Bytes));
             Assert.AreEqual(temp5Float, DataPointTranslator.Instance.FromDataPoint(dptType, temp5Bytes));

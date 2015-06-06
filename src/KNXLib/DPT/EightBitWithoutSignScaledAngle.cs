@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace KNXLib.DPT
 {
-    internal sealed class ThreeBitWithControl : DataPoint
+    internal sealed class EightBitWithoutSignScaledAngle : DataPoint
     {
         public override string[] Ids
         {
-            get { return new[] { "3.008", "3.007" }; }
+            get { return new[] { "5.003" }; }
         }
 
         public override object FromDataPoint(string data)
         {
             var dataConverted = new byte[data.Length];
             for (var i = 0; i < data.Length; i++)
-                dataConverted[i] = (byte)data[i];
+                dataConverted[i] = (byte) data[i];
 
             return FromDataPoint(dataConverted);
         }
@@ -25,12 +25,12 @@ namespace KNXLib.DPT
             if (data == null || data.Length != 1)
                 return 0;
 
-            int input = data[0] & 0x0F;
+            var value = (int) data[0];
 
-            bool direction = (input >> 3) == 1;
-            int step = input & 0x07;
+            decimal result = value * 360;
+            result = result / 255;
 
-            return direction ? step : (step * -1);
+            return result;
         }
 
         public override byte[] ToDataPoint(string value)
@@ -43,34 +43,27 @@ namespace KNXLib.DPT
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
             
-            int input = 0;
+            decimal input = 0;
             if (val is int)
-                input = ((int) val);
+                input = (decimal) ((int) val);
             else if (val is float)
-                input = (int) ((float) val);
+                input = (decimal) ((float) val);
             else if (val is long)
-                input = (int) ((long) val);
+                input = (decimal) ((long) val);
             else if (val is double)
-                input = (int) ((double) val);
+                input = (decimal) ((double) val);
             else if (val is decimal)
-                input = (int) ((decimal) val);
+                input = (decimal) val;
             else
                 return dataPoint;
 
-            if (input > 7 || input < -7)
+            if (input < 0 || input > 360)
                 return dataPoint;
 
-            var direction = 8; // binary 1000
-
-            if (input <= 0)
-            {
-                direction = 0;
-                input = input * -1;
-            }
-
-            int step = (input & 7);
-
-            dataPoint[0] = (byte)(step | direction);
+            input = input * 255;
+            input = input / 360;
+            
+            dataPoint[0] = (byte) ((int) input);
 
             return dataPoint;
         }

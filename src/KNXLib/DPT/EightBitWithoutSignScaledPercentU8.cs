@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace KNXLib.DPT
 {
-    internal sealed class ThreeBitWithControl : DataPoint
+    internal sealed class EightBitWithoutSignScaledPercentU8 : DataPoint
     {
         public override string[] Ids
         {
-            get { return new[] { "3.008", "3.007" }; }
+            get { return new[] { "5.004" }; }
         }
 
         public override object FromDataPoint(string data)
         {
             var dataConverted = new byte[data.Length];
             for (var i = 0; i < data.Length; i++)
-                dataConverted[i] = (byte)data[i];
+                dataConverted[i] = (byte) data[i];
 
             return FromDataPoint(dataConverted);
         }
@@ -25,12 +25,7 @@ namespace KNXLib.DPT
             if (data == null || data.Length != 1)
                 return 0;
 
-            int input = data[0] & 0x0F;
-
-            bool direction = (input >> 3) == 1;
-            int step = input & 0x07;
-
-            return direction ? step : (step * -1);
+            return (int) data[0];
         }
 
         public override byte[] ToDataPoint(string value)
@@ -57,20 +52,10 @@ namespace KNXLib.DPT
             else
                 return dataPoint;
 
-            if (input > 7 || input < -7)
+            if (input < 0 || input > 255)
                 return dataPoint;
-
-            var direction = 8; // binary 1000
-
-            if (input <= 0)
-            {
-                direction = 0;
-                input = input * -1;
-            }
-
-            int step = (input & 7);
-
-            dataPoint[0] = (byte)(step | direction);
+            
+            dataPoint[0] = (byte) input;
 
             return dataPoint;
         }

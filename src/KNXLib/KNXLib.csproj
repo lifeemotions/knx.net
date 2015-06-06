@@ -38,7 +38,13 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DPT\EightBitWithoutSignNonScaledValue1UCount.cs" />
+    <Compile Include="DPT\EightBitWithoutSignScaledPercentU8.cs" />
+    <Compile Include="DPT\EightBitWithoutSignScaledAngle.cs" />
+    <Compile Include="DPT\EightBitWithSignRelativeValue.cs" />
+    <Compile Include="DPT\EightBitWithoutSignScaledScaling.cs" />
     <Compile Include="DPT\ThreeBitWithControl.cs" />
+    <Compile Include="Exceptions\InvalidValueException.cs" />
     <Compile Include="Log\Logger.cs" />
     <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />

@@ -1,7 +1,7 @@
 {
   "name": "knx.net-site",
   "description": "KNX.net project website",
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "git@github.com:lifeemotions/knx.net.git"
   },

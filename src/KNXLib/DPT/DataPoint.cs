@@ -1,6 +1,6 @@
 ﻿namespace KNXLib.DPT
 {
-    public abstract class DataPoint
+    internal abstract class DataPoint
     {
         public abstract string[] Ids { get; }
 
