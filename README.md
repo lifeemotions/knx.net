@@ -61,7 +61,22 @@ connection.Action("1/1/17", connection.toDPT("5.001", 50));
 Converting status from event
 
 ```csharp
-float temp = (float)connection.fromDPT("9.001", state);
+static void Event(string address, string state)
+{
+  if (address == "1/1/16")
+  {
+    int temp = (int)connection.fromDPT("9.001", state);
+    Console.WriteLine("New Event: device " + address + " has status " + temp);
+    return;
+  }
+  if (address == "1/1/17")
+  {
+    int perc = (int)connection.fromDPT("5.001", state);
+    Console.WriteLine("New Event: device " + address + " has status " + perc);
+    return;
+  }
+}
+
 ```
 
 ### Sending actions without using datapoints

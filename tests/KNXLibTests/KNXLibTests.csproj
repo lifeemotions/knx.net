@@ -60,13 +60,13 @@
     <Compile Include="Support\Eibd\GroupResponse.cs" />
     <Compile Include="Support\Eibd\VBusMonitorManager.cs" />
     <Compile Include="Support\Os\Tools.cs" />
-    <Compile Include="Unit\DataPoint\EightBitWithSignRelativeValue.cs" />
-    <Compile Include="Unit\DataPoint\EightBitWithoutSignScaledScaling.cs" />
-    <Compile Include="Unit\DataPoint\EightBitWithoutSignScaledAngle.cs" />
-    <Compile Include="Unit\DataPoint\EightBitWithoutSignScaledPercentU8.cs" />
-    <Compile Include="Unit\DataPoint\Temperature.cs" />
-    <Compile Include="Unit\DataPoint\EightBitWithoutSignNonScaledValue1UCount.cs" />
-    <Compile Include="Unit\DataPoint\ThreeBitWithControl.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint8BitSignRelativeValue.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint8BitNoSignScaledScaling.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint8BitNoSignScaledAngle.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint8BitNoSignScaledPercentU8.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint2ByteFloatTemperature.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
+    <Compile Include="Unit\DataPoint\DataPoint3BitControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Integration\Routing\" />

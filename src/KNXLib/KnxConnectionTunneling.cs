@@ -5,6 +5,11 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
+    /// <summary>
+    ///     Class that controls a Tunneling KNX connection, a tunneling connection is UDP based and has state.
+    ///     This class will connect to the remote gateway provided and create an endpoint for the remote gateway
+    ///     to connect back
+    /// </summary>
     public class KnxConnectionTunneling : KnxConnection
     {
         private readonly IPEndPoint _localEndpoint;
@@ -12,6 +17,14 @@ namespace KNXLib
         private UdpClient _udpClient;
         private byte _sequenceNumber;
 
+        /// <summary>
+        ///     Initializes a new KNX tunneling connection with provided values. Make sure the local system allows
+        ///     UDP messages to the localIpAddress and localPort provided
+        /// </summary>
+        /// <param name="remoteIpAddress">Remote gateway IP address</param>
+        /// <param name="remotePort">Remote gateway port</param>
+        /// <param name="localIpAddress">Local IP address to bind to</param>
+        /// <param name="localPort">Local port to bind to</param>
         public KnxConnectionTunneling(string remoteIpAddress, int remotePort, string localIpAddress, int localPort)
             : base(remoteIpAddress, remotePort)
         {
@@ -19,7 +32,7 @@ namespace KNXLib
 
             ChannelId = 0x00;
             SequenceNumberLock = new object();
-            _stateRequestTimer = new Timer(60000) { AutoReset = true }; // same time as ETS with group monitor open
+            _stateRequestTimer = new Timer(60000) {AutoReset = true}; // same time as ETS with group monitor open
             _stateRequestTimer.Elapsed += StateRequest;
         }
 
@@ -42,6 +55,9 @@ namespace KNXLib
             _sequenceNumber = 0x00;
         }
 
+        /// <summary>
+        ///     Start the connection
+        /// </summary>
         public override void Connect()
         {
             try
@@ -61,7 +77,7 @@ namespace KNXLib
 
                 _udpClient = new UdpClient(_localEndpoint)
                 {
-                    Client = { DontFragment = true, SendBufferSize = 0 }
+                    Client = {DontFragment = true, SendBufferSize = 0}
                 };
             }
             catch (SocketException ex)
@@ -76,8 +92,8 @@ namespace KNXLib
             }
             else
             {
-                ((KnxReceiverTunneling)KnxReceiver).SetClient(_udpClient);
-                ((KnxSenderTunneling)KnxSender).SetClient(_udpClient);
+                ((KnxReceiverTunneling) KnxReceiver).SetClient(_udpClient);
+                ((KnxSenderTunneling) KnxSender).SetClient(_udpClient);
             }
 
             KnxReceiver.Start();
@@ -92,6 +108,9 @@ namespace KNXLib
             }
         }
 
+        /// <summary>
+        ///     Stop the connection
+        /// </summary>
         public override void Disconnect()
         {
             try
@@ -154,22 +173,22 @@ namespace KNXLib
             datagram[09] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[10] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[12] = (byte)(_localEndpoint.Port >> 8);
-            datagram[13] = (byte)_localEndpoint.Port;
+            datagram[12] = (byte) (_localEndpoint.Port >> 8);
+            datagram[13] = (byte) _localEndpoint.Port;
             datagram[14] = 0x08;
             datagram[15] = 0x01;
             datagram[16] = _localEndpoint.Address.GetAddressBytes()[0];
             datagram[17] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[18] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[19] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[20] = (byte)(_localEndpoint.Port >> 8);
-            datagram[21] = (byte)_localEndpoint.Port;
+            datagram[20] = (byte) (_localEndpoint.Port >> 8);
+            datagram[21] = (byte) _localEndpoint.Port;
             datagram[22] = 0x04;
             datagram[23] = 0x04;
             datagram[24] = 0x02;
             datagram[25] = 0x00;
 
-            ((KnxSenderTunneling)KnxSender).SendDataSingle(datagram);
+            ((KnxSenderTunneling) KnxSender).SendDataSingle(datagram);
         }
 
         private void StateRequest(object sender, ElapsedEventArgs e)
@@ -191,8 +210,8 @@ namespace KNXLib
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte)(_localEndpoint.Port >> 8);
-            datagram[15] = (byte)_localEndpoint.Port;
+            datagram[14] = (byte) (_localEndpoint.Port >> 8);
+            datagram[15] = (byte) _localEndpoint.Port;
 
             try
             {
@@ -223,8 +242,8 @@ namespace KNXLib
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte)(_localEndpoint.Port >> 8);
-            datagram[15] = (byte)_localEndpoint.Port;
+            datagram[14] = (byte) (_localEndpoint.Port >> 8);
+            datagram[15] = (byte) _localEndpoint.Port;
 
             KnxSender.SendData(datagram);
         }

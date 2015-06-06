@@ -6,6 +6,11 @@ using KNXLib.Exceptions;
 
 namespace KNXLib
 {
+    /// <summary>
+    ///     Class that controls a Routing KNX connection, a routing connection is UDP based and has no state.
+    ///     This class will bind to a multicast address to listen for events and send actions and requests to
+    ///     that same address
+    /// </summary>
     public class KnxConnectionRouting : KnxConnection
     {
         private const string DefaultMulticastAddress = "224.0.23.12";
@@ -14,37 +19,60 @@ namespace KNXLib
         private readonly IPEndPoint _localEndpoint;
         private readonly IList<UdpClient> _udpClients = new List<UdpClient>();
 
+        /// <summary>
+        ///     Initializes a new KNX routing connection with default values. The default multicast address is
+        ///     224.0.23.12 and the default port is 3671. Make sure the local system allows UDP messages to this port
+        /// </summary>
         public KnxConnectionRouting()
             : this(DefaultMulticastAddress, DefaultMulticastPort)
         {
         }
 
+        /// <summary>
+        ///     Initializes a new KNX routing connection with default address and provided port. The default multicast
+        ///     address is 224.0.23.12. Make sure the local system allows UDP messages to the provided port
+        /// </summary>
+        /// <param name="port">UDP port to send/receive KNX messages</param>
         public KnxConnectionRouting(int port)
             : this(DefaultMulticastAddress, port)
         {
         }
 
+        /// <summary>
+        ///     Initializes a new KNX routing connection with provided address and default port. The default port is
+        ///     3671. Make sure the local system allows UDP messages to this port
+        /// </summary>
+        /// <param name="host">UDP multicast address to send/receive KNX messages</param>
         public KnxConnectionRouting(string host)
             : this(host, DefaultMulticastPort)
         {
         }
 
+        /// <summary>
+        ///     Initializes a new KNX routing connection with provided address and port. Make sure the local system
+        ///     allows UDP messages to the provided port
+        /// </summary>
+        /// <param name="host">UDP multicast address to send/receive KNX messages</param>
+        /// <param name="port">UDP port to send/receive KNX messages</param>
         public KnxConnectionRouting(string host, int port)
             : base(host, port)
         {
             _localEndpoint = new IPEndPoint(IPAddress.Any, port);
         }
 
+        /// <summary>
+        ///     Start the connection
+        /// </summary>
         public override void Connect()
         {
             try
             {
-                var ipv4Addresses =
+                IEnumerable<IPAddress> ipv4Addresses =
                     Dns
-                    .GetHostAddresses(Dns.GetHostName())
-                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
+                        .GetHostAddresses(Dns.GetHostName())
+                        .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
 
-                foreach (var localIp in ipv4Addresses)
+                foreach (IPAddress localIp in ipv4Addresses)
                 {
                     var client = new UdpClient(new IPEndPoint(localIp, _localEndpoint.Port));
                     _udpClients.Add(client);
@@ -66,10 +94,13 @@ namespace KNXLib
             Connected();
         }
 
+        /// <summary>
+        ///     Stop the connection
+        /// </summary>
         public override void Disconnect()
         {
             KnxReceiver.Stop();
-            foreach (var client in _udpClients)
+            foreach (UdpClient client in _udpClients)
             {
                 client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();

@@ -1,5 +1,5 @@
-﻿using System.Net;
-using System.Net.Sockets;
+﻿using System;
+using System.Net;
 using KNXLib.Exceptions;
 
 namespace KNXLib
@@ -22,8 +22,9 @@ namespace KNXLib
                 {
                     IpAddress = Dns.GetHostEntry(host).AddressList[0];
                 }
-                catch (SocketException)
+                catch (Exception)
                 {
+                    throw new InvalidHostException(host);
                 }
             }
 

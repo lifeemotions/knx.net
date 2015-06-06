@@ -38,24 +38,22 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DPT\EightBitWithoutSignNonScaledValue1UCount.cs" />
-    <Compile Include="DPT\EightBitWithoutSignScaledPercentU8.cs" />
-    <Compile Include="DPT\EightBitWithoutSignScaledAngle.cs" />
-    <Compile Include="DPT\EightBitWithSignRelativeValue.cs" />
-    <Compile Include="DPT\EightBitWithoutSignScaledScaling.cs" />
-    <Compile Include="DPT\ThreeBitWithControl.cs" />
-    <Compile Include="Exceptions\InvalidValueException.cs" />
+    <Compile Include="DPT\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
+    <Compile Include="DPT\DataPoint8BitNoSignScaledPercentU8.cs" />
+    <Compile Include="DPT\DataPoint8BitNoSignScaledAngle.cs" />
+    <Compile Include="DPT\DataPoint8BitSignRelativeValue.cs" />
+    <Compile Include="DPT\DataPoint8BitNoSignScaledScaling.cs" />
+    <Compile Include="DPT\DataPoint3BitControl.cs" />
     <Compile Include="Log\Logger.cs" />
     <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />
-    <Compile Include="DPT\Temperature.cs" />
+    <Compile Include="DPT\DataPoint2ByteFloatTemperature.cs" />
     <Compile Include="DPT\DataPointTranslator.cs" />
     <Compile Include="KnxConnectionConfiguration.cs" />
     <Compile Include="KnxLockManager.cs" />
     <Compile Include="KnxSenderTunneling.cs" />
     <Compile Include="KnxReceiverTunneling.cs" />
     <Compile Include="KnxConnectionTunneling.cs" />
-    <Compile Include="Exceptions\MultipleLocalInterfacesException.cs" />
     <Compile Include="Exceptions\InvalidKnxDataException.cs" />
     <Compile Include="KnxSenderRouting.cs" />
     <Compile Include="Exceptions\ConnectionErrorException.cs" />
