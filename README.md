@@ -35,9 +35,9 @@ Examples
 ```csharp
 static void Main(string[] args)
 {
-  var connection = new KNXConnectionRouting();
+  var connection = new KnxConnectionRouting();
   connection.Connect();
-  connection.KNXEventDelegate += new KNXConnection.KNXEvent(Event);
+  connection.KnxEventDelegate += Event;
   connection.Action("5/0/2", false);
   Thread.Sleep(5000);
   connection.Action("5/0/2", true);
@@ -54,24 +54,55 @@ static void Event(string address, string state)
 Sending an action
 
 ```csharp
-connection.Action("1/1/16", connection.toDPT("9.001", 24.0f));
-connection.Action("1/1/17", connection.toDPT("5.001", 50));
+connection.Action("1/1/16", connection.ToDataPoint("9.001", 24.0f));
+connection.Action("1/1/17", connection.ToDataPoint("5.001", 50));
 ```
 
-Converting status from event
+Converting state from event
 
 ```csharp
 static void Event(string address, string state)
 {
   if (address == "1/1/16")
   {
-    decimal temp = (decimal)connection.fromDPT("9.001", state);
+    decimal temp = (decimal)connection.FromDataPoint("9.001", state);
     Console.WriteLine("New Event: device " + address + " has status " + temp);
     return;
   }
   if (address == "1/1/17")
   {
-    int perc = (int)connection.fromDPT("5.001", state);
+    int perc = (int)connection.FromDataPoint("5.001", state);
+    Console.WriteLine("New Event: device " + address + " has status " + perc);
+    return;
+  }
+}
+
+```
+
+### Requesting status
+
+Sending an action
+
+```csharp
+connection.KnxStatusDelegate += Status;
+connection.RequestStatus("1/1/16");
+connection.RequestStatus("1/1/17");
+```
+
+Converting state from status event
+
+```csharp
+static void Status(string address, string state)
+{
+  if (address == "1/1/16")
+  {
+    decimal temp = (decimal)connection.FromDataPoint("9.001", state);
+    Console.WriteLine("New Event: device " + address + " has status " + temp);
+    return;
+  }
+  if (address == "1/1/17")
+  {
+    int perc = (int)connection.FromDataPoint("5.001", state);
     Console.WriteLine("New Event: device " + address + " has status " + perc);
     return;
   }
@@ -85,6 +116,7 @@ static void Event(string address, string state)
 connection.Action("1/1/19", true);
 connection.Action("1/1/20", false);
 connection.Action("1/1/21", 60);
+connection.Action("1/1/22", 0x4E);
 ```
 
 ### Connecting using Tunneling
