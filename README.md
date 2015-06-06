@@ -65,7 +65,7 @@ static void Event(string address, string state)
 {
   if (address == "1/1/16")
   {
-    int temp = (int)connection.fromDPT("9.001", state);
+    decimal temp = (decimal)connection.fromDPT("9.001", state);
     Console.WriteLine("New Event: device " + address + " has status " + temp);
     return;
   }
