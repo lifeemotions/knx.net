@@ -10,7 +10,7 @@
     <projectUrl>http://lifeemotions.github.io/knx.net/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Added datapoints 5.xxx and 6.xxx. Updated documentation. Fixed issues with 9.001 datapoint.</releaseNotes>
+    <releaseNotes>Bugfix for DPT 3 bit with control (3.007 and 3.008).</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>knx .net c#</tags>
   </metadata>

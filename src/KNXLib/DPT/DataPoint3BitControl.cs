@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using KNXLib.Log;
 
 namespace KNXLib.DPT
@@ -9,14 +7,17 @@ namespace KNXLib.DPT
     {
         public override string[] Ids
         {
-            get { return new[] { "3.008", "3.007" }; }
+            get
+            {
+                return new[] {"3.008", "3.007"};
+            }
         }
 
         public override object FromDataPoint(string data)
         {
             var dataConverted = new byte[data.Length];
             for (var i = 0; i < data.Length; i++)
-                dataConverted[i] = (byte)data[i];
+                dataConverted[i] = (byte) data[i];
 
             return FromDataPoint(dataConverted);
         }
@@ -31,7 +32,22 @@ namespace KNXLib.DPT
             bool direction = (input >> 3) == 1;
             int step = input & 0x07;
 
-            return direction ? step : (step * -1);
+            if (step != 0)
+            {
+                if (direction)
+                {
+                    step = step*-1;
+                    step = step + 8;
+                }
+                else
+                {
+                    step = step*-1;
+                    step = step + 8;
+                    step = step*-1;
+                }
+            }
+
+            return step;
         }
 
         public override byte[] ToDataPoint(string value)
@@ -43,8 +59,8 @@ namespace KNXLib.DPT
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            
-            int input = 0;
+
+            var input = 0;
             if (val is int)
                 input = ((int) val);
             else if (val is float)
@@ -69,15 +85,23 @@ namespace KNXLib.DPT
 
             var direction = 8; // binary 1000
 
+
             if (input <= 0)
             {
                 direction = 0;
-                input = input * -1;
+                input = input*-1;
+                input = input - 8;
+                input = input*-1;
+            }
+            else
+            {
+                input = input*-1;
+                input = input + 8;
             }
 
             int step = (input & 7);
 
-            dataPoint[0] = (byte)(step | direction);
+            dataPoint[0] = (byte) (step | direction);
 
             return dataPoint;
         }

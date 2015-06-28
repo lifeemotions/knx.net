@@ -24,13 +24,13 @@ namespace KNXLibTests.Unit.DataPoint
             var incr4 = 4;
             var incr4Bytes = new byte[] { 0x0C };
             var incr1 = 1;
-            var incr1Bytes = new byte[] { 0x09 };
+            var incr1Bytes = new byte[] { 0x0F };
             var stop = 0;
             var stopBytes = new byte[] { 0x00 };
             var decr3 = -3;
-            var decr3Bytes = new byte[] { 0x03 };
+            var decr3Bytes = new byte[] { 0x05 };
             var decr7 = -7;
-            var decr7Bytes = new byte[] { 0x07 };
+            var decr7Bytes = new byte[] { 0x01 };
             
             Assert.AreEqual(incr4, DataPointTranslator.Instance.FromDataPoint(dptType, incr4Bytes));
             Assert.AreEqual(incr1, DataPointTranslator.Instance.FromDataPoint(dptType, incr1Bytes));
@@ -51,15 +51,15 @@ namespace KNXLibTests.Unit.DataPoint
             var dptType = "3.008";
 
             var incr7 = 7;
-            var incr7Bytes = new byte[] { 0x0F };
+            var incr7Bytes = new byte[] { 0x09 };
             var incr2 = 2;
-            var incr2Bytes = new byte[] { 0x0A };
+            var incr2Bytes = new byte[] { 0x0E };
             var stop = 0;
             var stopBytes = new byte[] { 0x00 };
             var decr5 = -5;
-            var decr5Bytes = new byte[] { 0x05 };
+            var decr5Bytes = new byte[] { 0x03 };
             var decr6 = -6;
-            var decr6Bytes = new byte[] { 0x06 };
+            var decr6Bytes = new byte[] { 0x02 };
 
             Assert.AreEqual(incr7, DataPointTranslator.Instance.FromDataPoint(dptType, incr7Bytes));
             Assert.AreEqual(incr2, DataPointTranslator.Instance.FromDataPoint(dptType, incr2Bytes));
