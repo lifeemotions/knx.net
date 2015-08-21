@@ -14,6 +14,37 @@ namespace KNXTest
 
         private static readonly IList<string> Lights = new List<string> { "5/1/2" };
 
+        // 1.001 Switches
+        private static readonly IDictionary<string, string> Switches = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 1.002 Toggles (boolean)
+        private static readonly IDictionary<string, string> Toggles = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 5.001 Percentages (0..100%)
+        private static readonly IDictionary<string, string> Percentages = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 7.007 Time (h)
+        private static readonly IDictionary<string, string> Duration = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 7.012 Current (mA)
+        private static readonly IDictionary<string, string> Current = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 9.001 Temperate (degrees C)
         private static readonly IDictionary<string, string> Temperatures = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
             { "0/4/0", "Inkomhal (Plafond)" },
@@ -40,6 +71,42 @@ namespace KNXTest
             { "1/3/17", "Warmwater - Temperatuur" }
         });
 
+        // 9.004 Light (lux)
+        private static readonly IDictionary<string, string> LightStrength = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 9.005 Speed (m/s)
+        private static readonly IDictionary<string, string> Speed = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "1/0/0", "Windsnelheid buiten" }
+        });
+
+        // 10.001 Time of day
+        private static readonly IDictionary<string, string> Times = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+
+        });
+
+        // 11.001 Date
+        private static readonly IDictionary<string, string> Dates = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "0/0/2", "Centrale Datum" }
+        });
+
+        // 13.010 Energy (Wh)
+        private static readonly IDictionary<string, string> EnergyWattHour = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "1/3/10", "Zonnecollector - Warmteopbrengst vandaag" }
+        });
+
+        // 13.013 Energy (kWh)
+        private static readonly IDictionary<string, string> EnergyKiloWattHour = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "1/3/9", "Zonnecollector - Warmteopbrengst" }
+        });
+
         private static void Main()
         {
             _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
@@ -57,6 +124,42 @@ namespace KNXTest
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
             Environment.Exit(0);
+        }
+
+        private static void Event(string address, byte[] state)
+        {
+            Print(address, state);
+        }
+
+        private static void Status(string address, byte[] state)
+        {
+            Print(address, state);
+        }
+
+        private static void Print(string address, byte[] state)
+        {
+            string description;
+
+            if (Temperatures.TryGetValue(address, out description))
+            {
+                var temp = _connection.FromDataPoint("9.001", state); // (decimal)
+                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
+            }
+            else if (EnergyWattHour.TryGetValue(address, out description))
+            {
+                var wattHour = _connection.FromDataPoint("13.010", state); // (int)
+                Console.WriteLine("[ENERGY] {0} ({1} Wh)", description, wattHour);
+            }
+            else if (Dates.TryGetValue(address, out description))
+            {
+                var date = (DateTime)_connection.FromDataPoint("11.001", state); // (DateTime)
+                Console.WriteLine("[DATE] {0} ({1})", description, date.ToString("dd/MM/yyyy"));
+            }
+            else if (Speed.TryGetValue(address, out description))
+            {
+                var speed = _connection.FromDataPoint("9.005", state); // (decimal)
+                Console.WriteLine("[SPEED] {0} ({1} m/s)", description, speed);
+            }
         }
 
         private static void LightOnOff()
@@ -139,43 +242,6 @@ namespace KNXTest
             Console.ReadLine();
             _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 24.0f));
             Thread.Sleep(200);
-        }
-
-        private static void Event(string address, byte[] state)
-        {
-            string description;
-
-            if (Temperatures.TryGetValue(address, out description))
-            {
-                var temp = (decimal)_connection.FromDataPoint("9.001", state);
-                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
-            }
-
-            //if (Temperatures.ContainsKey(address))
-            //{
-            //    var temp = (float)_connection.FromDataPoint("9.001", state);
-            //    Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
-            //}
-            //else if (Lights.Contains(address))
-            //{
-            //    Console.WriteLine("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("New Event: device " + address + " has status " + state);
-            //}
-        }
-
-        private static void Status(string address, byte[] state)
-        {
-            //Console.WriteLine("New Status: device " + address + " has status " + state);
-            string description;
-
-            if (Temperatures.TryGetValue(address, out description))
-            {
-                var temp = (decimal)_connection.FromDataPoint("9.001", state);
-                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
-            }
         }
 
         private static void Connected()

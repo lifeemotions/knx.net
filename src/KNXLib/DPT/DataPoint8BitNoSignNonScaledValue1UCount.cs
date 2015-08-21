@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using KNXLib.Log;
 
 namespace KNXLib.DPT
@@ -38,18 +36,29 @@ namespace KNXLib.DPT
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            
-            int input = 0;
+
+            int input;
+
             if (val is int)
+            {
                 input = ((int) val);
+            }
             else if (val is float)
+            {
                 input = (int) ((float) val);
+            }
             else if (val is long)
+            {
                 input = (int) ((long) val);
+            }
             else if (val is double)
+            {
                 input = (int) ((double) val);
+            }
             else if (val is decimal)
+            {
                 input = (int) ((decimal) val);
+            }
             else
             {
                 Logger.Error("5.010", "input value received is not a valid type");
@@ -61,7 +70,7 @@ namespace KNXLib.DPT
                 Logger.Error("5.010", "input value received is not in a valid range");
                 return dataPoint;
             }
-            
+
             dataPoint[0] = (byte) input;
 
             return dataPoint;

@@ -42,17 +42,28 @@ namespace KNXLib.DPT
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
 
-            decimal input = 0;
+            decimal input;
+
             if (val is int)
-                input = (decimal) ((int) val);
+            {
+                input = (int) val;
+            }
             else if (val is float)
+            {
                 input = (decimal) ((float) val);
+            }
             else if (val is long)
-                input = (decimal) ((long) val);
+            {
+                input = (long) val;
+            }
             else if (val is double)
+            {
                 input = (decimal) ((double) val);
+            }
             else if (val is decimal)
+            {
                 input = (decimal) val;
+            }
             else
             {
                 Logger.Error("5.001", "input value received is not a valid type");

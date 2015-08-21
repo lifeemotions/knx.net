@@ -41,6 +41,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DPT\DataPoint3BytesDate.cs" />
+    <Compile Include="DPT\DataPoint4Bytes.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledPercentU8.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledAngle.cs" />
