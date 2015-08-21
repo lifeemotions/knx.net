@@ -39,7 +39,7 @@ namespace KNXLib
         /// </summary>
         /// <param name="address"></param>
         /// <param name="state"></param>
-        public delegate void KnxEvent(string address, string state);
+        public delegate void KnxEvent(string address, byte[] state);
 
         /// <summary>
         ///     Event triggered when there is a new KNX event
@@ -51,7 +51,7 @@ namespace KNXLib
         /// </summary>
         /// <param name="address"></param>
         /// <param name="state"></param>
-        public delegate void KnxStatus(string address, string state);
+        public delegate void KnxStatus(string address, byte[] state);
 
         /// <summary>
         ///     Event triggered when received a status after a query
@@ -162,7 +162,7 @@ namespace KNXLib
             Logger.Debug(ClassName, "Send locked - {0} free locks", _lockManager.LockCount);
         }
 
-        internal void Event(string address, string state)
+        internal void Event(string address, byte[] state)
         {
             try
             {
@@ -176,7 +176,7 @@ namespace KNXLib
             Logger.Debug(ClassName, "Device {0} sent event {1}", address, state);
         }
 
-        internal void Status(string address, string state)
+        internal void Status(string address, byte[] state)
         {
             try
             {

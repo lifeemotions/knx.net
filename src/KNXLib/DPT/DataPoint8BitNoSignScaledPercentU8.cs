@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using KNXLib.Log;
 
 namespace KNXLib.DPT
@@ -38,7 +36,7 @@ namespace KNXLib.DPT
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            
+
             int input = 0;
             if (val is int)
                 input = ((int) val);
@@ -61,7 +59,7 @@ namespace KNXLib.DPT
                 Logger.Error("5.004", "input value received is not in a valid range");
                 return dataPoint;
             }
-            
+
             dataPoint[0] = (byte) input;
 
             return dataPoint;

@@ -61,7 +61,7 @@ namespace KNXLibTests.Integration.Tunneling
                 Assert.Fail("Didn't receive feedback from the action");
         }
 
-        private void Event(string address, string state)
+        private void Event(string address, byte[] state)
         {
             //Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
             if (LightOnOffAddress.Equals(address) && state != null && state.Length == 1 && state[0] == 1)

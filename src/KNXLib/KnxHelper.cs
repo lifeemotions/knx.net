@@ -262,21 +262,47 @@ namespace KNXLib
         // +--------+--------+--------+--------+--------+--------+--------+--------++--------+----....
         // +                            B  Y  T  E    2                            ||       B Y T E  3
         // +-----------------------------------------------------------------------++-------------....
-        public static string GetData(int dataLength, byte[] apdu)
+        public static byte[] GetData(int dataLength, byte[] apdu)
         {
-            
             switch (dataLength)
             {
+                //case 0:
+                //    return string.Empty;
+                //case 1:
+                //    return Convert.ToChar(0x3F & apdu[1]).ToString();
+                //case 2:
+                //    return Convert.ToChar(apdu[2]).ToString();
+                //default:
+                //    var data = string.Empty;
+                //    for (var i = 2; i < apdu.Length; i++)
+                //        data += Convert.ToChar(apdu[i]);
+
+                //    return data;
+
+                //case 0:
+                //    return string.Empty;
+                //case 1:
+                //    //return Convert.ToChar(0x3F & apdu[1]).ToString();
+                //    return string.Format("{0:x2}", (0x3F & apdu[1])).ToUpperInvariant();
+                //case 2:
+                //    //return Convert.ToChar(apdu[2]).ToString();
+                //    return string.Format("{0:x2}", apdu[2]).ToUpperInvariant();
+                //default:
+                //    var data = new StringBuilder(apdu.Length * 2);
+                //    for (var i = 2; i < apdu.Length; i++)
+                //        data.AppendFormat("{0:x2}", apdu[i]);
+                //    return data.ToString().ToUpperInvariant();
+
                 case 0:
-                    return string.Empty;
+                    return new byte[0];
                 case 1:
-                    return Convert.ToChar(0x3F & apdu[1]).ToString();
+                    return new byte[1] { (byte)(0x3F & apdu[1]) };
                 case 2:
-                    return Convert.ToChar(apdu[2]).ToString();
+                    return new byte[1] { apdu[2] };
                 default:
-                    var data = string.Empty;
+                    var data = new byte[apdu.Length - 2];
                     for (var i = 2; i < apdu.Length; i++)
-                        data += Convert.ToChar(apdu[i]);
+                        data[i - 2] = apdu[i];
 
                     return data;
             }

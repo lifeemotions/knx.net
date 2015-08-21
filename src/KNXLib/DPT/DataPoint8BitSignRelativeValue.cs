@@ -38,7 +38,7 @@ namespace KNXLib.DPT
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            
+
             int input = 0;
             if (val is int)
                 input = ((int) val);
@@ -55,7 +55,7 @@ namespace KNXLib.DPT
                 Logger.Error("6.xxx", "input value received is not a valid type");
                 return dataPoint;
             }
-            
+
             if (input < -128 || input > 127)
             {
                 Logger.Error("6.xxx", "input value received is not in a valid range");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using KNXLib;
 
@@ -12,7 +13,32 @@ namespace KNXTest
         private const string LightOnOffAddress = "5/0/2";
 
         private static readonly IList<string> Lights = new List<string> { "5/1/2" };
-        private static readonly IList<string> Temperatures = new List<string> { "1/1/17", "1/1/18" };
+
+        private static readonly IDictionary<string, string> Temperatures = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "0/4/0", "Inkomhal (Plafond)" },
+            { "0/4/1", "Toilet beneden (Plafond)" },
+            { "0/4/2", "Berging (Plafond)" },
+            { "0/4/3", "Garage (Plafond)" },
+            { "0/4/4", "Nachthal trap (Plafond)" },
+            { "0/4/5", "Nachthal badkamer (Plafond)" },
+            { "0/4/6", "Badkamer (Plafond)" },
+            { "0/4/7", "Toilet boven (Plafond)" },
+            { "0/4/8", "Slaapkamer 1 (Gezamelijk)" },
+            { "0/4/9", "Slaapkamer 2 (Merel)" },
+            { "0/4/10", "Slaapkamer 3 (Norah)" },
+            { "0/4/11", "Bureau" },
+            { "0/4/12", "Badkamer" },
+            { "0/4/13", "Weerstation" },
+            { "0/4/14", "Keuken" },
+
+            { "1/3/0", "Boiler - Buitentemperatuur" },
+            { "1/3/1", "Boiler - Temperatuur" },
+            { "1/3/5", "Zonnecollector - Zonnecollector temperatuur" },
+            { "1/3/6", "Zonnecollector - Zonnecylinder temperatuur" },
+            { "1/3/12", "Vloerverwarming - Temperatuur" },
+            { "1/3/17", "Warmwater - Temperatuur" }
+        });
 
         private static void Main()
         {
@@ -23,7 +49,7 @@ namespace KNXTest
             _connection.KnxStatusDelegate += Status;
             _connection.Connect();
 
-            LightOnOff();
+            //LightOnOff();
             //BlindUpDown1();
             //BlindUpDown2();
             //TemperatureSetpoint();
@@ -115,26 +141,41 @@ namespace KNXTest
             Thread.Sleep(200);
         }
 
-        private static void Event(string address, string state)
+        private static void Event(string address, byte[] state)
         {
-            if (Temperatures.Contains(address))
+            string description;
+
+            if (Temperatures.TryGetValue(address, out description))
             {
-                var temp = (float)_connection.FromDataPoint("9.001", state);
-                Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
+                var temp = (decimal)_connection.FromDataPoint("9.001", state);
+                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
             }
-            else if (Lights.Contains(address))
-            {
-                Console.WriteLine("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
-            }
-            else
-            {
-                Console.WriteLine("New Event: device " + address + " has status " + state);
-            }
+
+            //if (Temperatures.ContainsKey(address))
+            //{
+            //    var temp = (float)_connection.FromDataPoint("9.001", state);
+            //    Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
+            //}
+            //else if (Lights.Contains(address))
+            //{
+            //    Console.WriteLine("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("New Event: device " + address + " has status " + state);
+            //}
         }
 
-        private static void Status(string address, string state)
+        private static void Status(string address, byte[] state)
         {
-            Console.WriteLine("New Status: device " + address + " has status " + state);
+            //Console.WriteLine("New Status: device " + address + " has status " + state);
+            string description;
+
+            if (Temperatures.TryGetValue(address, out description))
+            {
+                var temp = (decimal)_connection.FromDataPoint("9.001", state);
+                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
+            }
         }
 
         private static void Connected()
