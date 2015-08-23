@@ -31,6 +31,7 @@ module EIS9_Float =
             ((0x15uy, 0xEDuy), 60.68)
             ((0x16uy, 0x15uy), 62.28)
             ((0x16uy, 0x13uy), 62.2)
+            ((0x8Auy, 0x24uy), -30.0)
         ]
 
         data

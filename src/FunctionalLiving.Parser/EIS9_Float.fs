@@ -15,8 +15,8 @@ module EIS9_Float =
 
         let sign =
             match bits.[0] with
-            | One -> -1
-            | Zero -> 1
+            | One -> -1.0
+            | Zero -> 1.0
 
         let exponent =
             [| bits.[1]; bits.[2]; bits.[3]; bits.[4] |]
@@ -26,10 +26,17 @@ module EIS9_Float =
         let power =
             2.0 ** exponent
 
+        let invertBit bit =
+            match bit with
+            | One -> Zero
+            | Zero -> One
+
         let mantissa =
             bits
             |> Array.skip 5
+            |> Array.map (fun bit -> if sign = -1.0 then invertBit bit else bit)
             |> bitsToUInt
+            |> (fun mantissa -> if sign = -1.0 then mantissa + 1 else mantissa)
             |> float
 
-        Math.Round(mantissa * power * resolution, 2)
+        Math.Round(sign * mantissa * power * resolution, 2)
