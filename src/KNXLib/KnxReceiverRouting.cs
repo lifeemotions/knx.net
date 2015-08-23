@@ -80,8 +80,8 @@ namespace KNXLib
                 total_length = datagram[4] + datagram[5]
             };
 
-            var cemi = new byte[datagram.Length - 6];
-            Array.Copy(datagram, 6, cemi, 0, datagram.Length - 6);
+            var cemi = new byte[datagram.Length - datagram[0]];
+            Array.Copy(datagram, datagram[0], cemi, 0, datagram.Length - datagram[0]);
 
             ProcessCEMI(knxDatagram, cemi);
         }

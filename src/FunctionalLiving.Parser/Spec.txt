@@ -1,0 +1,212 @@
+﻿- The KNX IP medium uses UDP IP datagram on fixed IP Port 3671
+- The IP multicast address used for the KNXnet/IP Routing traffic is typically 224.0.23.12
+
+Telegram:
+Control      Source    Target   TargetType   Counter   Length    User Data
+ 8 bit    -  16 bit -  16 bit -   1 bit    -  3 bit  - 4 bit  - 2-16 x 8bit
+
+Temp example:
+                   29 00 BC E0 11 3E 04 0A 03 00 80 0C 65
+
+BitConverter.ToString(datagram)
+  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
+"06-10-05-30-00-13-29-00-BC-D0-11-3E-04-0A-03-00-80-0C-65"
+                         |This is where the checksum starts, with the BC
+
+datagram
+{byte[19]}
+    [0]: 6      {00000110} Header length 0x06 (6 bytes)
+    [1]: 16     {00010000} KNXNet version 0x10 (1.0)
+    [2]: 5      {00000101} HighByte Service Type
+    [3]: 48     {00110000} LowByte Service Type 0x0530 (ROUTING_INDICATION)
+    [4]: 0      {00000000} HighByte Total Length
+    [5]: 19     {00010011} LowByte Total Length 0x13 (13 bytes following)
+
+    [6]: 41     {00101001} Message Code
+    [7]: 0      {00000000} Additional Info
+
+    [8]: 188    {10111100} Control
+
+    [9]: 208    {11010000}      224? {11100000}
+
+    [10]: 17    {00010001} SourceAddres
+    [11]: 62    {00111110} SourceAddress
+
+    [12]: 4     {00000100} TargetAddress
+    [13]: 10    {00001010} TargetAddress
+
+    [14]: 3     {00000011} Target Type + Route Counter + Length Counter
+
+    [15]: 0     {00000000} Data
+    [16]: 128   {10000000} Data
+    [17]: 12    {00001100} Data
+    [18]: 101   {01100101} Data
+
+Service Type:
+– SEARCH_REQUEST 0x0201
+– SEARCH_RESPONSE 0x0202
+– DESCRIPTION_REQUEST 0x0203
+– DESCRIPTION_RESPONSE 0x0204
+– CONNECTION_REQUEST 0x0205
+– CONNECTION_RESPONSE 0x0206
+– CONNECTIONSTATE_REQUEST 0x0207
+– CONNECTIONSTATE_RESPONSE 0x0208
+– DISCONNECT_REQUEST 0x0209
+– DISCONNECT_RESPONSE 0x020A
+– DEVICE_CONFIGURATION_REQUEST 0x0310
+– DEVICE_CONFIGURATION_ACK 0x0311
+– TUNNEL_REQUEST 0x0420
+– TUNNEL_RESPONSE 0x0421
+– ROUTING_INDICATION 0x0530
+- ROUTING_LOST_MESSAGE 0x0531
+- ROUTING_BUSY 0x0532
+
+Control:
+1011 1100
+B    C
+
+1   Fixed
+0   Fixed
+1   If 1: first message, if 0 repeat message
+1   Fixed
+11  00: System priority, 10: Alarm priority, 01: High priority, 11: Low priority
+0   Fixed
+0   Fixed
+
+SourceAddres:
+Zone Line BusDevice
+0001 0001 0011 1110
+1    1    3    E
+
+Zone: 1
+Line: 1
+Device: 62
+Addres: 1.1.62
+
+TargetAddress:
+0000 0100 0000 1010
+0    4    0    A
+
+L1    L2  L3
+00000 100 00001010
+
+L1: 0
+L2: 4
+L3: 10
+Address: 0/4/10
+
+(If only using 2 levels, L1 is first 5 bits, L2 the rest)
+
+Target Type:
+0
+
+1: Target is a groups address
+0: Target is a physical address
+
+Route Counter:
+000
+
+Starts at 6, and drops with 1 per hop
+
+Length Counter:
+0011
+3
+
+Number of data bytes - 1
+In this case we will have 4 bytes of data
+
+Data:
+0000 0000 1000 0000 0000 1100 0110 0101
+0    0    8    0    0    C    6    5
+
+Filler  Command  Data
+000000  0010     0000000000110001100101
+
+Command:
+0000 - Value Read
+0001 - Value Response
+0010 - Write
+1010 - Memory Write
+
+
+DataPoints
+----------
+
+Examples:
+1 bit               switching / motor
+2 bit               priority
+4 bit               relative dimming
+8 bit (1 byte)      value / absolute dimming
+16 bit (2 bytes)    floating point / temperature
+32 bit (4 bytes)    counter
+14 bytes            14 character text
+
+1.001 switch
+------------
+Data field 1 bit
+Writing "on":
+Filler  Command  Data
+000000  0010     000001
+
+3.007 dimming control (relative dimming)
+---------------------
+Data field 4 bits
+
+Dimming up 6%:
+Filler  Command  Data
+000000  0010     001101
+
+abcd
+a: 1 dimming up, 0 dimming down
+bcd:
+000 stop dimming
+001 dim 100%
+010 dim 50%
+011 dim 25%
+100 dim 12.5%
+101 dim 6%
+110 dim 3%
+111 dim 1.5%
+
+5.* 8-bit unsigned value
+------------------------
+Data field 1 byte
+
+5.001 percentage (0..100%)
+--------------------------
+Same type of field, different visualisation, 0 = 0%, 255 = 100%
+
+Dimming to 20%:
+Filler  Command  Data
+000000  0010     000000 00110011
+
+00110011: 51
+--> 100 / 255 * 51 = 20%
+
+9.* 2-byte float value
+----------------------
+Data field: 2 bytes
+Temp in degrees C, speed in m/s, light in lux, ...
+
+9.001 temperature
+-----------------
+Filler  Command  Data
+000000  0010     000000 S EEEE MMMMMMMMMMM
+
+S: Sign, 1 is minus, 0 is positive
+EEEE: Power of 2, for example 0011 would be 2 to the power of 3
+MMMMMMMMMMM: Mantisse
+  If S is 0: 11111111111 = 2047 and 00000000000 = 0
+  If S is 1: 11111111111 = -1 and 00000000000 = -2047 (2 complement)
+
+Our example:
+Filler  Command  Data
+000000  0010     000000 0 0001 10001100101
+
+Sign: positive
+Power: 1 (2 to the power of 1 = 2)
+Mantisse: 1125
+
+Mantisse * Power = 1125 * 2 = 2250 / 100 (resolution of datapoint) = 22,5 degrees
+
+So in the end 1.1.62 sent 22.5 degrees to 0/4/10

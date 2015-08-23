@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using KNXLib;
 
@@ -107,8 +108,12 @@ namespace KNXTest
             { "1/3/9", "Zonnecollector - Warmteopbrengst" }
         });
 
+        private static StreamWriter _logFile;
+
         private static void Main()
         {
+            _logFile = new StreamWriter("telegrams.txt");
+
             _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
             _connection.KnxConnectedDelegate += Connected;
             _connection.KnxDisconnectedDelegate += Disconnected;
@@ -123,6 +128,7 @@ namespace KNXTest
 
             Console.WriteLine("Done. Press [ENTER] to finish");
             Console.Read();
+            _logFile.Dispose();
             Environment.Exit(0);
         }
 
@@ -138,6 +144,8 @@ namespace KNXTest
 
         private static void Print(string address, byte[] state)
         {
+            _logFile.WriteLine("{0} - {1}", address, BitConverter.ToString(state));
+
             string description;
 
             if (Temperatures.TryGetValue(address, out description))

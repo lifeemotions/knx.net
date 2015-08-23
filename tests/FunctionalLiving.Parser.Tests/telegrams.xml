@@ -1,0 +1,63 @@
+<CommunicationLog xmlns="http://knx.org/xml/telegrams/01">
+    <RecordStart Timestamp="2015-08-23T13:39:32.8115471Z" Mode="LinkLayer" Host="Boxy" ConnectionName="KNX/IP-Router" ConnectionOptions="Tunneling, IPAddress=192.168.123.190, IPPort=3671, UseNat=False" ConnectorType="KnxIpTunneling" />
+    <Connection Timestamp="2015-08-23T13:39:32.8125474Z" State="Established" />
+    <Telegram Timestamp="2015-08-23T13:39:37.2924831Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180801010081" />
+    <Telegram Timestamp="2015-08-23T13:39:37.293484Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180802010080" />
+    <Telegram Timestamp="2015-08-23T13:39:45.1096396Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011141201010081" />
+    <Telegram Timestamp="2015-08-23T13:39:45.1096396Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011140500010081" />
+    <Telegram Timestamp="2015-08-23T13:39:45.1596854Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011CD010C010081" />
+    <Telegram Timestamp="2015-08-23T13:39:47.0601943Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011151202010081" />
+    <Telegram Timestamp="2015-08-23T13:39:47.1092215Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011150501010081" />
+    <Telegram Timestamp="2015-08-23T13:39:47.1102218Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011CD010D010081" />
+    <Telegram Timestamp="2015-08-23T13:39:47.2603084Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE0114804060300801271" />
+    <Telegram Timestamp="2015-08-23T13:39:48.7098212Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE0115304080300800C74" />
+    <Telegram Timestamp="2015-08-23T13:39:49.3590321Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011351303010081" />
+    <Telegram Timestamp="2015-08-23T13:39:49.4102186Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011350504010081" />
+    <Telegram Timestamp="2015-08-23T13:39:49.4601941Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011FA0B0603008015A0" />
+    <Telegram Timestamp="2015-08-23T13:39:49.5092202Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80204020080FF" />
+    <Telegram Timestamp="2015-08-23T13:39:49.5102205Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80104010081" />
+    <Telegram Timestamp="2015-08-23T13:39:50.0091875Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE01136130B010081" />
+    <Telegram Timestamp="2015-08-23T13:39:50.0101869Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011360505010081" />
+    <Telegram Timestamp="2015-08-23T13:39:50.109235Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80204020080FF" />
+    <Telegram Timestamp="2015-08-23T13:39:50.1603508Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80104010081" />
+    <Telegram Timestamp="2015-08-23T13:39:50.1603508Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80205020080FF" />
+    <Telegram Timestamp="2015-08-23T13:39:50.2093824Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80105010081" />
+    <Telegram Timestamp="2015-08-23T13:39:52.6595031Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011CC070D0300804F67" />
+    <Telegram Timestamp="2015-08-23T13:39:54.6598678Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011140500010080" />
+    <Telegram Timestamp="2015-08-23T13:39:54.7100484Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011FA0B0503008015E8" />
+    <Telegram Timestamp="2015-08-23T13:39:57.3596482Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011350504010080" />
+    <Telegram Timestamp="2015-08-23T13:39:58.5095959Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011360505010080" />
+    <Telegram Timestamp="2015-08-23T13:39:58.9594614Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011150501010080" />
+    <Telegram Timestamp="2015-08-23T13:39:59.3590528Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011CC070D0300804FD9" />
+    <Telegram Timestamp="2015-08-23T13:40:01.9088271Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011151202010081" />
+    <Telegram Timestamp="2015-08-23T13:40:01.9602163Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011150501010081" />
+    <Telegram Timestamp="2015-08-23T13:40:02.0093675Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011CD010D010081" />
+    <Telegram Timestamp="2015-08-23T13:40:03.3596132Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C9000204008017080F" />
+    <Telegram Timestamp="2015-08-23T13:40:03.5096718Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C90001040080EF2802" />
+    <Telegram Timestamp="2015-08-23T13:40:11.9594129Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE0111803080300804E6B" />
+    <Telegram Timestamp="2015-08-23T13:40:11.960412Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE01118030A030080544B" />
+    <Telegram Timestamp="2015-08-23T13:40:12.0099988Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE01118030B0300804EE6" />
+    <Telegram Timestamp="2015-08-23T13:40:12.0099988Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180309030080341D" />
+    <Telegram Timestamp="2015-08-23T13:40:12.0130017Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE01118040D0300800C74" />
+    <Telegram Timestamp="2015-08-23T13:40:12.0600286Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE0111808000300800014" />
+    <Telegram Timestamp="2015-08-23T13:40:13.3586596Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180801010081" />
+    <Telegram Timestamp="2015-08-23T13:40:13.3596584Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180802010080" />
+    <Telegram Timestamp="2015-08-23T13:40:13.7097054Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE0113E040A0300800C74" />
+    <Telegram Timestamp="2015-08-23T13:40:14.6106075Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011FA0B0503008015ED" />
+    <Telegram Timestamp="2015-08-23T13:40:19.5591453Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011FA0B110300801615" />
+    <Telegram Timestamp="2015-08-23T13:40:20.1592094Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011150501010080" />
+    <Telegram Timestamp="2015-08-23T13:40:21.7093722Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE01136130B010081" />
+    <Telegram Timestamp="2015-08-23T13:40:21.710376Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011360505010081" />
+    <Telegram Timestamp="2015-08-23T13:40:21.809371Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80204020080FF" />
+    <Telegram Timestamp="2015-08-23T13:40:21.8103689Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80104010081" />
+    <Telegram Timestamp="2015-08-23T13:40:21.8595396Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80205020080FF" />
+    <Telegram Timestamp="2015-08-23T13:40:21.8605373Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80105010081" />
+    <Telegram Timestamp="2015-08-23T13:40:23.109681Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011351303010081" />
+    <Telegram Timestamp="2015-08-23T13:40:23.1598415Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011350504010081" />
+    <Telegram Timestamp="2015-08-23T13:40:23.2598064Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80204020080FF" />
+    <Telegram Timestamp="2015-08-23T13:40:23.3088564Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011C80104010081" />
+    <Telegram Timestamp="2015-08-23T13:40:24.2098687Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180801010081" />
+    <Telegram Timestamp="2015-08-23T13:40:24.2591375Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011180802010080" />
+    <Telegram Timestamp="2015-08-23T13:40:24.7092733Z" Service="L_Data.ind" FrameFormat="CommonEmi" RawData="2900BCE011FA0B110300801613" />
+    <RecordStop Timestamp="2015-08-23T13:40:28.6796155Z" />
+</CommunicationLog>

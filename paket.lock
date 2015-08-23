@@ -1,0 +1,9 @@
+REDIRECTS: ON
+NUGET
+  remote: https://www.nuget.org/api/v2
+  specs:
+    Exude (0.2.1)
+      xunit (>= 1.9.2)
+    NUnit (2.6.4)
+    Unquote (3.0.0)
+    xunit (1.9.2)

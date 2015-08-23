@@ -296,9 +296,9 @@ namespace KNXLib
                 case 0:
                     return new byte[0];
                 case 1:
-                    return new byte[1] { (byte)(0x3F & apdu[1]) };
+                    return new[] { (byte)(0x3F & apdu[1]) };
                 case 2:
-                    return new byte[1] { apdu[2] };
+                    return new[] { apdu[2] };
                 default:
                     var data = new byte[apdu.Length - 2];
                     for (var i = 2; i < apdu.Length; i++)
