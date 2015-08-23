@@ -6,7 +6,7 @@ module EIS9_Float =
     open System
     open Domain
 
-    let parseFloat(floatBytes: FloatValue) =
+    let parseFloat (floatBytes: FloatValue) =
         let (byte1, byte2) = floatBytes
 
         let bits = bytesToBits [| byte1; byte2 |]

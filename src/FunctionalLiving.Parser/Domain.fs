@@ -26,4 +26,6 @@ module Domain =
 
     type DateValue = byte * byte * byte
 
+    type ScalingValue = byte
+
     type FloatValue = byte * byte
