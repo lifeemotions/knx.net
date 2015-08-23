@@ -4,13 +4,13 @@ open Xunit
 open Swensen.Unquote
 open Grean.Exude
 
-module EIS9_Float =
+module Category9_2ByteFloatValue =
 
     open FunctionalLiving.Parser
     open System
 
     let ``9.* 2-byte float value test`` telegramBytes expected =
-        verifyParser parseFloat telegramBytes expected
+        verifyParser parseTwoByteFloat telegramBytes expected
 
     [<FirstClassTests>]
     let ``9.* 2-byte float value`` () =

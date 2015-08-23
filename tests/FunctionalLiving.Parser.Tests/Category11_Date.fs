@@ -4,20 +4,20 @@ open Xunit
 open Swensen.Unquote
 open Grean.Exude
 
-module EIS3_Time =
+module Category11_Date =
 
     open FunctionalLiving.Parser
     open System
 
-    let ``10.001 time of day test`` telegramBytes expected =
-        verifyParser parseTime telegramBytes expected
+    let ``11.001 date test`` telegramBytes expected =
+        verifyParser parseDate telegramBytes expected
 
     [<FirstClassTests>]
-    let ``10.001 time of day`` () =
-        let f = ``10.001 time of day test``
+    let ``11.001 date`` () =
+        let f = ``11.001 date test``
 
         let data = [
-            ((0xEFuy, 0x28uy, 0x02uy), (Some Sunday, TimeSpan(15, 40, 2)))
+            ((0x17uy, 0x08uy, 0x0Fuy), new DateTime(2015, 8, 23))
         ]
 
         data

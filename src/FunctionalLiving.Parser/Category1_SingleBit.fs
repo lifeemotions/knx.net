@@ -1,12 +1,12 @@
 ﻿namespace FunctionalLiving.Parser
 
 [<AutoOpen>]
-module EIS1_Switching =
+module Category1_SingleBit =
 
     open Domain
 
-    let parseSwitching (switchingBytes: SwitchingValue) =
-        match switchingBytes with
+    let parseSingleBit (singleBitValue: SingleBitValue) =
+        match singleBitValue with
         | 0x00uy -> Some Off
         | 0x01uy -> Some On
         | _ -> None

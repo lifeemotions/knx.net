@@ -1,13 +1,13 @@
 ﻿namespace FunctionalLiving.Parser
 
 [<AutoOpen>]
-module EIS3_Time =
+module Category10_Time =
 
     open System
     open Domain
 
-    let parseTime (timeBytes: TimeValue) =
-        let (byte1, byte2, byte3) = timeBytes
+    let parseTime (timeValue: TimeValue) =
+        let (byte1, byte2, byte3) = timeValue
 
         let day =
             match firstBits byte1 3 with

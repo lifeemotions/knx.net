@@ -5,11 +5,24 @@ module Domain =
 
     open System
 
-    type Switching =
+    // Category1_SingleBit
+    type SingleBitValue = byte
+
+    type SingleBitState =
     | On
     | Off
 
-    type SwitchingValue = byte
+    // Category5_Scaling
+    type ScalingValue = byte
+
+    // Category7_2ByteUnsignedValue
+    type TwoByteUnsignedValue = byte * byte
+
+    // Category9_2ByteFloatValue
+    type TwoByteFloatValue = byte * byte
+
+    // Category10_Time
+    type TimeValue = byte * byte * byte
 
     type Day =
     | Monday
@@ -22,10 +35,5 @@ module Domain =
 
     type Time = Day option * TimeSpan
 
-    type TimeValue = byte * byte * byte
-
+    // Category11_Date
     type DateValue = byte * byte * byte
-
-    type ScalingValue = byte
-
-    type FloatValue = byte * byte

@@ -1,13 +1,13 @@
 ﻿namespace FunctionalLiving.Parser
 
 [<AutoOpen>]
-module EIS4_Date =
+module Category11_Date =
 
     open System
     open Domain
 
-    let parseDate (dateBytes: DateValue) =
-        let (byte1, byte2, byte3) = dateBytes
+    let parseDate (dateValue: DateValue) =
+        let (byte1, byte2, byte3) = dateValue
 
         let day = lastBits byte1 5
         let month = lastBits byte2 4

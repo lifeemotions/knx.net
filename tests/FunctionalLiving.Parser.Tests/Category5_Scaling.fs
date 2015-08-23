@@ -4,7 +4,7 @@ open Xunit
 open Swensen.Unquote
 open Grean.Exude
 
-module EIS6_Scaling =
+module Category5_Scaling =
 
     open FunctionalLiving.Parser
     open System

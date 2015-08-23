@@ -55,11 +55,12 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="BitHelpers.fs" />
     <Compile Include="Domain.fs" />
-    <Compile Include="EIS1_Switching.fs" />
-    <Compile Include="EIS3_Time.fs" />
-    <Compile Include="EIS4_Date.fs" />
-    <Compile Include="EIS6_Scaling.fs" />
-    <Compile Include="EIS9_Float.fs" />
+    <Compile Include="Category1_SingleBit.fs" />
+    <Compile Include="Category5_Scaling.fs" />
+    <Compile Include="Category7_2ByteUnsignedValue.fs" />
+    <Compile Include="Category9_2ByteFloatValue.fs" />
+    <Compile Include="Category10_Time.fs" />
+    <Compile Include="Category11_Date.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

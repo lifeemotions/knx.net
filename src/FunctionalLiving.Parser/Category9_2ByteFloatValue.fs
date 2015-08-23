@@ -1,13 +1,13 @@
 ﻿namespace FunctionalLiving.Parser
 
 [<AutoOpen>]
-module EIS9_Float =
+module Category9_2ByteFloatValue =
 
     open System
     open Domain
 
-    let parseFloat (floatBytes: FloatValue) =
-        let (byte1, byte2) = floatBytes
+    let parseTwoByteFloat (twoByteFloatValue: TwoByteFloatValue) =
+        let (byte1, byte2) = twoByteFloatValue
 
         let bits = bytesToBits [| byte1; byte2 |]
 

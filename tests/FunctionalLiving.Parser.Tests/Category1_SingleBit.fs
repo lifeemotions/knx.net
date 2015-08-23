@@ -4,20 +4,21 @@ open Xunit
 open Swensen.Unquote
 open Grean.Exude
 
-module EIS4_Date =
+module Category1_SingleBit =
 
     open FunctionalLiving.Parser
     open System
 
-    let ``11.001 date test`` telegramBytes expected =
-        verifyParser parseDate telegramBytes expected
+    let ``1.* switching test`` telegramBytes expected =
+        verifyParser parseSingleBit telegramBytes expected
 
     [<FirstClassTests>]
-    let ``11.001 date`` () =
-        let f = ``11.001 date test``
+    let ``1.* switching`` () =
+        let f = ``1.* switching test``
 
         let data = [
-            ((0x17uy, 0x08uy, 0x0Fuy), new DateTime(2015, 8, 23))
+            (0x00uy, Some SingleBitState.Off)
+            (0x01uy, Some SingleBitState.On)
         ]
 
         data

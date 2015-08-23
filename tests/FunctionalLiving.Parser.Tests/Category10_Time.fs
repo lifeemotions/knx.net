@@ -4,21 +4,20 @@ open Xunit
 open Swensen.Unquote
 open Grean.Exude
 
-module EIS1_Switching =
+module Category10_Time =
 
     open FunctionalLiving.Parser
     open System
 
-    let ``1.* switching test`` telegramBytes expected =
-        verifyParser parseSwitching telegramBytes expected
+    let ``10.001 time of day test`` telegramBytes expected =
+        verifyParser parseTime telegramBytes expected
 
     [<FirstClassTests>]
-    let ``1.* switching`` () =
-        let f = ``1.* switching test``
+    let ``10.001 time of day`` () =
+        let f = ``10.001 time of day test``
 
         let data = [
-            (0x00uy, Some Switching.Off)
-            (0x01uy, Some Switching.On)
+            ((0xEFuy, 0x28uy, 0x02uy), (Some Sunday, TimeSpan(15, 40, 2)))
         ]
 
         data
