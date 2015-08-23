@@ -11,6 +11,7 @@ module Domain =
     type SingleBitState =
     | On
     | Off
+     with member this.Text = toString this
 
     // Category5_Scaling
     type ScalingValue = byte
@@ -32,6 +33,7 @@ module Domain =
     | Friday
     | Saturday
     | Sunday
+    with member this.Text = toString this
 
     type Time = Day option * TimeSpan
 

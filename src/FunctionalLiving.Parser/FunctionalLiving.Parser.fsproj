@@ -52,7 +52,10 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Content Include="Spec.txt" />
+    <None Include="paket.references" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Extensions.fs" />
+    <Compile Include="StringHelpers.fs" />
     <Compile Include="BitHelpers.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Category1_SingleBit.fs" />

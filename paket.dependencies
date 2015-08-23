@@ -6,3 +6,4 @@ nuget NUnit
 nuget Unquote
 nuget xunit 1.9.2
 nuget Exude
+nuget FSharp.Core

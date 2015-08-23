@@ -4,6 +4,7 @@ NUGET
   specs:
     Exude (0.2.1)
       xunit (>= 1.9.2)
+    FSharp.Core (4.0.0.1)
     NUnit (2.6.4)
     Unquote (3.0.0)
     xunit (1.9.2)

@@ -5,6 +5,8 @@ using System.IO;
 using System.Threading;
 using KNXLib;
 
+using FunctionalLiving.Parser;
+
 namespace KNXTest
 {
     public class TestRouting
@@ -18,31 +20,40 @@ namespace KNXTest
         // 1.001 Switches
         private static readonly IDictionary<string, string> Switches = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/1/0", "Verlichting - Leefruimte - Spots TV - Aan/Uit" },
+            { "0/1/22", "Verlichting - Bureau - Centraal - Aan/Uit" },
         });
 
         // 1.002 Toggles (boolean)
         private static readonly IDictionary<string, string> Toggles = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/5/4", "Beweging in nachthal trap" },
+            { "0/5/5", "Beweging in nachthal badkamer" },
         });
 
         // 5.001 Percentages (0..100%)
         private static readonly IDictionary<string, string> Percentages = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/2/7", "Verlichting - Bureau - Spots Binnencirkel - Dimmen" },
+            { "0/2/8", "Verlichting - Bureau - Spots Buitencirkel - Dimmen" },
         });
 
         // 7.007 Time (h)
         private static readonly IDictionary<string, string> Duration = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/7/10", "Aantal uren activiteit droogkast" },
+            { "0/7/12", "Aantal uren activiteit wasmachine" },
+            { "0/7/14", "Aantal uren activiteit diepvries" },
+            { "0/7/16", "Aantal uren activiteit koelkast" },
         });
 
         // 7.012 Current (mA)
         private static readonly IDictionary<string, string> Current = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/7/11", "Huidig verbruik droogkast" },
+            { "0/7/13", "Huidig verbruik wasmachine" },
+            { "0/7/15", "Huidig verbruik diepvries" },
+            { "0/7/17", "Huidig verbruik koelkast" },
         });
 
         // 9.001 Temperate (degrees C)
@@ -75,7 +86,8 @@ namespace KNXTest
         // 9.004 Light (lux)
         private static readonly IDictionary<string, string> LightStrength = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/3/4", "Lichtsterkte in nachthal trap" },
+            { "0/3/5", "Lichtsterkte in nachthal badkamer" }
         });
 
         // 9.005 Speed (m/s)
@@ -87,7 +99,7 @@ namespace KNXTest
         // 10.001 Time of day
         private static readonly IDictionary<string, string> Times = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
         {
-
+            { "0/0/1", "Centrale Tijd" }
         });
 
         // 11.001 Date
@@ -144,29 +156,69 @@ namespace KNXTest
 
         private static void Print(string address, byte[] state)
         {
-            _logFile.WriteLine("{0} - {1}", address, BitConverter.ToString(state));
-
             string description;
 
-            if (Temperatures.TryGetValue(address, out description))
+            if (Switches.TryGetValue(address, out description))
+            {
+                var functionalToggle = Category1_SingleBit.parseSingleBit(state[0]);
+                Console.WriteLine("[ON/OFF] {0} ({1})", description, functionalToggle.Exists() ? functionalToggle.Value.Text : "N/A");
+            }
+            else if (Toggles.TryGetValue(address, out description))
+            {
+                var functionalToggle = Category1_SingleBit.parseSingleBit(state[0]);
+                Console.WriteLine("[TRUE/FALSE] {0} ({1})", description, functionalToggle.Exists() ? functionalToggle.Value.Text : "N/A");
+            }
+            else if (Percentages.TryGetValue(address, out description))
+            {
+                var functionalPercentage = Category5_Scaling.parseScaling(0, 100, state[0]);
+                Console.WriteLine("[PERCENTAGE] {0} ({1} %)", description, functionalPercentage);
+            }
+            else if (Duration.TryGetValue(address, out description))
+            {
+                var functionalDuration = Category7_2ByteUnsignedValue.parseTwoByteUnsigned(1, state[0], state[1]);
+                Console.WriteLine("[DURATION] {0} ({1} h)", description, functionalDuration);
+            }
+            else if (Current.TryGetValue(address, out description))
+            {
+                var functionalCurrent = Category7_2ByteUnsignedValue.parseTwoByteUnsigned(1, state[0], state[1]);
+                Console.WriteLine("[ENERGY] {0} ({1} mA)", description, functionalCurrent);
+            }
+            else if (Temperatures.TryGetValue(address, out description))
             {
                 var temp = _connection.FromDataPoint("9.001", state); // (decimal)
-                Console.WriteLine("[TEMP] {0} ({1} °C)", description, temp);
+                var functionalTemp = Category9_2ByteFloatValue.parseTwoByteFloat(state[0], state[1]);
+                Console.WriteLine("[TEMP] {0} (C#: {1} °C) (F#: {2} °C)", description, temp, functionalTemp);
+            }
+            else if (LightStrength.TryGetValue(address, out description))
+            {
+                var functionalLightStrength = Category9_2ByteFloatValue.parseTwoByteFloat(state[0], state[1]);
+                Console.WriteLine("[LUX] {0} ({1} Lux)", description, functionalLightStrength);
+            }
+            else if (Times.TryGetValue(address, out description))
+            {
+                var functionalTime = Category10_Time.parseTime(state[0], state[1], state[2]);
+                Console.WriteLine("[TIME] {0} ({1}, {2})", description, functionalTime.Item1.Exists() ? functionalTime.Item1.Value.Text : string.Empty, functionalTime.Item2.ToString("c"));
             }
             else if (EnergyWattHour.TryGetValue(address, out description))
             {
                 var wattHour = _connection.FromDataPoint("13.010", state); // (int)
-                Console.WriteLine("[ENERGY] {0} ({1} Wh)", description, wattHour);
+                Console.WriteLine("[ENERGY] {0} (C#: {1} Wh)", description, wattHour);
             }
             else if (Dates.TryGetValue(address, out description))
             {
                 var date = (DateTime)_connection.FromDataPoint("11.001", state); // (DateTime)
-                Console.WriteLine("[DATE] {0} ({1})", description, date.ToString("dd/MM/yyyy"));
+                var functionalDate = Category11_Date.parseDate(state[0], state[1], state[2]);
+                Console.WriteLine("[DATE] {0} (C#: {1}) (F#: {2})", description, date.ToString("dd/MM/yyyy"), functionalDate.ToString("dd/MM/yyyy"));
             }
             else if (Speed.TryGetValue(address, out description))
             {
                 var speed = _connection.FromDataPoint("9.005", state); // (decimal)
-                Console.WriteLine("[SPEED] {0} ({1} m/s)", description, speed);
+                var functionalSpeed = Category9_2ByteFloatValue.parseTwoByteFloat(state[0], state[1]);
+                Console.WriteLine("[SPEED] {0} (C#: {1} m/s) (F#: {2} m/s)", description, speed, functionalSpeed);
+            }
+            else
+            {
+                _logFile.WriteLine("{0} - {1}", address, BitConverter.ToString(state));
             }
         }
 
