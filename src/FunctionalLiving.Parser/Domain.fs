@@ -23,3 +23,5 @@ module Domain =
     type Time = Day option * TimeSpan
 
     type TimeValue = byte * byte * byte
+
+    type DateValue = byte * byte * byte

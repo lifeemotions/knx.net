@@ -57,6 +57,7 @@
     <Compile Include="Domain.fs" />
     <Compile Include="EIS1_Switching.fs" />
     <Compile Include="EIS3_Time.fs" />
+    <Compile Include="EIS4_Date.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
