@@ -3,8 +3,23 @@
 [<AutoOpen>]
 module Domain =
 
-    type SwitchingValue =
+    open System
+
+    type Switching =
     | On
     | Off
 
-    type Switching = byte
+    type SwitchingValue = byte
+
+    type Day =
+    | Monday
+    | Tuesday
+    | Wednesday
+    | Thursday
+    | Friday
+    | Saturday
+    | Sunday
+
+    type Time = Day option * TimeSpan
+
+    type TimeValue = byte * byte * byte

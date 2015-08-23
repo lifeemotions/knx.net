@@ -51,10 +51,12 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Domain.fs" />
     <Content Include="Spec.txt" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="BitHelpers.fs" />
+    <Compile Include="Domain.fs" />
     <Compile Include="EIS1_Switching.fs" />
+    <Compile Include="EIS3_Time.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
