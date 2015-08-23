@@ -1,3 +1,5 @@
+.paket/paket.exe
+
 # site ignore directories
 site/build
 site/output
