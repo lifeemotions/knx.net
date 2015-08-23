@@ -10,11 +10,7 @@ module EIS1_Switching =
     open System
 
     let ``1.* switching test`` telegramBytes expected =
-        let datapoint =
-            telegramBytes
-            |> parseSwitching
-
-        test <@ datapoint = expected @>
+        verifyParser parseSwitching telegramBytes expected
 
     [<FirstClassTests>]
     let ``1.* switching`` () =

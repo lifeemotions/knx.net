@@ -10,11 +10,7 @@ module EIS3_Time =
     open System
 
     let ``10.001 time of day test`` telegramBytes expected =
-        let datapoint =
-            telegramBytes
-            |> parseTime
-
-        test <@ datapoint = expected @>
+        verifyParser parseTime telegramBytes expected
 
     [<FirstClassTests>]
     let ``10.001 time of day`` () =

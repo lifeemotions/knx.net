@@ -6,8 +6,8 @@ module EIS3_Time =
     open System
     open Domain
 
-    let parseTime (time: TimeValue) =
-        let (byte1, byte2, byte3) = time
+    let parseTime (timeBytes: TimeValue) =
+        let (byte1, byte2, byte3) = timeBytes
 
         let day =
             match firstBits byte1 3 with

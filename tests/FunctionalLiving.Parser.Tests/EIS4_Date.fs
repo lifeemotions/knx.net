@@ -10,11 +10,7 @@ module EIS4_Date =
     open System
 
     let ``11.001 date test`` telegramBytes expected =
-        let datapoint =
-            telegramBytes
-            |> parseDate
-
-        test <@ datapoint = expected @>
+        verifyParser parseDate telegramBytes expected
 
     [<FirstClassTests>]
     let ``11.001 date`` () =

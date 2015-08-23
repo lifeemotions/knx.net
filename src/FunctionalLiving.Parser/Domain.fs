@@ -25,3 +25,5 @@ module Domain =
     type TimeValue = byte * byte * byte
 
     type DateValue = byte * byte * byte
+
+    type FloatValue = byte * byte

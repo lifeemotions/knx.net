@@ -6,8 +6,8 @@ module EIS4_Date =
     open System
     open Domain
 
-    let parseDate(date: DateValue) =
-        let (byte1, byte2, byte3) = date
+    let parseDate(dateBytes: DateValue) =
+        let (byte1, byte2, byte3) = dateBytes
 
         let day = lastBits byte1 5
         let month = lastBits byte2 4

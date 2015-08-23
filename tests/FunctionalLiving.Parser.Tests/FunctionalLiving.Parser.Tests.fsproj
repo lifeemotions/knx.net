@@ -60,6 +60,7 @@
     <Compile Include="EIS1_Switching.fs" />
     <Compile Include="EIS3_Time.fs" />
     <Compile Include="EIS4_Date.fs" />
+    <Compile Include="EIS9_Float.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
