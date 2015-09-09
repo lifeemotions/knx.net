@@ -2,8 +2,10 @@ redirects: on
 source https://api.nuget.org/v3/index.json
 source https://www.nuget.org/api/v2/
 
-nuget NUnit
 nuget Unquote
-nuget xunit 1.9.2
 nuget Exude
+nuget xunit 1.9.2
+nuget FsCheck.NUnit
+nuget NUnit
+nuget NUnit.Runners
 nuget FSharp.Core
