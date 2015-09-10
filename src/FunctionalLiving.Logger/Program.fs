@@ -5,6 +5,7 @@ open InfluxDB.FSharp
 open FunctionalLiving.Parser.Domain
 open FunctionalLiving.Parser.Category1_SingleBit
 open FunctionalLiving.Parser.Category9_2ByteFloatValue
+open System.Net
 
 type DatapointType =
 | Switch
@@ -83,8 +84,8 @@ let logSwitch device (state: byte[]) =
         printfn "[ON/OFF] %s (%s)" device.Description toggle.Text
 
         let data = {
-            Measurement = device.Address
-            Tags = Map [ "name", device.Description; ]
+            Measurement = "toggle"
+            Tags = Map [ "address", device.Address; "name", device.Description; ]
             Fields = Map [ "toggle", FieldValue.Bool(toggle = SingleBitState.On) ]
             Timestamp = DateTime.UtcNow
         }
@@ -97,8 +98,8 @@ let logTemperature  device (state: byte[]) =
     printfn "[TEMP] %s (%f °C)" device.Description temperature
 
     let data = {
-        Measurement = device.Address
-        Tags = Map [ "name", device.Description; ]
+        Measurement = "temperature"
+        Tags = Map [ "address",  device.Address; "name", device.Description; ]
         Fields = Map [ "temperature", FieldValue.Float(temperature) ]
         Timestamp = DateTime.UtcNow
     }
@@ -137,6 +138,9 @@ let rec reconnect = fun _ ->
 
 [<EntryPoint>]
 let main argv =
+    ServicePointManager.DefaultConnectionLimit <- 5
+    ServicePointManager.Expect100Continue <- false
+
     printfn "Connecting..."
 
     connect reconnect |> ignore

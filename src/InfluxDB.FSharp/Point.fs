@@ -131,7 +131,7 @@ module Point =
             |> Seq.map (fun (k, v) ->
                 let value =
                     match v with
-                    | Int v -> sprintf "%ii" v
+                    | Int v -> sprintf "%di" v
                     | Float v -> v.ToString("0.0###############", invCulture)
                     | String v -> sprintf "\"%s\"" v
                     | Bool true -> "t"
