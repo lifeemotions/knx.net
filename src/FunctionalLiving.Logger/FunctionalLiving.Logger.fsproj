@@ -14,6 +14,8 @@
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>FunctionalLiving.Logger</Name>
     <TargetFrameworkProfile />
+    <Win32Resource>
+    </Win32Resource>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +28,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\FunctionalLiving.Logger.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <OtherFlags>
+    </OtherFlags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,38 +42,6 @@
     <DocumentationFile>bin\Release\FunctionalLiving.Logger.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="paket.references" />
-    <None Include="App.config" />
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FunctionalLiving.Parser\FunctionalLiving.Parser.fsproj">
-      <Name>FunctionalLiving.Parser</Name>
-      <Project>{30c78232-571c-45b7-b390-1f0bf7b9bf84}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\InfluxDB.FSharp\InfluxDB.FSharp.fsproj">
-      <Name>InfluxDB.FSharp</Name>
-      <Project>{a7a43714-99fd-4cc1-a078-3c922abe33c0}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\KNXLib\KNXLib.csproj">
-      <Name>KNXLib</Name>
-      <Project>{cd1911ad-1967-40cb-a1c3-ec2fa562872b}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -94,4 +66,44 @@
   </Target>
   -->
   <Import Project="..\..\.paket\paket.targets" />
+  <ItemGroup>
+    <None Include="paket.references" />
+    <None Include="App.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Devices.fs" />
+    <Compile Include="Influx.fs" />
+    <Compile Include="Switch.fs" />
+    <Compile Include="Toggle.fs" />
+    <Compile Include="Duration.fs" />
+    <Compile Include="Current.fs" />
+    <Compile Include="Temperature.fs" />
+    <Compile Include="Light.fs" />
+    <Compile Include="Speed.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\FunctionalLiving.Parser\FunctionalLiving.Parser.fsproj">
+      <Name>FunctionalLiving.Parser</Name>
+      <Project>{30c78232-571c-45b7-b390-1f0bf7b9bf84}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\InfluxDB.FSharp\InfluxDB.FSharp.fsproj">
+      <Name>InfluxDB.FSharp</Name>
+      <Project>{a7a43714-99fd-4cc1-a078-3c922abe33c0}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\KNXLib\KNXLib.csproj">
+      <Name>KNXLib</Name>
+      <Project>{cd1911ad-1967-40cb-a1c3-ec2fa562872b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

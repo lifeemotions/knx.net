@@ -5,6 +5,8 @@ open System.Net
 open InfluxDB.FSharp.Choice
 open InfluxDB.FSharp.AsyncChoice
 open InfluxDB.FSharp.Http
+open System.Net.Http
+open System.Text
 
 module internal Contracts =
     open System.Collections.Generic
@@ -98,13 +100,41 @@ type Client (host: string, ?port: uint16, ?credentials: Credentials, ?proxy: Inf
             | _ -> buildError response <!> HttpError
     }
 
+    let postAsync query body =
+        async {
+            let uri =
+                let b = UriBuilder (uri "write")
+                b.Query <-
+                    query
+                    |> Seq.map (fun (k,v) -> sprintf "%s=%s" (Uri.EscapeDataString k) (Uri.EscapeDataString v))
+                    |> String.concat "&"
+                b.Uri
+
+            use httpClient = new System.Net.Http.HttpClient()
+            use content = new StringContent(body, Encoding.UTF8);
+
+            let! response = httpClient.PostAsync(uri, content) |> Async.AwaitTask
+            let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+
+            return Ok
+                { StatusCode = response.StatusCode
+                  Headers = Map.empty
+                  Body = Some content }
+        }
+
     let write query body = asyncChoice {
         let! response =
-            createRequest (Post body) (uri "write")
-            |> withQueryStringItems query
-            |> getResponse
+            postAsync query body
+            |> AsyncChoice.map (fun res -> res)
+            |> AsyncChoice.mapFail HttpError.otherErrorExn
             <!!> HttpError
 
+//        let! response =
+//            createRequest (Post body) (uri "write")
+//            |> withQueryStringItems query
+//            |> getResponse
+//            <!!> HttpError
+//
         return!
             match response.StatusCode with
             | HttpStatusCode.NoContent -> Ok ()
