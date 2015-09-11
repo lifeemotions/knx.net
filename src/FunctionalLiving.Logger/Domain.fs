@@ -15,8 +15,8 @@ type DatapointType =
 | Speed
 //| TimeOfDay
 //| Date
-//| EnergyWh
-//| EnergyKWh
+| EnergyWh
+| EnergyKWh
 
 type Device = { Address: string; Type: DatapointType; Description: string; }
 

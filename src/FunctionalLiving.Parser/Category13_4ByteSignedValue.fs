@@ -10,4 +10,4 @@ module Category13_4ByteSignedValue =
         let (byte1, byte2, byte3, byte4) = fourByteSignedValue
         let data = [| byte4; byte3; byte2; byte1 |]
 
-        BitConverter.ToInt32(data, 0)
+        BitConverter.ToInt32(data, 0) |> int64

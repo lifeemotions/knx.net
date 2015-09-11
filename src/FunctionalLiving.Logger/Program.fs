@@ -12,6 +12,8 @@ let logDevice device state =
         | Temperature -> logTemperature device state
         | Light -> logLight device state
         | Speed -> logSpeed device state
+        | EnergyWh -> logEnergyWh device state
+        | EnergyKWh -> logEnergyKWh device state
     }
 
 let log address state =

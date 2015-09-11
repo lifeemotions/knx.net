@@ -84,4 +84,10 @@ let devices =
 
         // 9.005 Speed (m/s)
         { Address = "1/0/0"; Type = DatapointType.Speed; Description = "Windsnelheid buiten" }
+
+        // 13.010 Energy (Wh)
+        { Address = "1/3/10"; Type = DatapointType.EnergyWh; Description = "Zonnecollector - Warmteopbrengst vandaag" }
+
+        // 13.013 Energy (kWh)
+        { Address = "1/3/9"; Type = DatapointType.EnergyKWh; Description = "Zonnecollector - Warmteopbrengst" }
     ]

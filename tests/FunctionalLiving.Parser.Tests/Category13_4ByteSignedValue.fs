@@ -17,8 +17,8 @@ module Category13_4ByteSignedValue =
         let f = ``13.010 active energy (Wh) test``
 
         let data = [
-            ((0x00uy, 0x00uy, 0x0Euy, 0x56uy), 3670)
-            ((0x00uy, 0x00uy, 0x1Buy, 0x07uy), 6919)
+            ((0x00uy, 0x00uy, 0x0Euy, 0x56uy), 3670L)
+            ((0x00uy, 0x00uy, 0x1Buy, 0x07uy), 6919L)
         ]
 
         data

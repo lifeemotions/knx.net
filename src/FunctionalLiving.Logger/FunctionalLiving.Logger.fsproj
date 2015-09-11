@@ -80,6 +80,8 @@
     <Compile Include="Temperature.fs" />
     <Compile Include="Light.fs" />
     <Compile Include="Speed.fs" />
+    <Compile Include="EnergyWh.fs" />
+    <Compile Include="EnergyKWh.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

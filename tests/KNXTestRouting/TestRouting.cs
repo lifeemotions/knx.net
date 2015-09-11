@@ -202,7 +202,8 @@ namespace KNXTest
             else if (EnergyWattHour.TryGetValue(address, out description))
             {
                 var wattHour = _connection.FromDataPoint("13.010", state); // (int)
-                Console.WriteLine("[ENERGY] {0} (C#: {1} Wh)", description, wattHour);
+                var functionalWattHour = Category13_4ByteSignedValue.parseFourByteSigned(state[0], state[1], state[2], state[3]);
+                Console.WriteLine("[ENERGY] {0} (C#: {1} Wh) (F#: {2} Wh)", description, wattHour, functionalWattHour);
             }
             else if (Dates.TryGetValue(address, out description))
             {
