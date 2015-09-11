@@ -39,3 +39,6 @@ module Domain =
 
     // Category11_Date
     type DateValue = byte * byte * byte
+
+    // Category13_4ByteSignedValue
+    type FourByteSignedValue = byte * byte * byte * byte

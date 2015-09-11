@@ -64,6 +64,7 @@
     <Compile Include="Category9_2ByteFloatValue.fs" />
     <Compile Include="Category10_Time.fs" />
     <Compile Include="Category11_Date.fs" />
+    <Compile Include="Category13_4ByteSignedValue.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
