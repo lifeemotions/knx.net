@@ -4,16 +4,19 @@ open KNXLib
 
 let logDevice device state =
     async {
-        match device.Type with
-        | Switch -> logSwitch device state
-        | Toggle -> logToggle device state
-        | Duration -> logDuration device state
-        | Current -> logCurrent device state
-        | Temperature -> logTemperature device state
-        | Light -> logLight device state
-        | Speed -> logSpeed device state
-        | EnergyWh -> logEnergyWh device state
-        | EnergyKWh -> logEnergyKWh device state
+        try
+            match device.Type with
+            | Switch -> logSwitch device state
+            | Toggle -> logToggle device state
+            | Duration -> logDuration device state
+            | Current -> logCurrent device state
+            | Temperature -> logTemperature device state
+            | Light -> logLight device state
+            | Speed -> logSpeed device state
+            | EnergyWh -> logEnergyWh device state
+            | EnergyKWh -> logEnergyKWh device state
+        with
+        | _ -> ()
     }
 
 let log address state =
