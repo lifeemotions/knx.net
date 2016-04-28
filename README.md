@@ -1,7 +1,7 @@
 KNX.net ![build status](https://travis-ci.org/lifeemotions/knx.net.svg?branch=master) [![NuGet version](https://badge.fury.io/nu/KNX.net.svg)](https://badge.fury.io/nu/KNX.net)
 =======
 
-KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
+KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET
 
 This API allows to connect in both modes:
 * Tunneling
@@ -13,8 +13,8 @@ The following datapoints are available in the API:
 
 | DPT     | input type                                  | input range     | output type | output range    | Description                         |
 | ------- |-------------------------------------------- | --------------- | ----------- | --------------- | ----------------------------------- |
-| `3.007` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control blinds (steps) [`0` stops]  |
-| `3.008` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control dimming (steps) [`0` stops] |
+| `3.007` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control dimming (steps) [`0` stops] |
+| `3.008` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control blinds (steps) [`0` stops] |
 | `5.001` | `int`, `float`, `long`, `double`, `decimal` | `[0,100]`       | `decimal`   | `[0,100]`       | Percentage (%)                      |
 | `5.003` | `int`, `float`, `long`, `double`, `decimal` | `[0,360]`       | `decimal`   | `[0,360]`       | Angle (°)                           |
 | `5.004` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Percentage `[0,255]` (%)          |

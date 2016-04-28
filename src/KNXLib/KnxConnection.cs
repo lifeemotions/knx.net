@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Text;
+using System.Linq;
 using KNXLib.DPT;
 using KNXLib.Exceptions;
 using KNXLib.Log;
@@ -125,20 +126,19 @@ namespace KNXLib
         /// </summary>
         internal virtual void Connected()
         {
+            _lockManager.UnlockConnection();
+            
             try
             {
                 if (KnxConnectedDelegate != null)
                     KnxConnectedDelegate();
             }
-            catch
+            catch(Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Info(ClassName, "KNX is connected");
-            Logger.Debug(ClassName, "Unlocking send - {0} free locks", _lockManager.LockCount);
-
-            _lockManager.UnlockConnection();
+            Logger.Debug(ClassName, "KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
         }
 
         /// <summary>
@@ -153,9 +153,9 @@ namespace KNXLib
                 if (KnxDisconnectedDelegate != null)
                     KnxDisconnectedDelegate();
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "KNX is disconnected");
@@ -168,12 +168,12 @@ namespace KNXLib
             {
                 KnxEventDelegate(address, state);
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "Device {0} sent event {1}", address, state);
+            Logger.Debug(ClassName, "Device {0} sent event 0x{1}", address, string.Join("", state.Select(c => ((int)c).ToString("X2"))));
         }
 
         internal void Status(string address, string state)
@@ -182,12 +182,21 @@ namespace KNXLib
             {
                 KnxStatusDelegate(address, state);
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "Device {0} has status {1}", address, state);
+        }
+
+        /// <summary>
+        ///     Set the lock interval between requests sent to the network (in ms)
+        /// </summary>
+        /// <param name="interval">time in ms for the interval</param>
+        public void SetLockIntervalMs(int interval)
+        {
+            _lockManager.IntervalMs = interval;
         }
 
         /// <summary>
@@ -287,11 +296,11 @@ namespace KNXLib
         /// <param name="data">Byte array value</param>
         public void Action(string address, byte[] data)
         {
-            Logger.Debug(ClassName, "Sending {0} to {1}.", data, address);
+            Logger.Debug(ClassName, "Sending 0x{0} to {1}.", BitConverter.ToString(data), address);
 
             _lockManager.PerformLockedOperation(() => KnxSender.Action(address, data));
 
-            Logger.Debug(ClassName, "Sent {0} to {1}.", data, address);
+            Logger.Debug(ClassName, "Sent 0x{0} to {1}.", BitConverter.ToString(data), address);
         }
 
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
