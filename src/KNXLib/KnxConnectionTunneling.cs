@@ -1,7 +1,9 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Sockets;
 using System.Timers;
 using KNXLib.Exceptions;
+using KNXLib.Log;
+using System;
 
 namespace KNXLib
 {
@@ -12,8 +14,11 @@ namespace KNXLib
     /// </summary>
     public class KnxConnectionTunneling : KnxConnection
     {
+        private static readonly string ClassName = typeof(KnxConnectionTunneling).ToString();
+
         private readonly IPEndPoint _localEndpoint;
         private readonly Timer _stateRequestTimer;
+        private const int stateRequestTimerInterval = 60000;
         private UdpClient _udpClient;
         private byte _sequenceNumber;
 
@@ -32,7 +37,7 @@ namespace KNXLib
 
             ChannelId = 0x00;
             SequenceNumberLock = new object();
-            _stateRequestTimer = new Timer(60000) {AutoReset = true}; // same time as ETS with group monitor open
+            _stateRequestTimer = new Timer(stateRequestTimerInterval) { AutoReset = true }; // same time as ETS with group monitor open
             _stateRequestTimer.Elapsed += StateRequest;
         }
 
@@ -60,6 +65,8 @@ namespace KNXLib
         /// </summary>
         public override void Connect()
         {
+            Logger.Info(ClassName, "KNXLib connecting...");
+
             try
             {
                 if (_udpClient != null)
@@ -67,17 +74,28 @@ namespace KNXLib
                     try
                     {
                         _udpClient.Close();
-                        _udpClient.Client.Dispose();
+
+                        if (_udpClient.Client != null)
+                            _udpClient.Client.Dispose();
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // ignore
+                        Logger.Error(ClassName, e.Message);
+                        Logger.Error(ClassName, e.ToString());
+                        Logger.Error(ClassName, e.StackTrace);
+
+                        if (e.InnerException != null)
+                        {
+                            Logger.Error(ClassName, e.InnerException.Message);
+                            Logger.Error(ClassName, e.ToString());
+                            Logger.Error(ClassName, e.InnerException.StackTrace);
+                        }
                     }
                 }
 
                 _udpClient = new UdpClient(_localEndpoint)
                 {
-                    Client = {DontFragment = true, SendBufferSize = 0}
+                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = stateRequestTimerInterval + 1000 }
                 };
             }
             catch (SocketException ex)
@@ -92,8 +110,8 @@ namespace KNXLib
             }
             else
             {
-                ((KnxReceiverTunneling) KnxReceiver).SetClient(_udpClient);
-                ((KnxSenderTunneling) KnxSender).SetClient(_udpClient);
+                ((KnxReceiverTunneling)KnxReceiver).SetClient(_udpClient);
+                ((KnxSenderTunneling)KnxSender).SetClient(_udpClient);
             }
 
             KnxReceiver.Start();
@@ -102,9 +120,18 @@ namespace KNXLib
             {
                 ConnectRequest();
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e.Message);
+                Logger.Error(ClassName, e.ToString());
+                Logger.Error(ClassName, e.StackTrace);
+
+                if (e.InnerException != null)
+                {
+                    Logger.Error(ClassName, e.InnerException.Message);
+                    Logger.Error(ClassName, e.ToString());
+                    Logger.Error(ClassName, e.InnerException.StackTrace);
+                }
             }
         }
 
@@ -120,9 +147,18 @@ namespace KNXLib
                 KnxReceiver.Stop();
                 _udpClient.Close();
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e.Message);
+                Logger.Error(ClassName, e.ToString());
+                Logger.Error(ClassName, e.StackTrace);
+
+                if (e.InnerException != null)
+                {
+                    Logger.Error(ClassName, e.InnerException.Message);
+                    Logger.Error(ClassName, e.ToString());
+                    Logger.Error(ClassName, e.InnerException.StackTrace);
+                }
             }
 
             base.Disconnected();
@@ -173,25 +209,25 @@ namespace KNXLib
             datagram[09] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[10] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[12] = (byte) (_localEndpoint.Port >> 8);
-            datagram[13] = (byte) _localEndpoint.Port;
+            datagram[12] = (byte)(_localEndpoint.Port >> 8);
+            datagram[13] = (byte)_localEndpoint.Port;
             datagram[14] = 0x08;
             datagram[15] = 0x01;
             datagram[16] = _localEndpoint.Address.GetAddressBytes()[0];
             datagram[17] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[18] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[19] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[20] = (byte) (_localEndpoint.Port >> 8);
-            datagram[21] = (byte) _localEndpoint.Port;
+            datagram[20] = (byte)(_localEndpoint.Port >> 8);
+            datagram[21] = (byte)_localEndpoint.Port;
             datagram[22] = 0x04;
             datagram[23] = 0x04;
             datagram[24] = 0x02;
             datagram[25] = 0x00;
 
-            ((KnxSenderTunneling) KnxSender).SendDataSingle(datagram);
+            ((KnxSenderTunneling)KnxSender).SendDataSingle(datagram);
         }
 
-        private void StateRequest(object sender, ElapsedEventArgs e)
+        private void StateRequest(object sender, ElapsedEventArgs ev)
         {
             // HEADER
             var datagram = new byte[16];
@@ -210,16 +246,25 @@ namespace KNXLib
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte) (_localEndpoint.Port >> 8);
-            datagram[15] = (byte) _localEndpoint.Port;
+            datagram[14] = (byte)(_localEndpoint.Port >> 8);
+            datagram[15] = (byte)_localEndpoint.Port;
 
             try
             {
                 KnxSender.SendData(datagram);
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e.Message);
+                Logger.Error(ClassName, e.ToString());
+                Logger.Error(ClassName, e.StackTrace);
+
+                if (e.InnerException != null)
+                {
+                    Logger.Error(ClassName, e.InnerException.Message);
+                    Logger.Error(ClassName, e.ToString());
+                    Logger.Error(ClassName, e.InnerException.StackTrace);
+                }
             }
         }
 
@@ -242,8 +287,8 @@ namespace KNXLib
             datagram[11] = _localEndpoint.Address.GetAddressBytes()[1];
             datagram[12] = _localEndpoint.Address.GetAddressBytes()[2];
             datagram[13] = _localEndpoint.Address.GetAddressBytes()[3];
-            datagram[14] = (byte) (_localEndpoint.Port >> 8);
-            datagram[15] = (byte) _localEndpoint.Port;
+            datagram[14] = (byte)(_localEndpoint.Port >> 8);
+            datagram[15] = (byte)_localEndpoint.Port;
 
             KnxSender.SendData(datagram);
         }
