@@ -133,16 +133,7 @@ namespace KNXLib
             }
             catch(Exception e)
             {
-                Logger.Error(ClassName, e.Message);
-                Logger.Error(ClassName, e.ToString());
-                Logger.Error(ClassName, e.StackTrace);
-
-                if (e.InnerException != null)
-                {
-                    Logger.Error(ClassName, e.InnerException.Message);
-                    Logger.Error(ClassName, e.ToString());
-                    Logger.Error(ClassName, e.InnerException.StackTrace);
-                }
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
@@ -164,16 +155,7 @@ namespace KNXLib
             }
             catch (Exception e)
             {
-                Logger.Error(ClassName, e.Message);
-                Logger.Error(ClassName, e.ToString());
-                Logger.Error(ClassName, e.StackTrace);
-
-                if (e.InnerException != null)
-                {
-                    Logger.Error(ClassName, e.InnerException.Message);
-                    Logger.Error(ClassName, e.ToString());
-                    Logger.Error(ClassName, e.InnerException.StackTrace);
-                }
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "KNX is disconnected");
@@ -188,16 +170,7 @@ namespace KNXLib
             }
             catch (Exception e)
             {
-                Logger.Error(ClassName, e.Message);
-                Logger.Error(ClassName, e.ToString());
-                Logger.Error(ClassName, e.StackTrace);
-
-                if (e.InnerException != null)
-                {
-                    Logger.Error(ClassName, e.InnerException.Message);
-                    Logger.Error(ClassName, e.ToString());
-                    Logger.Error(ClassName, e.InnerException.StackTrace);
-                }
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "Device {0} sent event 0x{1}", address, string.Join("", state.Select(c => ((int)c).ToString("X2"))));
@@ -211,16 +184,7 @@ namespace KNXLib
             }
             catch (Exception e)
             {
-                Logger.Error(ClassName, e.Message);
-                Logger.Error(ClassName, e.ToString());
-                Logger.Error(ClassName, e.StackTrace);
-
-                if (e.InnerException != null)
-                {
-                    Logger.Error(ClassName, e.InnerException.Message);
-                    Logger.Error(ClassName, e.ToString());
-                    Logger.Error(ClassName, e.InnerException.StackTrace);
-                }
+                Logger.Error(ClassName, e);
             }
 
             Logger.Debug(ClassName, "Device {0} has status {1}", address, state);
