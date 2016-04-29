@@ -206,16 +206,7 @@ namespace KNXLib
             }
             catch (Exception e)
             {
-                Logger.Error(ClassName, e.Message);
-                Logger.Error(ClassName, e.ToString());
-                Logger.Error(ClassName, e.StackTrace);
-
-                if (e.InnerException != null)
-                {
-                    Logger.Error(ClassName, e.InnerException.Message);
-                    Logger.Error(ClassName, e.ToString());
-                    Logger.Error(ClassName, e.InnerException.StackTrace);
-                }
+                Logger.Error(ClassName, e);
             }
         }
     }
