@@ -38,7 +38,8 @@ namespace KNXLib
                     }
                     catch (InvalidOperationException) { }
 
-                    KnxConnection.Event(datagram.destination_address, datagram.data);
+                    if (datagram != null)
+                        KnxConnection.Event(datagram.destination_address, datagram.data);
                 }
             }
             catch (ThreadAbortException)
@@ -185,7 +186,7 @@ namespace KNXLib
                     Logger.Debug(ClassName, "Event Destination Address: " + datagram.destination_address);
                     Logger.Debug(ClassName, "Event Data Length: " + datagram.data_length);
                     Logger.Debug(ClassName, "Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
-                    Logger.Debug(ClassName, "Event Data: 0x" + string.Join("", datagram.data.Select(c => ((int)c).ToString("X2"))));
+                    Logger.Debug(ClassName, "Event Data: 0x" + string.Join("", datagram.data.Select(c => ((int) c).ToString("X2"))));
                     Logger.Debug(ClassName, "-----------------------------------------------------------------------------------------------------");
                 }
 
