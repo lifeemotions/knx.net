@@ -2,6 +2,7 @@ using KNXLib.Log;
 using System;
 using System.Threading;
 using System.Linq;
+using System.Collections.Concurrent;
 
 namespace KNXLib
 {
@@ -10,6 +11,9 @@ namespace KNXLib
         private static readonly string ClassName = typeof(KnxReceiver).ToString();
 
         private Thread _receiverThread;
+        private Thread _consumerThread;
+
+        private BlockingCollection<KnxDatagram> _rxDatagrams;
 
         protected KnxReceiver(KnxConnection connection)
         {
@@ -20,9 +24,36 @@ namespace KNXLib
 
         public abstract void ReceiverThreadFlow();
 
+        private void ConsumerThreadFlow()
+        {
+            try
+            {
+                while (true)
+                {
+                    KnxDatagram datagram = null;
+
+                    try
+                    {
+                        datagram = _rxDatagrams.Take();
+                    }
+                    catch (InvalidOperationException) { }
+
+                    KnxConnection.Event(datagram.destination_address, datagram.data);
+                }
+            }
+            catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+            }
+        }
+
         public void Start()
         {
-            _receiverThread = new Thread(ReceiverThreadFlow) { IsBackground = true };
+            _rxDatagrams = new BlockingCollection<KnxDatagram>();
+            _consumerThread = new Thread(ConsumerThreadFlow) { Name = "KnxEventConsumerThread", IsBackground = true };
+            _consumerThread.Start();
+
+            _receiverThread = new Thread(ReceiverThreadFlow) { Name = "KnxReceiverThread", IsBackground = true };
             _receiverThread.Start();
         }
 
@@ -31,7 +62,10 @@ namespace KNXLib
             try
             {
                 if (_receiverThread.ThreadState.Equals(ThreadState.Running))
+                {
                     _receiverThread.Abort();
+                    _consumerThread.Abort();
+                }
             }
             catch
             {
@@ -163,7 +197,7 @@ namespace KNXLib
                 switch (type)
                 {
                     case 8:
-                        KnxConnection.Event(datagram.destination_address, datagram.data);
+                        _rxDatagrams.Add(datagram);
                         break;
                     case 4:
                         KnxConnection.Status(datagram.destination_address, datagram.data);
