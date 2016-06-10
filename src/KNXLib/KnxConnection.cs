@@ -126,6 +126,8 @@ namespace KNXLib
         /// </summary>
         internal virtual void Connected()
         {
+            _lockManager.UnlockConnection();
+            
             try
             {
                 if (KnxConnectedDelegate != null)
@@ -137,8 +139,6 @@ namespace KNXLib
             }
 
             Logger.Debug(ClassName, "KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
-
-            _lockManager.UnlockConnection();
         }
 
         /// <summary>
