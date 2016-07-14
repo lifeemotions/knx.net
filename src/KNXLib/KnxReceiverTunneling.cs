@@ -87,7 +87,7 @@ namespace KNXLib
             catch (Exception e)
             {
                 Logger.Error(ClassName, e);
-                // ignore, missing warning information
+            // ignore, missing warning information
             }
         }
 
