@@ -76,6 +76,9 @@ namespace KNXLib
                     case KnxHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
                         ProcessDisconnectRequest(datagram);
                         break;
+                    case KnxHelper.SERVICE_TYPE.DISCONNECT_RESPONSE:
+                        ProcessDisconnectResponse(datagram);
+                        break;
                     case KnxHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
                         ProcessDatagramHeaders(datagram);
                         break;
@@ -129,13 +132,16 @@ namespace KNXLib
 
         private void ProcessDisconnectRequest(byte[] datagram)
         {
+            KnxConnectionTunneling.DisconnectRequest();
+        }
+
+        private void ProcessDisconnectResponse(byte[] datagram)
+        {
             var channelId = datagram[6];
             if (channelId != KnxConnectionTunneling.ChannelId)
                 return;
 
-            Stop();
-            KnxConnection.Disconnected();
-            _udpClient.Close();
+            KnxConnectionTunneling.Disconnect();
         }
 
         private void ProcessTunnelingAck(byte[] datagram)

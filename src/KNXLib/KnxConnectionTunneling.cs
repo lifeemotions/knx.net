@@ -232,7 +232,7 @@ namespace KNXLib
             }
         }
 
-        private void DisconnectRequest()
+        internal void DisconnectRequest()
         {
             // HEADER
             var datagram = new byte[16];
