@@ -10,7 +10,7 @@
     <projectUrl>http://lifeemotions.github.io/knx.net/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Avoid lock (thanks to GioviQ)</releaseNotes>
+    <releaseNotes>Disconnect Response (thanks to GioviQ)</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>knx .net c#</tags>
   </metadata>
