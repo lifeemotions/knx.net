@@ -86,7 +86,7 @@ namespace KNXLib
 
                 _udpClient = new UdpClient(_localEndpoint)
                 {
-                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = stateRequestTimerInterval + 1000 }
+                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = stateRequestTimerInterval * 2 }
                 };
             }
             catch (SocketException ex)
