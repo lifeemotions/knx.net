@@ -1,4 +1,5 @@
 .paket/paket.exe
+nunit-result.xml
 
 # site ignore directories
 site/build

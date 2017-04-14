@@ -196,7 +196,6 @@
                 {
                     case 8:
                         _rxDatagrams.Add(datagram);
-                        //KnxConnection.Event(datagram.destination_address, datagram.data);
                         break;
                     case 4:
                         KnxConnection.Status(datagram.destination_address, datagram.data);
