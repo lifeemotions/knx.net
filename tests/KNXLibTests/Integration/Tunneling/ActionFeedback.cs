@@ -5,32 +5,34 @@ using NUnit.Framework;
 
 namespace KNXLibTests.Integration.Tunneling
 {
-    [TestFixture]
+    [TestFixture, Platform(Exclude = "Win")]
     internal class ActionFeedback
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             try
             {
                 if (!Support.Eibd.DaemonManager.IsEibdAvailable())
                     throw new PlatformNotSupportedException("Can't run integration tests without eibd daemon installed on the system");
+
                 if (!Support.Eibd.VBusMonitorManager.IsVBusMonitorAvailable())
                     throw new PlatformNotSupportedException("Can't run integration tests without vbusmonitor installed on the system");
 
                 if (!Support.Eibd.DaemonManager.StartTunneling())
                     throw new Exception("Could not start eibd daemon");
+
                 if (!Support.Eibd.VBusMonitorManager.Start())
                     throw new Exception("Could not start vbusmonitor");
             }
-            catch (Exception e)
+            catch
             {
                 TearDown();
-                throw e;
+                throw;
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             Support.Eibd.DaemonManager.Stop();
@@ -42,7 +44,7 @@ namespace KNXLibTests.Integration.Tunneling
         private const bool LightOnOffActionStatus = true;
         private const int Timeout = 2000;
 
-        [Category("KNXLib.Integration.Tunneling.ActionFeedback"), Test, Platform(Exclude = "Win")]
+        [Category("KNXLib.Integration.Tunneling.ActionFeedback"), Test]
         public void TunnelingActionFeedbackTest()
         {
             ResetEvent = new ManualResetEventSlim();

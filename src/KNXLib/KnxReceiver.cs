@@ -1,24 +1,59 @@
-﻿using System;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
+    using System.Threading;
+    using Log;
+
     internal abstract class KnxReceiver
     {
+        private static readonly string ClassName = typeof(KnxReceiver).ToString();
+
         private Thread _receiverThread;
+        private Thread _consumerThread;
 
-        protected KnxReceiver(KnxConnection connection)
-        {
-            KnxConnection = connection;
-        }
+        private BlockingCollection<KnxDatagram> _rxDatagrams;
 
-        protected KnxConnection KnxConnection { get; private set; }
+        protected KnxReceiver(KnxConnection connection) => KnxConnection = connection;
+
+        protected KnxConnection KnxConnection { get; }
 
         public abstract void ReceiverThreadFlow();
 
+        private void ConsumerThreadFlow()
+        {
+            try
+            {
+                while (true)
+                {
+                    KnxDatagram datagram = null;
+
+                    try
+                    {
+                        datagram = _rxDatagrams.Take();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+
+                    if (datagram != null)
+                        KnxConnection.Event(datagram.destination_address, datagram.data);
+                }
+            }
+            catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+            }
+        }
+
         public void Start()
         {
-            _receiverThread = new Thread(ReceiverThreadFlow) { IsBackground = true };
+            _rxDatagrams = new BlockingCollection<KnxDatagram>();
+            _consumerThread = new Thread(ConsumerThreadFlow) { Name = "KnxEventConsumerThread", IsBackground = true };
+            _consumerThread.Start();
+
+            _receiverThread = new Thread(ReceiverThreadFlow) { Name = "KnxReceiverThread", IsBackground = true };
             _receiverThread.Start();
         }
 
@@ -26,8 +61,11 @@ namespace KNXLib
         {
             try
             {
-                if (_receiverThread.ThreadState.Equals(ThreadState.Running))
-                    _receiverThread.Abort();
+                if (!_receiverThread.ThreadState.Equals(ThreadState.Running))
+                    return;
+
+                _receiverThread.Abort();
+                _consumerThread.Abort();
             }
             catch
             {
@@ -104,9 +142,7 @@ namespace KNXLib
                 {
                     datagram.aditional_info = new byte[datagram.aditional_info_length];
                     for (var i = 0; i < datagram.aditional_info_length; i++)
-                    {
                         datagram.aditional_info[i] = cemi[2 + i];
-                    }
                 }
 
                 datagram.control_field_1 = cemi[2 + datagram.aditional_info_length];
@@ -128,27 +164,27 @@ namespace KNXLib
 
                 if (KnxConnection.Debug)
                 {
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
-                    Console.WriteLine(BitConverter.ToString(cemi));
-                    Console.WriteLine("Event Header Length: " + datagram.header_length);
-                    Console.WriteLine("Event Protocol Version: " + datagram.protocol_version.ToString("x"));
-                    Console.WriteLine("Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
-                    Console.WriteLine("Event Total Length: " + datagram.total_length);
+                    Logger.Debug(ClassName, "-----------------------------------------------------------------------------------------------------");
+                    Logger.Debug(ClassName, BitConverter.ToString(cemi));
+                    Logger.Debug(ClassName, "Event Header Length: " + datagram.header_length);
+                    Logger.Debug(ClassName, "Event Protocol Version: " + datagram.protocol_version.ToString("x"));
+                    Logger.Debug(ClassName, "Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
+                    Logger.Debug(ClassName, "Event Total Length: " + datagram.total_length);
 
-                    Console.WriteLine("Event Message Code: " + datagram.message_code.ToString("x"));
-                    Console.WriteLine("Event Aditional Info Length: " + datagram.aditional_info_length);
+                    Logger.Debug(ClassName, "Event Message Code: " + datagram.message_code.ToString("x"));
+                    Logger.Debug(ClassName, "Event Aditional Info Length: " + datagram.aditional_info_length);
 
                     if (datagram.aditional_info_length > 0)
-                        Console.WriteLine("Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
+                        Logger.Debug(ClassName, "Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
 
-                    Console.WriteLine("Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
-                    Console.WriteLine("Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
-                    Console.WriteLine("Event Source Address: " + datagram.source_address);
-                    Console.WriteLine("Event Destination Address: " + datagram.destination_address);
-                    Console.WriteLine("Event Data Length: " + datagram.data_length);
-                    Console.WriteLine("Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
-                    Console.WriteLine("Event Data: " + datagram.data);
-                    Console.WriteLine("-----------------------------------------------------------------------------------------------------");
+                    Logger.Debug(ClassName, "Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
+                    Logger.Debug(ClassName, "Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
+                    Logger.Debug(ClassName, "Event Source Address: " + datagram.source_address);
+                    Logger.Debug(ClassName, "Event Destination Address: " + datagram.destination_address);
+                    Logger.Debug(ClassName, "Event Data Length: " + datagram.data_length);
+                    Logger.Debug(ClassName, "Event APDU: 0x" + BitConverter.ToString(datagram.apdu).Replace("-", string.Empty));
+                    Logger.Debug(ClassName, "Event Data: 0x" + string.Join(string.Empty, datagram.data.Select(c => ((int) c).ToString("X2"))));
+                    Logger.Debug(ClassName, "-----------------------------------------------------------------------------------------------------");
                 }
 
                 if (datagram.message_code != 0x29)
@@ -159,16 +195,17 @@ namespace KNXLib
                 switch (type)
                 {
                     case 8:
-                        KnxConnection.Event(datagram.destination_address, datagram.data);
+                        _rxDatagrams.Add(datagram);
+                        //KnxConnection.Event(datagram.destination_address, datagram.data);
                         break;
                     case 4:
                         KnxConnection.Status(datagram.destination_address, datagram.data);
                         break;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                // ignore, missing warning information
+                Logger.Error(ClassName, e);
             }
         }
     }

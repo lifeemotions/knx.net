@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+
     internal class KnxSenderRouting : KnxSender
     {
         private readonly IList<UdpClient> _udpClients;

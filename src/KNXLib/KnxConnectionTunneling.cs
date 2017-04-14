@@ -1,10 +1,12 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Timers;
-using KNXLib.Exceptions;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Timers;
+    using Exceptions;
+    using Log;
+
     /// <summary>
     ///     Class that controls a Tunneling KNX connection, a tunneling connection is UDP based and has state.
     ///     This class will connect to the remote gateway provided and create an endpoint for the remote gateway
@@ -12,8 +14,11 @@ namespace KNXLib
     /// </summary>
     public class KnxConnectionTunneling : KnxConnection
     {
+        private static readonly string ClassName = typeof(KnxConnectionTunneling).ToString();
+
         private readonly IPEndPoint _localEndpoint;
         private readonly Timer _stateRequestTimer;
+        private const int StateRequestTimerInterval = 60000;
         private UdpClient _udpClient;
         private byte _sequenceNumber;
 
@@ -32,7 +37,7 @@ namespace KNXLib
 
             ChannelId = 0x00;
             SequenceNumberLock = new object();
-            _stateRequestTimer = new Timer(60000) {AutoReset = true}; // same time as ETS with group monitor open
+            _stateRequestTimer = new Timer(StateRequestTimerInterval) { AutoReset = true }; // same time as ETS with group monitor open
             _stateRequestTimer.Elapsed += StateRequest;
         }
 
@@ -40,26 +45,19 @@ namespace KNXLib
 
         internal object SequenceNumberLock { get; set; }
 
-        internal byte GenerateSequenceNumber()
-        {
-            return _sequenceNumber++;
-        }
+        internal byte GenerateSequenceNumber() => _sequenceNumber++;
 
-        internal void RevertSingleSequenceNumber()
-        {
-            _sequenceNumber--;
-        }
+        internal void RevertSingleSequenceNumber() => _sequenceNumber--;
 
-        internal void ResetSequenceNumber()
-        {
-            _sequenceNumber = 0x00;
-        }
+        internal void ResetSequenceNumber() => _sequenceNumber = 0x00;
 
         /// <summary>
         ///     Start the connection
         /// </summary>
         public override void Connect()
         {
+            Logger.Info(ClassName, "KNXLib connecting...");
+
             try
             {
                 if (_udpClient != null)
@@ -67,17 +65,17 @@ namespace KNXLib
                     try
                     {
                         _udpClient.Close();
-                        _udpClient.Client.Dispose();
+                        _udpClient.Client?.Dispose();
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // ignore
+                        Logger.Error(ClassName, e);
                     }
                 }
 
                 _udpClient = new UdpClient(_localEndpoint)
                 {
-                    Client = {DontFragment = true, SendBufferSize = 0}
+                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = StateRequestTimerInterval * 2 }
                 };
             }
             catch (SocketException ex)
@@ -102,9 +100,9 @@ namespace KNXLib
             {
                 ConnectRequest();
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e);
             }
         }
 
@@ -120,9 +118,9 @@ namespace KNXLib
                 KnxReceiver.Stop();
                 _udpClient.Close();
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e);
             }
 
             base.Disconnected();
@@ -191,7 +189,7 @@ namespace KNXLib
             ((KnxSenderTunneling) KnxSender).SendDataSingle(datagram);
         }
 
-        private void StateRequest(object sender, ElapsedEventArgs e)
+        private void StateRequest(object sender, ElapsedEventArgs ev)
         {
             // HEADER
             var datagram = new byte[16];
@@ -217,13 +215,13 @@ namespace KNXLib
             {
                 KnxSender.SendData(datagram);
             }
-            catch
+            catch (Exception e)
             {
-                // ignore
+                Logger.Error(ClassName, e);
             }
         }
 
-        private void DisconnectRequest()
+        internal void DisconnectRequest()
         {
             // HEADER
             var datagram = new byte[16];

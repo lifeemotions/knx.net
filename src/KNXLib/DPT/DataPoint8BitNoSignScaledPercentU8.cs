@@ -1,14 +1,11 @@
-﻿using System.Globalization;
-using KNXLib.Log;
-
-namespace KNXLib.DPT
+﻿namespace KNXLib.DPT
 {
+    using System.Globalization;
+    using Log;
+
     internal sealed class DataPoint8BitNoSignScaledPercentU8 : DataPoint
     {
-        public override string[] Ids
-        {
-            get { return new[] { "5.004" }; }
-        }
+        public override string[] Ids => new[] { "5.004" };
 
         public override object FromDataPoint(string data)
         {
@@ -27,10 +24,7 @@ namespace KNXLib.DPT
             return (int) data[0];
         }
 
-        public override byte[] ToDataPoint(string value)
-        {
-            return ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
-        }
+        public override byte[] ToDataPoint(string value) => ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
 
         public override byte[] ToDataPoint(object val)
         {
@@ -41,23 +35,23 @@ namespace KNXLib.DPT
 
             if (val is int)
             {
-                input = ((int) val);
+                input = (int) val;
             }
             else if (val is float)
             {
-                input = (int) ((float) val);
+                input = (int) (float) val;
             }
             else if (val is long)
             {
-                input = (int) ((long) val);
+                input = (int) (long) val;
             }
             else if (val is double)
             {
-                input = (int) ((double) val);
+                input = (int) (double) val;
             }
             else if (val is decimal)
             {
-                input = (int) ((decimal) val);
+                input = (int) (decimal) val;
             }
             else
             {

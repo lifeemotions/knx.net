@@ -134,3 +134,10 @@ If connecting in routing mode:
 
 If connecting in tunneling mode:
 * make sure the system firewall allows incoming connections to the specified `localPort`
+
+### Run Tests
+`./packages/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/KNXLibTests/bin/Release/KNXLibTests.dll  --labels=On --nocolor --verbose --workers=1 --full --result:"./nunit-result.xml;format=nunit2"`
+
+`./packages/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/InfluxDB.FSharp.UnitTests/bin/Release/InfluxDB.FSharp.UnitTests.dll  --labels=On --nocolor --verbose --workers=1 --full --result:"./nunit-result.xml;format=nunit2"`
+
+`./packages/xunit.runners/tools/xunit.console.clr4.exe ./tests/FunctionalLiving.Parser.Tests/bin/Release/FunctionalLiving.Parser.Tests.dll`

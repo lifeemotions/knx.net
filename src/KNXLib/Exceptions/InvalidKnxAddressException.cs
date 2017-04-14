@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace KNXLib.Exceptions
+﻿namespace KNXLib.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Exception thrown when an invalid KNX address is used to perform an action or status query
     /// </summary>
@@ -26,7 +26,7 @@ namespace KNXLib.Exceptions
         /// </returns>
         public override string ToString()
         {
-            return string.Format("InvalidKnxAddressException: Address {0} is invalid.", _address);
+            return $"InvalidKnxAddressException: Address {_address} is invalid.";
         }
     }
 }

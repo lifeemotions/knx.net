@@ -1,19 +1,16 @@
-﻿using System;
-
-namespace KNXLib.DPT
+﻿namespace KNXLib.DPT
 {
+    using System;
+
     internal class DataPoint3BytesDate : DataPoint
     {
-        public override string[] Ids
-        {
-            get { return new[] { "11.001" }; }
-        }
+        public override string[] Ids => new[] { "11.001" };
 
         public override object FromDataPoint(string data)
         {
             var dataConverted = new byte[data.Length];
             for (var i = 0; i < data.Length; i++)
-                dataConverted[i] = (byte)data[i];
+                dataConverted[i] = (byte) data[i];
 
             return FromDataPoint(dataConverted);
         }
@@ -30,12 +27,12 @@ namespace KNXLib.DPT
 
         public override byte[] ToDataPoint(string value)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override byte[] ToDataPoint(object value)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

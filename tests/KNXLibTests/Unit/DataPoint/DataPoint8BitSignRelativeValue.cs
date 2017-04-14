@@ -5,17 +5,7 @@ namespace KNXLibTests.Unit.DataPoint
 {
     [TestFixture]
     internal class DataPoint8BitSignRelativeValue
-    {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-        }
-
+    { 
         [Category("KNXLib.Unit.DataPoint.8BitSign"), Test]
         public void DataPoint8BitSignRelativeValuePercentTest()
         {

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+
     internal class KnxSenderTunneling : KnxSender
     {
         private UdpClient _udpClient;
         private readonly IPEndPoint _remoteEndpoint;
+
+        private KnxConnectionTunneling KnxConnectionTunneling => (KnxConnectionTunneling) KnxConnection;
 
         internal KnxSenderTunneling(KnxConnection connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
             : base(connection)
@@ -16,20 +18,9 @@ namespace KNXLib
             _remoteEndpoint = remoteEndpoint;
         }
 
-        private KnxConnectionTunneling KnxConnectionTunneling
-        {
-            get { return (KnxConnectionTunneling)KnxConnection; }
-        }
+        public void SetClient(UdpClient client) => _udpClient = client;
 
-        public void SetClient(UdpClient client)
-        {
-            _udpClient = client;
-        }
-
-        public void SendDataSingle(byte[] datagram)
-        {
-            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
-        }
+        public void SendDataSingle(byte[] datagram) => _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
 
         public override void SendData(byte[] datagram)
         {

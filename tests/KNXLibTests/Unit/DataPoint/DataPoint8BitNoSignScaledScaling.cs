@@ -6,16 +6,6 @@ namespace KNXLibTests.Unit.DataPoint
     [TestFixture]
     internal class DataPoint8BitNoSignScaledScaling
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-        }
-
         [Category("KNXLib.Unit.DataPoint.8BitNoSign"), Test]
         public void DataPoint8BitNoSignScaledScalingTest()
         {

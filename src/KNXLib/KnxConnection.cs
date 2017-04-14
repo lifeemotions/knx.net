@@ -1,12 +1,13 @@
-﻿using System;
-using System.Net;
-using System.Text;
-using KNXLib.DPT;
-using KNXLib.Exceptions;
-using KNXLib.Log;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
+    using DPT;
+    using Exceptions;
+    using Log;
+
     /// <summary>
     ///     Base class that controls the KNX connection, implemented by KnxConnectionRouting and KnxConnetionTunneling
     /// </summary>
@@ -22,7 +23,7 @@ namespace KNXLib
         /// <summary>
         ///     Event triggered when connection is established
         /// </summary>
-        public KnxConnected KnxConnectedDelegate = null;
+        public KnxConnected KnxConnectedDelegate = () => { };
 
         /// <summary>
         ///     Delegate function for disconnection trigger
@@ -32,7 +33,7 @@ namespace KNXLib
         /// <summary>
         ///     Event triggered when connection drops
         /// </summary>
-        public KnxDisconnected KnxDisconnectedDelegate = null;
+        public KnxDisconnected KnxDisconnectedDelegate = () => { };
 
         /// <summary>
         ///     Delegate function for KNX events
@@ -74,18 +75,12 @@ namespace KNXLib
             Debug = false;
         }
 
-        internal KnxConnectionConfiguration ConnectionConfiguration { get; private set; }
+        internal KnxConnectionConfiguration ConnectionConfiguration { get; }
 
         /// <summary>
         ///     Get the IPEndPoint instance representing the remote KNX gateway
         /// </summary>
-        public IPEndPoint RemoteEndpoint
-        {
-            get
-            {
-                return ConnectionConfiguration.EndPoint;
-            }
-        }
+        public IPEndPoint RemoteEndpoint => ConnectionConfiguration.EndPoint;
 
         internal KnxReceiver KnxReceiver { get; set; }
 
@@ -125,20 +120,18 @@ namespace KNXLib
         /// </summary>
         internal virtual void Connected()
         {
+            _lockManager.UnlockConnection();
+
             try
             {
-                if (KnxConnectedDelegate != null)
-                    KnxConnectedDelegate();
+                KnxConnectedDelegate();
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Info(ClassName, "KNX is connected");
-            Logger.Debug(ClassName, "Unlocking send - {0} free locks", _lockManager.LockCount);
-
-            _lockManager.UnlockConnection();
+            Logger.Debug(ClassName, "KNX is connected. Unlocking send - {0} free locks", _lockManager.LockCount);
         }
 
         /// <summary>
@@ -150,16 +143,14 @@ namespace KNXLib
 
             try
             {
-                if (KnxDisconnectedDelegate != null)
-                    KnxDisconnectedDelegate();
+                KnxDisconnectedDelegate();
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "KNX is disconnected");
-            Logger.Debug(ClassName, "Send locked - {0} free locks", _lockManager.LockCount);
+            Logger.Debug(ClassName, "KNX is disconnected. Send locked - {0} free locks", _lockManager.LockCount);
         }
 
         internal void Event(string address, byte[] state)
@@ -168,12 +159,12 @@ namespace KNXLib
             {
                 KnxEventDelegate(address, state);
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "Device {0} sent event {1}", address, state);
+            Logger.Debug(ClassName, "Device {0} sent event 0x{1}", address, string.Join(string.Empty, state.Select(c => ((int) c).ToString("X2"))));
         }
 
         internal void Status(string address, byte[] state)
@@ -182,12 +173,12 @@ namespace KNXLib
             {
                 KnxStatusDelegate(address, state);
             }
-            catch
+            catch (Exception e)
             {
-                //ignore
+                Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "Device {0} has status {1}", address, state);
+            Logger.Debug(ClassName, "Device {0} sent status 0x{1}", address, string.Join(string.Empty, state.Select(c => ((int) c).ToString("X2"))));
         }
 
         /// <summary>
@@ -202,7 +193,7 @@ namespace KNXLib
 
             try
             {
-                val = new[] {Convert.ToByte(data)};
+                val = new[] { Convert.ToByte(data) };
             }
             catch
             {
@@ -275,10 +266,7 @@ namespace KNXLib
         /// </summary>
         /// <param name="address">KNX Address</param>
         /// <param name="data">byte value</param>
-        public void Action(string address, byte data)
-        {
-            Action(address, new byte[] {0x00, data});
-        }
+        public void Action(string address, byte data) => Action(address, new byte[] { 0x00, data });
 
         /// <summary>
         ///     Send a byte array value as data to specified address
@@ -287,11 +275,11 @@ namespace KNXLib
         /// <param name="data">Byte array value</param>
         public void Action(string address, byte[] data)
         {
-            Logger.Debug(ClassName, "Sending {0} to {1}.", data, address);
+            Logger.Debug(ClassName, "Sending 0x{0} to {1}.", BitConverter.ToString(data), address);
 
             _lockManager.PerformLockedOperation(() => KnxSender.Action(address, data));
 
-            Logger.Debug(ClassName, "Sent {0} to {1}.", data, address);
+            Logger.Debug(ClassName, "Sent 0x{0} to {1}.", BitConverter.ToString(data), address);
         }
 
         // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
@@ -315,10 +303,7 @@ namespace KNXLib
         /// <param name="type">Datapoint type, e.g.: 9.001</param>
         /// <param name="data">Data to convert</param>
         /// <returns></returns>
-        public object FromDataPoint(string type, string data)
-        {
-            return DataPointTranslator.Instance.FromDataPoint(type, data);
-        }
+        public object FromDataPoint(string type, string data) => DataPointTranslator.Instance.FromDataPoint(type, data);
 
         /// <summary>
         ///     Convert a value received from KNX using datapoint translator, e.g.,
@@ -327,10 +312,7 @@ namespace KNXLib
         /// <param name="type">Datapoint type, e.g.: 9.001</param>
         /// <param name="data">Data to convert</param>
         /// <returns></returns>
-        public object FromDataPoint(string type, byte[] data)
-        {
-            return DataPointTranslator.Instance.FromDataPoint(type, data);
-        }
+        public object FromDataPoint(string type, byte[] data) => DataPointTranslator.Instance.FromDataPoint(type, data);
 
         /// <summary>
         ///     Convert a value to send to KNX using datapoint translator, e.g.,
@@ -339,10 +321,7 @@ namespace KNXLib
         /// <param name="type">Datapoint type, e.g.: 9.001</param>
         /// <param name="value">Value to convert</param>
         /// <returns></returns>
-        public byte[] ToDataPoint(string type, string value)
-        {
-            return DataPointTranslator.Instance.ToDataPoint(type, value);
-        }
+        public byte[] ToDataPoint(string type, string value) => DataPointTranslator.Instance.ToDataPoint(type, value);
 
         /// <summary>
         ///     Convert a value to send to KNX using datapoint translator, e.g.,
@@ -351,9 +330,6 @@ namespace KNXLib
         /// <param name="type">Datapoint type, e.g.: 9.001</param>
         /// <param name="value">Value to convert</param>
         /// <returns></returns>
-        public byte[] ToDataPoint(string type, object value)
-        {
-            return DataPointTranslator.Instance.ToDataPoint(type, value);
-        }
+        public byte[] ToDataPoint(string type, object value) => DataPointTranslator.Instance.ToDataPoint(type, value);
     }
 }

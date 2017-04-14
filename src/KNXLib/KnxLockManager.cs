@@ -1,18 +1,15 @@
-﻿using System;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Threading;
+
     internal class KnxLockManager
     {
         private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(0);
         private readonly object _connectedLock = new object();
         private bool _isConnected;
 
-        public int LockCount
-        {
-            get { return _sendLock.CurrentCount; }
-        }
+        public int LockCount => _sendLock.CurrentCount;
 
         public void LockConnection()
         {
