@@ -87,8 +87,7 @@ namespace KNXLib
             catch (Exception e)
             {
                 Logger.Error(ClassName, e);
-
-                // ignore, missing warning information
+            // ignore, missing warning information
             }
         }
 
@@ -187,7 +186,8 @@ namespace KNXLib
 
             if (knxDatagram.channel_id == 0x00 && knxDatagram.status == 0x24)
             {
-                Logger.Info(ClassName, "KNXLib received connect response - No more connections available");                
+                Logger.Info(ClassName, "KNXLib received connect response - No more connections available");
+                KnxConnectionTunneling.DisconnectRequest();
             }
             else
             {
