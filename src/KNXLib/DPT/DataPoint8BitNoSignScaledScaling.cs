@@ -23,7 +23,11 @@ namespace KNXLib.DPT
 
         public override object FromDataPoint(byte[] data)
         {
-            if (data == null || data.Length != 1)
+            if (data == null)
+                return 0;
+            if (data.Length == 2)
+                data = data.Skip(1).ToArray();
+            else if (data.Length != 1)
                 return 0;
 
             var value = (int) data[0];

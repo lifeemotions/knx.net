@@ -12,15 +12,15 @@ namespace KNXLibTests.Unit.DataPoint
             string dptType = "5.001";
 
             int scale0 = 0;
-            byte[] scale0Bytes = {0x00};
+            byte[] scale0Bytes = { 0x00, 0x00 };
             int scale20 = 20;
-            byte[] scale20Bytes = {0x33};
+            byte[] scale20Bytes = { 0x00, 0x33 };
             int scale60 = 60;
-            byte[] scale60Bytes = {0x99};
+            byte[] scale60Bytes = { 0x00, 0x99 };
             int scale80 = 80;
-            byte[] scale80Bytes = {0xCC};
+            byte[] scale80Bytes = { 0x00, 0xCC };
             int scale100 = 100;
-            byte[] scale100Bytes = {0xFF};
+            byte[] scale100Bytes = { 0x00, 0xFF };
 
             Assert.AreEqual(scale0, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale0Bytes)));
             Assert.AreEqual(scale20, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale20Bytes)));
