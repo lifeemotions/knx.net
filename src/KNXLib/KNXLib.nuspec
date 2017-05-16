@@ -10,7 +10,7 @@
     <projectUrl>http://lifeemotions.github.io/knx.net/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixing ReceiveTimeout: too short in production system (thanks to GioviQ)</releaseNotes>
+    <releaseNotes>Fixing #32: error in 5.001 length</releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>knx .net c#</tags>
   </metadata>
