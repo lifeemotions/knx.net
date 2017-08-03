@@ -1,7 +1,7 @@
 KNX.net ![build status](https://travis-ci.org/lifeemotions/knx.net.svg?branch=master) [![NuGet version](https://badge.fury.io/nu/KNX.net.svg)](https://badge.fury.io/nu/KNX.net)
 =======
 
-KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for C#
+KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET
 
 This API allows to connect in both modes:
 * Tunneling
