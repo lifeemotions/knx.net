@@ -2,7 +2,17 @@
 
 set -e
 
-sudo ./run-tests.sh
+sudo ./prepare-environment.sh
 
-cd ./src/KNXLib
+pushd ./tests/KNXLibTests/
+
+dotnet build 
+dotnet test
+
+popd
+
+pushd ./src/KNXLib
+
 dotnet pack -o ../../output/ -c Release
+
+popd

@@ -24,8 +24,3 @@ rm dotnet.tar.gz
 ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 ./install-eibd.sh
-
-cd ./tests/KNXLibTests/
-
-dotnet build 
-dotnet test
