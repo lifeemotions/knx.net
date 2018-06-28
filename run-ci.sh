@@ -2,7 +2,7 @@
 
 set -e
 
-./run-tests.sh
+sudo ./run-tests.sh
 
 cd ./src/KNXLib
 dotnet pack -o ../../output/ -c Release
