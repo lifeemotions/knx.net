@@ -1,12 +1,12 @@
 ﻿using KNXLib.DPT;
-using NUnit.Framework;
+using Xunit;
 
 namespace KNXLibTests.Unit.DataPoint
 {
-    [TestFixture]
-    internal class DataPoint8BitNoSignNonScaledValue1UCount
+    public class DataPoint8BitNoSignNonScaledValue1UCount
     {
-        [Category("KNXLib.Unit.DataPoint.8BitNoSign"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.8BitNoSign")]
         public void DataPoint8BitNoSignNonScaledValue1UCountTest()
         {
             string dptType = "5.010";
@@ -22,17 +22,17 @@ namespace KNXLibTests.Unit.DataPoint
             int count255 = 255;
             byte[] count255Bytes = {0xFF};
 
-            Assert.AreEqual(count0, DataPointTranslator.Instance.FromDataPoint(dptType, count0Bytes));
-            Assert.AreEqual(count97, DataPointTranslator.Instance.FromDataPoint(dptType, count97Bytes));
-            Assert.AreEqual(count128, DataPointTranslator.Instance.FromDataPoint(dptType, count128Bytes));
-            Assert.AreEqual(count199, DataPointTranslator.Instance.FromDataPoint(dptType, count199Bytes));
-            Assert.AreEqual(count255, DataPointTranslator.Instance.FromDataPoint(dptType, count255Bytes));
+            Assert.Equal(count0, DataPointTranslator.Instance.FromDataPoint(dptType, count0Bytes));
+            Assert.Equal(count97, DataPointTranslator.Instance.FromDataPoint(dptType, count97Bytes));
+            Assert.Equal(count128, DataPointTranslator.Instance.FromDataPoint(dptType, count128Bytes));
+            Assert.Equal(count199, DataPointTranslator.Instance.FromDataPoint(dptType, count199Bytes));
+            Assert.Equal(count255, DataPointTranslator.Instance.FromDataPoint(dptType, count255Bytes));
 
-            Assert.AreEqual(count0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count0));
-            Assert.AreEqual(count97Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count97));
-            Assert.AreEqual(count128Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count128));
-            Assert.AreEqual(count199Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count199));
-            Assert.AreEqual(count255Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count255));
+            Assert.Equal(count0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count0));
+            Assert.Equal(count97Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count97));
+            Assert.Equal(count128Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count128));
+            Assert.Equal(count199Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count199));
+            Assert.Equal(count255Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count255));
         }
     }
 }

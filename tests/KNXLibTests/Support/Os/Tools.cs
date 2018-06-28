@@ -1,16 +1,32 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace KNXLibTests.Support.Os
 {
     public class Tools
     {
-        public static bool IsUnix
+        public static bool IsWindows
         {
             get
             {
-                int p = (int) Environment.OSVersion.Platform;
-                return (p == 4) || (p == 6) || (p == 128);
+                return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            }
+        }
+
+        public static bool IsLinux
+        {
+            get
+            {
+                return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+            }
+        }
+
+        public static bool IsOSX
+        {
+            get
+            {
+                return RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             }
         }
 
@@ -18,7 +34,7 @@ namespace KNXLibTests.Support.Os
         {
             get
             {
-                return IsUnix ? ':' : ';';
+                return (IsLinux || IsOSX) ? ':' : ';';
             }
         }
 

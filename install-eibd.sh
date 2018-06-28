@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+set -e
 
 sudo apt-get -y install xsltproc libxml2-utils libc6 zlib1g
 

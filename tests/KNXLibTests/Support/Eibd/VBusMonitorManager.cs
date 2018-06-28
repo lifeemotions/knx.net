@@ -64,7 +64,7 @@ namespace KNXLibTests.Support.Eibd
             //Receives this:
             // LPDU: BC 00 01 08 06 F1 00 81 3C :L_Data low from 0.0.1 to 1/0/6 hops: 07 T_DATA_XXX_REQ A_GroupValue_Write (small) 01
 
-            if (!e.Data.Contains("A_GroupValue_Write"))
+            if (string.IsNullOrWhiteSpace(e?.Data) || !e.Data.Contains("A_GroupValue_Write"))
                 return;
 
             string address = string.Empty;

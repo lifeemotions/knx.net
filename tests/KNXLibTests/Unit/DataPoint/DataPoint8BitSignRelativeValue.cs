@@ -1,12 +1,12 @@
 ﻿using KNXLib.DPT;
-using NUnit.Framework;
+using Xunit;
 
 namespace KNXLibTests.Unit.DataPoint
 {
-    [TestFixture]
-    internal class DataPoint8BitSignRelativeValue
+    public class DataPoint8BitSignRelativeValue
     {
-        [Category("KNXLib.Unit.DataPoint.8BitSign"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.8BitSign")]
         public void DataPoint8BitSignRelativeValuePercentTest()
         {
             string dptType = "6.001";
@@ -22,20 +22,21 @@ namespace KNXLibTests.Unit.DataPoint
             int perc127 = 127;
             byte[] perc127Bytes = {0x7F};
 
-            Assert.AreEqual(perc128N, DataPointTranslator.Instance.FromDataPoint(dptType, perc128NBytes));
-            Assert.AreEqual(perc1N, DataPointTranslator.Instance.FromDataPoint(dptType, perc1NBytes));
-            Assert.AreEqual(perc0, DataPointTranslator.Instance.FromDataPoint(dptType, perc0Bytes));
-            Assert.AreEqual(perc55, DataPointTranslator.Instance.FromDataPoint(dptType, perc55Bytes));
-            Assert.AreEqual(perc127, DataPointTranslator.Instance.FromDataPoint(dptType, perc127Bytes));
+            Assert.Equal(perc128N, DataPointTranslator.Instance.FromDataPoint(dptType, perc128NBytes));
+            Assert.Equal(perc1N, DataPointTranslator.Instance.FromDataPoint(dptType, perc1NBytes));
+            Assert.Equal(perc0, DataPointTranslator.Instance.FromDataPoint(dptType, perc0Bytes));
+            Assert.Equal(perc55, DataPointTranslator.Instance.FromDataPoint(dptType, perc55Bytes));
+            Assert.Equal(perc127, DataPointTranslator.Instance.FromDataPoint(dptType, perc127Bytes));
 
-            Assert.AreEqual(perc128NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc128N));
-            Assert.AreEqual(perc1NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc1N));
-            Assert.AreEqual(perc0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc0));
-            Assert.AreEqual(perc55Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc55));
-            Assert.AreEqual(perc127Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc127));
+            Assert.Equal(perc128NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc128N));
+            Assert.Equal(perc1NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc1N));
+            Assert.Equal(perc0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc0));
+            Assert.Equal(perc55Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc55));
+            Assert.Equal(perc127Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, perc127));
         }
 
-        [Category("KNXLib.Unit.DataPoint.8BitSign"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.8BitSign")]
         public void DataPoint8BitSignRelativeValueCountTest()
         {
             string dptType = "6.010";
@@ -51,17 +52,17 @@ namespace KNXLibTests.Unit.DataPoint
             int count127 = 127;
             byte[] count127Bytes = {0x7F};
 
-            Assert.AreEqual(count128N, DataPointTranslator.Instance.FromDataPoint(dptType, count128NBytes));
-            Assert.AreEqual(count1N, DataPointTranslator.Instance.FromDataPoint(dptType, count1NBytes));
-            Assert.AreEqual(count0, DataPointTranslator.Instance.FromDataPoint(dptType, count0Bytes));
-            Assert.AreEqual(count55, DataPointTranslator.Instance.FromDataPoint(dptType, count55Bytes));
-            Assert.AreEqual(count127, DataPointTranslator.Instance.FromDataPoint(dptType, count127Bytes));
+            Assert.Equal(count128N, DataPointTranslator.Instance.FromDataPoint(dptType, count128NBytes));
+            Assert.Equal(count1N, DataPointTranslator.Instance.FromDataPoint(dptType, count1NBytes));
+            Assert.Equal(count0, DataPointTranslator.Instance.FromDataPoint(dptType, count0Bytes));
+            Assert.Equal(count55, DataPointTranslator.Instance.FromDataPoint(dptType, count55Bytes));
+            Assert.Equal(count127, DataPointTranslator.Instance.FromDataPoint(dptType, count127Bytes));
 
-            Assert.AreEqual(count128NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, count128N));
-            Assert.AreEqual(count1NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, count1N));
-            Assert.AreEqual(count0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count0));
-            Assert.AreEqual(count55Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count55));
-            Assert.AreEqual(count127Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count127));
+            Assert.Equal(count128NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, count128N));
+            Assert.Equal(count1NBytes, DataPointTranslator.Instance.ToDataPoint(dptType, count1N));
+            Assert.Equal(count0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count0));
+            Assert.Equal(count55Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count55));
+            Assert.Equal(count127Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, count127));
         }
     }
 }

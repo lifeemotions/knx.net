@@ -1,12 +1,12 @@
 ﻿using KNXLib.DPT;
-using NUnit.Framework;
+using Xunit;
 
 namespace KNXLibTests.Unit.DataPoint
 {
-    [TestFixture]
-    internal class DataPoint8BitNoSignScaledScaling
+    public class DataPoint8BitNoSignScaledScaling
     {
-        [Category("KNXLib.Unit.DataPoint.8BitNoSign"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.8BitNoSign")]
         public void DataPoint8BitNoSignScaledScalingTest()
         {
             string dptType = "5.001";
@@ -22,18 +22,18 @@ namespace KNXLibTests.Unit.DataPoint
             int scale100 = 100;
             byte[] scale100Bytes = { 0x00, 0xFF };
 
-            Assert.AreEqual(scale0, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale0Bytes)));
-            Assert.AreEqual(scale20, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale20Bytes)));
-            Assert.AreEqual(scale60, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale60Bytes)));
-            Assert.AreEqual(scale80, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale80Bytes)));
-            Assert.AreEqual(scale100,
+            Assert.Equal(scale0, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale0Bytes)));
+            Assert.Equal(scale20, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale20Bytes)));
+            Assert.Equal(scale60, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale60Bytes)));
+            Assert.Equal(scale80, ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale80Bytes)));
+            Assert.Equal(scale100,
                 ((int) (decimal) DataPointTranslator.Instance.FromDataPoint(dptType, scale100Bytes)));
 
-            Assert.AreEqual(scale0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale0));
-            Assert.AreEqual(scale20Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale20));
-            Assert.AreEqual(scale60Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale60));
-            Assert.AreEqual(scale80Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale80));
-            Assert.AreEqual(scale100Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale100));
+            Assert.Equal(scale0Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale0));
+            Assert.Equal(scale20Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale20));
+            Assert.Equal(scale60Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale60));
+            Assert.Equal(scale80Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale80));
+            Assert.Equal(scale100Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, scale100));
         }
     }
 }

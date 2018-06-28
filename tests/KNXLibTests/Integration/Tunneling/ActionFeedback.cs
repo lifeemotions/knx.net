@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Threading;
 using KNXLib;
-using NUnit.Framework;
+using KNXLibTests.Support.Os;
+using Xunit;
 
 namespace KNXLibTests.Integration.Tunneling
 {
-    [TestFixture, Platform(Exclude = "Win")]
-    internal class ActionFeedback
+    public class ActionFeedback
     {
-        [OneTimeSetUp]
-        public void SetUp()
+        private void StartEibd()
         {
             try
             {
@@ -27,13 +26,12 @@ namespace KNXLibTests.Integration.Tunneling
             }
             catch (Exception)
             {
-                TearDown();
+                StopEibd();
                 throw;
             }
         }
 
-        [OneTimeTearDown]
-        public void TearDown()
+        private void StopEibd()
         {
             Support.Eibd.DaemonManager.Stop();
             Support.Eibd.VBusMonitorManager.Stop();
@@ -44,28 +42,38 @@ namespace KNXLibTests.Integration.Tunneling
         private const bool LightOnOffActionStatus = true;
         private const int Timeout = 2000;
 
-        [Category("KNXLib.Integration.Tunneling.ActionFeedback"), Test]
+        [SkippableFact]
+        [Trait("Category","KNXLib.Integration.Tunneling.ActionFeedback")]
         public void TunnelingActionFeedbackTest()
         {
-            ResetEvent = new ManualResetEventSlim();
+            Skip.IfNot(Tools.IsLinux);
 
-            KnxConnection connection = new KnxConnectionTunneling("127.0.0.1", 3671, "127.0.0.1", 3672) { Debug = false };
+            StartEibd();
 
-            connection.KnxEventDelegate += Event;
+            try
+            {
+                ResetEvent = new ManualResetEventSlim();
 
-            connection.Connect();
+                KnxConnection connection = new KnxConnectionTunneling("127.0.0.1", 3671, "127.0.0.1", 3672) { Debug = false };
 
-            Thread.Sleep(50);
+                connection.KnxEventDelegate += Event;
 
-            connection.Action(LightOnOffAddress, true);
+                connection.Connect();
 
-            if (!ResetEvent.Wait(Timeout))
-                Assert.Fail("Didn't receive feedback from the action");
+                Thread.Sleep(50);
+
+                connection.Action(LightOnOffAddress, true);
+
+                Assert.True(ResetEvent.Wait(Timeout), "Didn't receive feedback from the action");
+            }
+            finally
+            {
+                StopEibd();
+            }
         }
 
         private void Event(string address, string state)
         {
-            //Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
             if (LightOnOffAddress.Equals(address) && state != null && state.Length == 1 && state[0] == 1)
                 ResetEvent.Set();
         }

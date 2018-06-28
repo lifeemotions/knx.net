@@ -1,12 +1,12 @@
 ﻿using KNXLib.DPT;
-using NUnit.Framework;
+using Xunit;
 
 namespace KNXLibTests.Unit.DataPoint
 {
-    [TestFixture]
-    internal class DataPoint3BitControl
+    public class DataPoint3BitControl
     {
-        [Category("KNXLib.Unit.DataPoint.3BitControl"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.3BitControl")]
         public void DataPoint3BitControlDimmingTest()
         {
             string dptType = "3.007";
@@ -22,20 +22,21 @@ namespace KNXLibTests.Unit.DataPoint
             int decr7 = -7;
             byte[] decr7Bytes = {0x01};
 
-            Assert.AreEqual(incr4, DataPointTranslator.Instance.FromDataPoint(dptType, incr4Bytes));
-            Assert.AreEqual(incr1, DataPointTranslator.Instance.FromDataPoint(dptType, incr1Bytes));
-            Assert.AreEqual(stop, DataPointTranslator.Instance.FromDataPoint(dptType, stopBytes));
-            Assert.AreEqual(decr3, DataPointTranslator.Instance.FromDataPoint(dptType, decr3Bytes));
-            Assert.AreEqual(decr7, DataPointTranslator.Instance.FromDataPoint(dptType, decr7Bytes));
+            Assert.Equal(incr4, DataPointTranslator.Instance.FromDataPoint(dptType, incr4Bytes));
+            Assert.Equal(incr1, DataPointTranslator.Instance.FromDataPoint(dptType, incr1Bytes));
+            Assert.Equal(stop, DataPointTranslator.Instance.FromDataPoint(dptType, stopBytes));
+            Assert.Equal(decr3, DataPointTranslator.Instance.FromDataPoint(dptType, decr3Bytes));
+            Assert.Equal(decr7, DataPointTranslator.Instance.FromDataPoint(dptType, decr7Bytes));
 
-            Assert.AreEqual(incr4Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr4));
-            Assert.AreEqual(incr1Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr1));
-            Assert.AreEqual(stopBytes, DataPointTranslator.Instance.ToDataPoint(dptType, stop));
-            Assert.AreEqual(decr3Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr3));
-            Assert.AreEqual(decr7Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr7));
+            Assert.Equal(incr4Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr4));
+            Assert.Equal(incr1Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr1));
+            Assert.Equal(stopBytes, DataPointTranslator.Instance.ToDataPoint(dptType, stop));
+            Assert.Equal(decr3Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr3));
+            Assert.Equal(decr7Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr7));
         }
 
-        [Category("KNXLib.Unit.DataPoint.3BitControl"), Test]
+        [Fact]
+        [Trait("Category","KNXLib.Unit.DataPoint.3BitControl")]
         public void DataPoint3BitControlBlindsTest()
         {
             string dptType = "3.008";
@@ -51,17 +52,17 @@ namespace KNXLibTests.Unit.DataPoint
             int decr6 = -6;
             byte[] decr6Bytes = {0x02};
 
-            Assert.AreEqual(incr7, DataPointTranslator.Instance.FromDataPoint(dptType, incr7Bytes));
-            Assert.AreEqual(incr2, DataPointTranslator.Instance.FromDataPoint(dptType, incr2Bytes));
-            Assert.AreEqual(stop, DataPointTranslator.Instance.FromDataPoint(dptType, stopBytes));
-            Assert.AreEqual(decr5, DataPointTranslator.Instance.FromDataPoint(dptType, decr5Bytes));
-            Assert.AreEqual(decr6, DataPointTranslator.Instance.FromDataPoint(dptType, decr6Bytes));
+            Assert.Equal(incr7, DataPointTranslator.Instance.FromDataPoint(dptType, incr7Bytes));
+            Assert.Equal(incr2, DataPointTranslator.Instance.FromDataPoint(dptType, incr2Bytes));
+            Assert.Equal(stop, DataPointTranslator.Instance.FromDataPoint(dptType, stopBytes));
+            Assert.Equal(decr5, DataPointTranslator.Instance.FromDataPoint(dptType, decr5Bytes));
+            Assert.Equal(decr6, DataPointTranslator.Instance.FromDataPoint(dptType, decr6Bytes));
 
-            Assert.AreEqual(incr7Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr7));
-            Assert.AreEqual(incr2Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr2));
-            Assert.AreEqual(stopBytes, DataPointTranslator.Instance.ToDataPoint(dptType, stop));
-            Assert.AreEqual(decr5Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr5));
-            Assert.AreEqual(decr6Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr6));
+            Assert.Equal(incr7Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr7));
+            Assert.Equal(incr2Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, incr2));
+            Assert.Equal(stopBytes, DataPointTranslator.Instance.ToDataPoint(dptType, stop));
+            Assert.Equal(decr5Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr5));
+            Assert.Equal(decr6Bytes, DataPointTranslator.Instance.ToDataPoint(dptType, decr6));
         }
     }
 }
