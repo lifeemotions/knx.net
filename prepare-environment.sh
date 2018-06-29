@@ -5,6 +5,7 @@ set -e
 apt-get update
 apt-get install -y --no-install-recommends \
         ca-certificates \
+        git \
         libc6 \
         libgcc1 \
         libgssapi-krb5-2 \
