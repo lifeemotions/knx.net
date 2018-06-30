@@ -84,10 +84,29 @@ namespace KNXLib
                     }
                 }
 
-                _udpClient = new UdpClient(_localEndpoint)
+                if (NotOSX)
                 {
-                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = stateRequestTimerInterval * 2 }
-                };
+                    _udpClient = new UdpClient(_localEndpoint)
+                    {
+                        Client =
+                        {
+                            NoDelay = true,
+                            DontFragment = true,
+                            SendBufferSize = 0,
+                            ReceiveTimeout = stateRequestTimerInterval * 2
+                        }
+                    };
+                }
+                else 
+                {
+                    _udpClient = new UdpClient(_localEndpoint)
+                    {
+                        Client =
+                        {
+                            ReceiveTimeout = stateRequestTimerInterval * 2
+                        }
+                    };
+                }
             }
             catch (SocketException ex)
             {
@@ -128,6 +147,7 @@ namespace KNXLib
                 DisconnectRequest();
                 KnxReceiver.Stop();
                 _udpClient.Close();
+                _udpClient.Dispose();
             }
             catch (Exception e)
             {

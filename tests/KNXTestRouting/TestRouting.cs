@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using KNXLib;
 
-namespace KNXTest
+namespace KNXTestRouting
 {
     public class TestRouting
     {

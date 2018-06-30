@@ -74,7 +74,23 @@ namespace KNXLib
 
                 foreach (IPAddress localIp in ipv4Addresses)
                 {
-                    var client = new UdpClient(new IPEndPoint(localIp, _localEndpoint.Port));
+                    UdpClient client;
+                    if (NotOSX)
+                    {
+                        client = new UdpClient(new IPEndPoint(localIp, _localEndpoint.Port))
+                        {
+                            Client =
+                            {
+                                NoDelay = true,
+                                DontFragment = true,
+                                SendBufferSize = 0
+                            }
+                        };
+                    }
+                    else
+                    {
+                        client = new UdpClient(new IPEndPoint(localIp, _localEndpoint.Port));
+                    }
                     _udpClients.Add(client);
                     client.JoinMulticastGroup(ConnectionConfiguration.IpAddress, localIp);
                 }
@@ -104,6 +120,7 @@ namespace KNXLib
             {
                 client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();
+                client.Dispose();
             }
         }
     }

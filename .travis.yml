@@ -4,4 +4,4 @@ dist: trusty
 env:  
   - CLI_VERSION=latest
 script:
-  - ./run-ci.sh
+  - ./scripts/run-ci.sh

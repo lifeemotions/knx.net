@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using KNXLib;
 
-namespace KNXTest
+namespace KNXTestTunneling
 {
     public class TestTunneling
     {

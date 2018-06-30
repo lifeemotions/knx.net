@@ -5,6 +5,7 @@ using System.Linq;
 using KNXLib.DPT;
 using KNXLib.Exceptions;
 using KNXLib.Log;
+using System.Runtime.InteropServices;
 
 namespace KNXLib
 {
@@ -355,5 +356,7 @@ namespace KNXLib
         {
             return DataPointTranslator.Instance.ToDataPoint(type, value);
         }
+
+        protected bool NotOSX => !RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     }
 }
