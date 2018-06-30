@@ -191,6 +191,15 @@ namespace KNXLib
         }
 
         /// <summary>
+        ///     Set the lock interval between requests sent to the network (in ms)
+        /// </summary>
+        /// <param name="interval">time in ms for the interval</param>
+        public void SetLockIntervalMs(int interval)
+        {
+            _lockManager.IntervalMs = interval;
+        }
+
+        /// <summary>
         ///     Send a bit value as data to specified address
         /// </summary>
         /// <param name="address">KNX Address</param>
