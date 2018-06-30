@@ -90,7 +90,6 @@ namespace KNXLib
                     {
                         Client =
                         {
-                            NoDelay = true,
                             DontFragment = true,
                             SendBufferSize = 0,
                             ReceiveTimeout = stateRequestTimerInterval * 2

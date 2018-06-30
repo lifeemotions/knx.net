@@ -81,7 +81,6 @@ namespace KNXLib
                         {
                             Client =
                             {
-                                NoDelay = true,
                                 DontFragment = true,
                                 SendBufferSize = 0
                             }
