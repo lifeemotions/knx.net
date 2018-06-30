@@ -13,6 +13,8 @@ namespace KNXLib
         private Thread _receiverThread;
         private Thread _consumerThread;
 
+        private const ThreadState StateAlive = ThreadState.Running | ThreadState.Background | ThreadState.WaitSleepJoin;
+
         private BlockingCollection<KnxDatagram> _rxDatagrams;
 
         protected KnxReceiver(KnxConnection connection)
@@ -36,7 +38,11 @@ namespace KNXLib
                     {
                         datagram = _rxDatagrams.Take();
                     }
-                    catch (InvalidOperationException) { }
+                    catch (Exception e)
+                    {
+                        if (e is ThreadAbortException)
+                            throw;
+                    }
 
                     if (datagram != null)
                         KnxConnection.Event(datagram.destination_address, datagram.data);
@@ -62,9 +68,19 @@ namespace KNXLib
         {
             try
             {
-                if (_receiverThread.ThreadState.Equals(ThreadState.Running))
+                if (_receiverThread.ThreadState.Equals(StateAlive))
                 {
                     _receiverThread.Abort();
+                }
+            }
+            catch
+            {
+                Thread.ResetAbort();
+            }
+            try
+            {
+                if (_consumerThread.ThreadState.Equals(StateAlive))
+                {
                     _consumerThread.Abort();
                 }
             }
@@ -72,6 +88,7 @@ namespace KNXLib
             {
                 Thread.ResetAbort();
             }
+            _rxDatagrams.Dispose();
         }
 
         protected void ProcessCEMI(KnxDatagram datagram, byte[] cemi)
