@@ -24,4 +24,4 @@ tar -zxf dotnet.tar.gz -C /usr/share/dotnet
 rm dotnet.tar.gz
 ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
-./install-eibd.sh
+./scripts/install-eibd.sh

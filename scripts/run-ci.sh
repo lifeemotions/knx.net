@@ -2,9 +2,9 @@
 
 set -e
 
-sudo ./prepare-environment.sh
+sudo ./scripts/prepare-environment.sh
 
-cd ../tests/KNXLibTests/
+cd ./tests/KNXLibTests/
 
 dotnet build 
 dotnet test
