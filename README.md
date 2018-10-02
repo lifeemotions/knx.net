@@ -134,3 +134,10 @@ If connecting in routing mode:
 
 If connecting in tunneling mode:
 * make sure the system firewall allows incoming connections to the specified `localPort`
+
+If sending actions is not working for you, you might need to define the parameter `ActionMessageCode` on the connection. Some KNX Router/Interfaces need this to be set to 0x29 for example.
+
+```csharp
+connection = new KnxConnectionRouting();
+connection.ActionMessageCode = 0x29;
+```
