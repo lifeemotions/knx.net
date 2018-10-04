@@ -39,7 +39,8 @@
 
         public void PerformLockedOperation(Action action)
         {
-            // TODO: Shouldn't this check if we are connected?
+            if (!_isConnected)
+                throw new InvalidOperationException("Unable to perform action: KNX is not connected.");
 
             try
             {
