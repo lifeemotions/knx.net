@@ -44,6 +44,11 @@
     <Compile Include="DPT\DataPoint8BitSignRelativeValue.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledScaling.cs" />
     <Compile Include="DPT\DataPoint3BitControl.cs" />
+    <Compile Include="Enums\KnxGroupAddressStyle.cs" />
+    <Compile Include="GA\KnxFreeStyleGroupAddress.cs" />
+    <Compile Include="GA\KnxGroupAddress.cs" />
+    <Compile Include="GA\KnxThreeLevelGroupAddress.cs" />
+    <Compile Include="GA\KnxTwoLevelGroupAddress.cs" />
     <Compile Include="Log\Logger.cs" />
     <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />
