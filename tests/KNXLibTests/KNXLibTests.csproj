@@ -67,6 +67,10 @@
     <Compile Include="Unit\DataPoint\DataPoint2ByteFloatTemperature.cs" />
     <Compile Include="Unit\DataPoint\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
     <Compile Include="Unit\DataPoint\DataPoint3BitControl.cs" />
+    <Compile Include="Unit\GA\KnxFreeStyleGroupAddressTest.cs" />
+    <Compile Include="Unit\GA\KnxGroupAddressTest.cs" />
+    <Compile Include="Unit\GA\KnxThreeLevelGroupAddressTest.cs" />
+    <Compile Include="Unit\GA\KnxTwoLevelGroupAddressTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Integration\Routing\" />
