@@ -8,14 +8,6 @@ namespace KNXLib.Enums
     public enum KnxGroupAddressStyle
     {
         /// <summary>
-        /// Group addresses in the style of 'MainGroup/SubGroup'
-        /// Main    => [0-31] 
-        /// Sub     => [0-2047]
-        /// Example GA: 4/1025
-        /// </summary>
-        TwoLevel,
-
-        /// <summary>
         /// Group addresses in the style of 'MainGroup/MiddleGroup/SubGroup'
         /// Main    => [0-31]
         /// Middle  => [0-7]
@@ -23,6 +15,14 @@ namespace KNXLib.Enums
         /// Example GA: 4/1/25
         /// </summary>
         ThreeLevel,
+
+        /// <summary>
+        /// Group addresses in the style of 'MainGroup/SubGroup'
+        /// Main    => [0-31] 
+        /// Sub     => [0-2047]
+        /// Example GA: 4/1025
+        /// </summary>
+        TwoLevel,
 
         /// <summary>
         /// Group addresses in the style of 'SubGroup'
