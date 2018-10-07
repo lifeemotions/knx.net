@@ -1,6 +1,6 @@
 ﻿using KNXLib.Exceptions;
 
-namespace KNXLib.GA
+namespace KNXLib.Addressing
 {
     public class KnxThreeLevelGroupAddress : KnxGroupAddress
     {
@@ -26,7 +26,7 @@ namespace KNXLib.GA
         //    bits   | 7| 6| 5| 4| 3| 2| 1| 0| 7| 6| 5| 4| 3| 2| 1| 0|
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //           | E| Main Grp  | Midd G |       Sub Group       |
-        //           +--+--------------------+-----------------------+
+        //           +-----------------------+-----------------------+
         //           Note: When using extended GAs Bit 7 of OCTET 0 
         //                 is also used for MainGroup
 
@@ -94,6 +94,19 @@ namespace KNXLib.GA
         public override string ToString()
         {
             return $"{MainGroup}/{MiddleGroup}/{SubGroup}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is KnxThreeLevelGroupAddress)
+                return base.Equals(obj);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

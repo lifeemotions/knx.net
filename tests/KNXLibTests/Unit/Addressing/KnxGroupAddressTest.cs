@@ -1,13 +1,13 @@
 ﻿using NUnit.Framework;
-using KNXLib.GA;
+using KNXLib.Addressing;
 using KNXLib.Enums;
 
-namespace KNXLibTests.Unit.GA
+namespace KNXLibTests.Unit.Addressing
 {
     [TestFixture]
     internal class KnxGroupAddressTest
     {
-        [Category("KNXLib.Unit.GA"), Test]
+        [Category("KNXLib.Unit.Address"), Test]
         public void StringParserTestThreeLevel()
         {
             var ga = KnxGroupAddress.Parse("18/5/230");
@@ -17,9 +17,11 @@ namespace KNXLibTests.Unit.GA
             Assert.AreEqual(18, threeLevelGa.MainGroup);
             Assert.AreEqual(5, threeLevelGa.MiddleGroup);
             Assert.AreEqual(230, threeLevelGa.SubGroup);
+            Assert.AreEqual(true, threeLevelGa.Equals(18, 5, 230));
+            Assert.AreEqual(true, threeLevelGa.Equals("18/5/230"));
         }
 
-        [Category("KNXLib.Unit.GA"), Test]
+        [Category("KNXLib.Unit.Address"), Test]
         public void StringParserTestTwoLevel()
         {
             var ga = KnxGroupAddress.Parse("18/230");
@@ -28,9 +30,11 @@ namespace KNXLibTests.Unit.GA
             KnxTwoLevelGroupAddress threeLevelGa = (KnxTwoLevelGroupAddress)ga;
             Assert.AreEqual(18, threeLevelGa.MainGroup);
             Assert.AreEqual(230, threeLevelGa.SubGroup);
+            Assert.AreEqual(true, threeLevelGa.Equals(18, 230));
+            Assert.AreEqual(true, threeLevelGa.Equals("18/230"));
         }
 
-        [Category("KNXLib.Unit.GA"), Test]
+        [Category("KNXLib.Unit.Address"), Test]
         public void StringParserTestFreeStyle()
         {
             var ga = KnxGroupAddress.Parse("230");
@@ -38,9 +42,11 @@ namespace KNXLibTests.Unit.GA
 
             KnxFreeStyleGroupAddress threeLevelGa = (KnxFreeStyleGroupAddress)ga;
             Assert.AreEqual(230, threeLevelGa.SubGroup);
+            Assert.AreEqual(true, threeLevelGa.Equals(230));
+            Assert.AreEqual(true, threeLevelGa.Equals("230"));
         }
 
-        [Category("KNXLib.Unit.GA"), Test]
+        [Category("KNXLib.Unit.Address"), Test]
         public void ByteParserTest()
         {
             var gaThreeLevel = KnxGroupAddress.Parse(new byte[] { 0xa0, 0xb4 }, KnxGroupAddressStyle.ThreeLevel);

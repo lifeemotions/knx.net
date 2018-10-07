@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using KNXLib;
+using KNXLib.Addressing;
+using KNXLib.Events;
 using NUnit.Framework;
 
 namespace KNXLibTests.Integration.Tunneling
@@ -57,16 +59,16 @@ namespace KNXLibTests.Integration.Tunneling
 
             Thread.Sleep(50);
 
-            connection.Action(LightOnOffAddress, true);
+            connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), true);
 
             if (!ResetEvent.Wait(Timeout))
                 Assert.Fail("Didn't receive feedback from the action");
         }
 
-        private void Event(string address, string state)
+        private void Event(object sender, KnxEventArgs args)
         {
             //Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
-            if (LightOnOffAddress.Equals(address) && state != null && state.Length == 1 && state[0] == 1)
+            if (LightOnOffAddress.Equals(args.SourceAddress.ToString()) && args.State != null && args.State.Length == 1 && args.State[0] == 1)
                 ResetEvent.Set();
         }
     }

@@ -1,13 +1,13 @@
 ﻿using NUnit.Framework;
-using KNXLib.GA;
+using KNXLib.Addressing;
 using KNXLib.Exceptions;
 
-namespace KNXLibTests.Unit.GA
+namespace KNXLibTests.Unit.Addressing
 {
     [TestFixture]
     internal class KnxFreeStyleGroupAddressTest
     {
-        [Category("KNXLib.Unit.GA.FreeLevel"), Test]
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
         public void InvalidTest()
         {
             void Check(int SubGroup)
@@ -24,7 +24,7 @@ namespace KNXLibTests.Unit.GA
             Check(70565);    // Sub too high
         }
 
-        [Category("KNXLib.Unit.GA.FreeLevel"), Test]
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
         public void ValidTest()
         {
             void Check(int SubGroup)
@@ -42,7 +42,7 @@ namespace KNXLibTests.Unit.GA
         }
 
 
-        [Category("KNXLib.Unit.GA.FreeLevel"), Test]
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
         public void ValidParserTest()
         {
             void Check(string groupAddress, int SubGroup)
@@ -59,7 +59,7 @@ namespace KNXLibTests.Unit.GA
         }
 
 
-        [Category("KNXLib.Unit.GA.FreeLevel"), Test]
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
         public void InvalidParserTest()
         {
             void Check(string groupAddress)
@@ -80,7 +80,7 @@ namespace KNXLibTests.Unit.GA
             Check("");
         }
 
-        [Category("KNXLib.Unit.GA.FreeLevel"), Test]
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
         public void ConversionTest()
         {
             void Check(int SubGroup, byte[] Expected)
@@ -97,6 +97,23 @@ namespace KNXLibTests.Unit.GA
 
             Check(41140, new byte[] { 0xa0, 0xb4 });
             Check(20992, new byte[] { 0x52, 0x00 });
+        }
+
+        [Category("KNXLib.Unit.Address.FreeStyle"), Test]
+        public void EqualTest()
+        {
+            var ga1 = new KnxFreeStyleGroupAddress(555);
+            var ga2 = new KnxFreeStyleGroupAddress(555);
+            var ga3 = new KnxFreeStyleGroupAddress(666);
+
+            Assert.AreEqual(true, ga1.Equals(ga2));
+            Assert.AreEqual(false, ga1.Equals(ga3));
+
+            var pa1 = new KnxIndividualAddress(1, 0, 3);
+            var pa2 = new KnxIndividualAddress(ga1.GetAddress());
+
+            Assert.AreEqual(false, ga1.Equals(pa1));
+            Assert.AreEqual(false, ga1.Equals(pa2));
         }
     }
 }

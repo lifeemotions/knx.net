@@ -1,8 +1,8 @@
 ﻿using KNXLib.Enums;
 
-namespace KNXLib.GA
+namespace KNXLib.Addressing
 {
-    public abstract class KnxGroupAddress
+    public abstract class KnxGroupAddress : KnxAddress
     {
         public int MainGroup { get; set; }
         public int MiddleGroup { get; set; }
@@ -20,11 +20,7 @@ namespace KNXLib.GA
             SubGroup = subGroup;
         }
 
-        public abstract byte[] GetAddress();
-        protected abstract void InternalParse(string groupAddress);
-        protected abstract void InternalParse(byte[] groupAddress);
-
-        public virtual bool IsValid()
+        public override bool IsValid()
         {
             // The GA 0x00 is not allowed
             if (MainGroup == 0 && MiddleGroup == 0 && SubGroup == 0)
@@ -33,7 +29,7 @@ namespace KNXLib.GA
             return true;
         }
 
-        public static KnxGroupAddress Parse(string groupAddress)
+        public static new KnxGroupAddress Parse(string groupAddress)
         {
             var groupParts = groupAddress.Split('/');
 
@@ -53,6 +49,34 @@ namespace KNXLib.GA
                 return new KnxTwoLevelGroupAddress(groupAddress);
 
             return new KnxFreeStyleGroupAddress(groupAddress);
+        }
+
+        public bool Equals(int mainGroup, int middleGroup, int subGroup)
+        {
+            return (MainGroup == mainGroup && MiddleGroup == middleGroup && SubGroup == subGroup);
+        }
+
+        public bool Equals(int mainGroup, int subGroup)
+        {
+            return (MainGroup == mainGroup && MiddleGroup == 0 && SubGroup == subGroup);
+        }
+
+        public bool Equals(int subGroup)
+        {
+            return (MainGroup == 0 && MiddleGroup == 0 && SubGroup == subGroup);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is KnxGroupAddress)
+                return base.Equals(obj);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

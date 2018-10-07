@@ -1,6 +1,6 @@
 ﻿using KNXLib.Exceptions;
 
-namespace KNXLib.GA
+namespace KNXLib.Addressing
 {
     public class KnxFreeStyleGroupAddress : KnxGroupAddress
     {
@@ -27,7 +27,7 @@ namespace KNXLib.GA
         //    bits   | 7| 6| 5| 4| 3| 2| 1| 0| 7| 6| 5| 4| 3| 2| 1| 0|
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //           |                  Sub Group                    |
-        //           +--+--------------------+-----------------------+
+        //           +-----------------------+-----------------------+
 
 
         public override byte[] GetAddress()
@@ -85,6 +85,19 @@ namespace KNXLib.GA
         public override string ToString()
         {
             return $"{SubGroup}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is KnxFreeStyleGroupAddress)
+                return base.Equals(obj);
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

@@ -3,6 +3,9 @@ using System;
 using System.Threading;
 using System.Linq;
 using System.Collections.Concurrent;
+using KNXLib.Addressing;
+using KNXLib.Events;
+using KNXLib.Enums;
 
 namespace KNXLib
 {
@@ -45,7 +48,7 @@ namespace KNXLib
                     }
 
                     if (datagram != null)
-                        KnxConnection.Event(datagram.destination_address, datagram.data);
+                        KnxConnection.Event(new KnxEventArgs(datagram));
                 }
             }
             catch (ThreadAbortException)
@@ -165,14 +168,19 @@ namespace KNXLib
                     }
                 }
 
-                datagram.control_field_1 = cemi[2 + datagram.aditional_info_length];
-                datagram.control_field_2 = cemi[3 + datagram.aditional_info_length];
-                datagram.source_address = KnxHelper.GetIndividualAddress(new[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
+                datagram.control_field_1 = new KnxControlField1(cemi[2 + datagram.aditional_info_length]);
+                datagram.control_field_2 = new KnxControlField2(cemi[3 + datagram.aditional_info_length]);
+                datagram.source_address = KnxIndividualAddress.Parse(new[] { cemi[4 + datagram.aditional_info_length], cemi[5 + datagram.aditional_info_length] });
 
-                datagram.destination_address =
-                    KnxHelper.GetKnxDestinationAddressType(datagram.control_field_2).Equals(KnxHelper.KnxDestinationAddressType.INDIVIDUAL)
-                        ? KnxHelper.GetIndividualAddress(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] })
-                        : KnxHelper.GetGroupAddress(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KnxConnection.ThreeLevelGroupAddressing);
+                if (datagram.control_field_2.DestinationAddressType == KnxDestinationAddressType.Individual)
+                {
+                    // Destination is PA
+                    datagram.destination_address = KnxIndividualAddress.Parse(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] });
+                } else
+                {
+                    // Destination is GA
+                    datagram.destination_address = KnxGroupAddress.Parse(new[] { cemi[6 + datagram.aditional_info_length], cemi[7 + datagram.aditional_info_length] }, KnxConnection.GroupAddressStyle);
+                }
 
                 datagram.data_length = cemi[8 + datagram.aditional_info_length];
                 datagram.apdu = new byte[datagram.data_length + 1];
@@ -185,7 +193,7 @@ namespace KNXLib
                 if (KnxConnection.Debug)
                 {
                     Logger.Debug(ClassName, "-----------------------------------------------------------------------------------------------------");
-                    Logger.Debug(ClassName, BitConverter.ToString(cemi));
+                    Logger.Debug(ClassName, BitConverter.ToString(cemi)); 
                     Logger.Debug(ClassName, "Event Header Length: " + datagram.header_length);
                     Logger.Debug(ClassName, "Event Protocol Version: " + datagram.protocol_version.ToString("x"));
                     Logger.Debug(ClassName, "Event Service Type: 0x" + BitConverter.ToString(datagram.service_type).Replace("-", string.Empty));
@@ -197,8 +205,8 @@ namespace KNXLib
                     if (datagram.aditional_info_length > 0)
                         Logger.Debug(ClassName, "Event Aditional Info: 0x" + BitConverter.ToString(datagram.aditional_info).Replace("-", string.Empty));
 
-                    Logger.Debug(ClassName, "Event Control Field 1: " + Convert.ToString(datagram.control_field_1, 2));
-                    Logger.Debug(ClassName, "Event Control Field 2: " + Convert.ToString(datagram.control_field_2, 2));
+                    Logger.Debug(ClassName, "Event Control Field 1: " + datagram.control_field_1.ToString());
+                    Logger.Debug(ClassName, "Event Control Field 2: " + datagram.control_field_2.ToString());
                     Logger.Debug(ClassName, "Event Source Address: " + datagram.source_address);
                     Logger.Debug(ClassName, "Event Destination Address: " + datagram.destination_address);
                     Logger.Debug(ClassName, "Event Data Length: " + datagram.data_length);
@@ -218,7 +226,7 @@ namespace KNXLib
                         _rxDatagrams.Add(datagram);
                         break;
                     case 4:
-                        KnxConnection.Status(datagram.destination_address, datagram.data);
+                        KnxConnection.Status(new KnxStatusArgs(datagram));
                         break;
                 }
             }
