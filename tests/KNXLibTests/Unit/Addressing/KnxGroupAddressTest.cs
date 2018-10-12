@@ -19,6 +19,7 @@ namespace KNXLibTests.Unit.Addressing
             Assert.AreEqual(230, threeLevelGa.SubGroup);
             Assert.AreEqual(true, threeLevelGa.Equals(18, 5, 230));
             Assert.AreEqual(true, threeLevelGa.Equals("18/5/230"));
+            Assert.AreEqual(true, ga.Equals("18/5/230"));
         }
 
         [Category("KNXLib.Unit.Address"), Test]

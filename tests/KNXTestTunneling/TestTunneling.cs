@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading;
 using KNXLib;
+using KNXLib.Addressing;
+using KNXLib.Events;
 
 namespace KNXTest
 {
@@ -26,8 +28,13 @@ namespace KNXTest
             Environment.Exit(0);
         }
 
-        private static void Event(string address, string state)
+        private static void Event(object sender, KnxEventArgs args)
         {
+            if (!(args.DestinationAddress is KnxGroupAddress address))
+                return;
+
+            string state = args.State;
+
             if (address.Equals("1/2/1") || address.Equals("1/2/2"))
             {
                 Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + _connection.FromDataPoint("9.001", state));
@@ -72,9 +79,10 @@ namespace KNXTest
             }
         }
 
-        private static void Status(string address, string state)
+        private static void Status(object sender, KnxStatusArgs args)
         {
-            Console.WriteLine("New Status: device " + address + " has status " + state);
+
+            Console.WriteLine("New Status: device " + args.DestinationAddress + " has status " + args.State);
         }
 
         private static void Connected()
