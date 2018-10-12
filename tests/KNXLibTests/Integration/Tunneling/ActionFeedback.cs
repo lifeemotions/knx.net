@@ -68,7 +68,7 @@ namespace KNXLibTests.Integration.Tunneling
         private void Event(object sender, KnxEventArgs args)
         {
             //Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
-            if (LightOnOffAddress.Equals(args.SourceAddress.ToString()) && args.State != null && args.State.Length == 1 && args.State[0] == 1)
+            if (LightOnOffAddress.Equals(args.DestinationAddress.ToString()) && args.State != null && args.State.Length == 1 && args.State[0] == 1)
                 ResetEvent.Set();
         }
     }
