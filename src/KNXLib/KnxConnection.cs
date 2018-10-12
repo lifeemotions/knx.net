@@ -5,6 +5,9 @@ using System.Linq;
 using KNXLib.DPT;
 using KNXLib.Exceptions;
 using KNXLib.Log;
+using KNXLib.Enums;
+using KNXLib.Addressing;
+using KNXLib.Events;
 
 namespace KNXLib
 {
@@ -38,26 +41,22 @@ namespace KNXLib
         /// <summary>
         ///     Delegate function for KNX events
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="state"></param>
-        public delegate void KnxEvent(string address, string state);
+        public delegate void KnxEvent(object sender, KnxEventArgs args);
 
         /// <summary>
         ///     Event triggered when there is a new KNX event
         /// </summary>
-        public KnxEvent KnxEventDelegate = (address, state) => { };
+        public KnxEvent KnxEventDelegate = (sender, args) => { };
 
         /// <summary>
         ///     Delegate function for KNX status queries
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="state"></param>
-        public delegate void KnxStatus(string address, string state);
+        public delegate void KnxStatus(object sender, KnxStatusArgs args);
 
         /// <summary>
         ///     Event triggered when received a status after a query
         /// </summary>
-        public KnxStatus KnxStatusDelegate = (address, state) => { };
+        public KnxStatus KnxStatusDelegate = (sender, args) => { };
 
         private readonly KnxLockManager _lockManager = new KnxLockManager();
 
@@ -71,7 +70,7 @@ namespace KNXLib
             ConnectionConfiguration = new KnxConnectionConfiguration(host, port);
 
             ActionMessageCode = 0x00;
-            ThreeLevelGroupAddressing = true;
+            GroupAddressStyle = KnxGroupAddressStyle.ThreeLevel;
             Debug = false;
         }
 
@@ -94,11 +93,12 @@ namespace KNXLib
 
         /// <summary>
         ///     Configure this paramenter based on the KNX installation:
-        ///     - true: 3-level group address: main/middle/sub(5/3/8 bits)
-        ///     - false: 2-level group address: main/sub (5/11 bits)
-        ///     Default: true
+        ///     - ThreeLevel: 3-level group address: main/middle/sub (5/3/8 bits)
+        ///     - TwoLevel: 2-level group address: main/sub (5/11 bits)
+        ///     - Free: free style group address: sub (16 bits)
+        ///     Default: ThreeLevel
         /// </summary>
-        public bool ThreeLevelGroupAddressing { get; set; }
+        public KnxGroupAddressStyle GroupAddressStyle { get; set; }
 
         /// <summary>
         ///     Set to true to receive debug log messages
@@ -130,8 +130,7 @@ namespace KNXLib
             
             try
             {
-                if (KnxConnectedDelegate != null)
-                    KnxConnectedDelegate();
+                KnxConnectedDelegate?.Invoke();
             }
             catch(Exception e)
             {
@@ -150,8 +149,7 @@ namespace KNXLib
 
             try
             {
-                if (KnxDisconnectedDelegate != null)
-                    KnxDisconnectedDelegate();
+                KnxDisconnectedDelegate?.Invoke();
             }
             catch (Exception e)
             {
@@ -162,32 +160,32 @@ namespace KNXLib
             Logger.Debug(ClassName, "Send locked - {0} free locks", _lockManager.LockCount);
         }
 
-        internal void Event(string address, string state)
+        internal void Event(KnxEventArgs args)
         {
             try
             {
-                KnxEventDelegate(address, state);
+                KnxEventDelegate(this, args);
             }
             catch (Exception e)
             {
                 Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "Device {0} sent event 0x{1}", address, string.Join("", state.Select(c => ((int)c).ToString("X2"))));
+            Logger.Debug(ClassName, $"Device {args.SourceAddress} sent event 0x{string.Join("", args.State.Select(c => ((int)c).ToString("X2")))} to {args.DestinationAddress}");
         }
 
-        internal void Status(string address, string state)
+        internal void Status(KnxStatusArgs args)
         {
             try
             {
-                KnxStatusDelegate(address, state);
+                KnxStatusDelegate(this, args);
             }
             catch (Exception e)
             {
                 Logger.Error(ClassName, e);
             }
 
-            Logger.Debug(ClassName, "Device {0} has status {1}", address, state);
+            Logger.Debug(ClassName, $"Device {args.SourceAddress} has status {args.State} for {args.DestinationAddress}");
         }
 
         /// <summary>
@@ -205,7 +203,7 @@ namespace KNXLib
         /// <param name="address">KNX Address</param>
         /// <param name="data">Bit value</param>
         /// <exception cref="InvalidKnxDataException"></exception>
-        public void Action(string address, bool data)
+        public void Action(KnxAddress address, bool data)
         {
             byte[] val;
 
@@ -230,7 +228,7 @@ namespace KNXLib
         /// <param name="address">KNX Address</param>
         /// <param name="data">String value</param>
         /// <exception cref="InvalidKnxDataException"></exception>
-        public void Action(string address, string data)
+        public void Action(KnxAddress address, string data)
         {
             byte[] val;
             try
@@ -254,7 +252,7 @@ namespace KNXLib
         /// <param name="address">KNX Address</param>
         /// <param name="data">Int value</param>
         /// <exception cref="InvalidKnxDataException"></exception>
-        public void Action(string address, int data)
+        public void Action(KnxAddress address, int data)
         {
             var val = new byte[2];
             if (data <= 255)
@@ -284,7 +282,7 @@ namespace KNXLib
         /// </summary>
         /// <param name="address">KNX Address</param>
         /// <param name="data">byte value</param>
-        public void Action(string address, byte data)
+        public void Action(KnxAddress address, byte data)
         {
             Action(address, new byte[] {0x00, data});
         }
@@ -294,7 +292,7 @@ namespace KNXLib
         /// </summary>
         /// <param name="address">KNX Address</param>
         /// <param name="data">Byte array value</param>
-        public void Action(string address, byte[] data)
+        public void Action(KnxAddress address, byte[] data)
         {
             Logger.Debug(ClassName, "Sending 0x{0} to {1}.", BitConverter.ToString(data), address);
 
@@ -303,12 +301,11 @@ namespace KNXLib
             Logger.Debug(ClassName, "Sent 0x{0} to {1}.", BitConverter.ToString(data), address);
         }
 
-        // TODO: It would be good to make a type for address, to make sure not any random string can be passed in
         /// <summary>
         ///     Send a request to KNX asking for specified address current status
         /// </summary>
         /// <param name="address"></param>
-        public void RequestStatus(string address)
+        public void RequestStatus(KnxAddress address)
         {
             Logger.Debug(ClassName, "Sending request status to {0}.", address);
 

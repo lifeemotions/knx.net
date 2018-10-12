@@ -60,6 +60,7 @@
     <Compile Include="Support\Eibd\GroupResponse.cs" />
     <Compile Include="Support\Eibd\VBusMonitorManager.cs" />
     <Compile Include="Support\Os\Tools.cs" />
+    <Compile Include="Unit\Addressing\KnxIndividualAddressTest.cs" />
     <Compile Include="Unit\DataPoint\DataPoint8BitSignRelativeValue.cs" />
     <Compile Include="Unit\DataPoint\DataPoint8BitNoSignScaledScaling.cs" />
     <Compile Include="Unit\DataPoint\DataPoint8BitNoSignScaledAngle.cs" />
@@ -67,6 +68,12 @@
     <Compile Include="Unit\DataPoint\DataPoint2ByteFloatTemperature.cs" />
     <Compile Include="Unit\DataPoint\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
     <Compile Include="Unit\DataPoint\DataPoint3BitControl.cs" />
+    <Compile Include="Unit\Addressing\KnxFreeStyleGroupAddressTest.cs" />
+    <Compile Include="Unit\Addressing\KnxGroupAddressTest.cs" />
+    <Compile Include="Unit\Addressing\KnxThreeLevelGroupAddressTest.cs" />
+    <Compile Include="Unit\Addressing\KnxTwoLevelGroupAddressTest.cs" />
+    <Compile Include="Unit\KnxControlField1Test.cs" />
+    <Compile Include="Unit\KnxControlField2Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Integration\Routing\" />

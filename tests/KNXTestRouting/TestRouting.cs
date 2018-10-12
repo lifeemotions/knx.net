@@ -1,7 +1,9 @@
-﻿using System;
+﻿using KNXLib;
+using KNXLib.Addressing;
+using KNXLib.Events;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using KNXLib;
 
 namespace KNXTest
 {
@@ -37,12 +39,12 @@ namespace KNXTest
         {
             Console.WriteLine("Press [ENTER] to send command ({0}) - false", LightOnOffAddress);
             Console.ReadLine();
-            _connection.Action(LightOnOffAddress, false);
+            _connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command ({0}) - true", LightOnOffAddress);
             Console.ReadLine();
-            _connection.Action(LightOnOffAddress, true);
+            _connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), true);
             Thread.Sleep(200);
         }
 
@@ -50,17 +52,17 @@ namespace KNXTest
         {
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - false");
             Console.ReadLine();
-            _connection.Action("2/1/1", false);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 1, 1), false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - true");
             Console.ReadLine();
-            _connection.Action("2/1/1", true);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 1, 1), true);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            _connection.Action("2/2/1", true);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 2, 1), true);
             Thread.Sleep(200);
         }
 
@@ -68,22 +70,22 @@ namespace KNXTest
         {
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x00");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0x00);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0x00);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \xFF");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0xFF);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0xFF);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x80");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0x80);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0x80);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            _connection.Action("2/2/1", true);
+            _connection.Action(new KnxThreeLevelGroupAddress(2, 2, 1), true);
             Thread.Sleep(200);
         }
 
@@ -91,38 +93,43 @@ namespace KNXTest
         {
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 28ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 28.0f));
+            _connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), _connection.ToDataPoint("9.001", 28.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 27ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 27.0f));
+            _connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), _connection.ToDataPoint("9.001", 27.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 26ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 26.0f));
+            _connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), _connection.ToDataPoint("9.001", 26.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 25ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 25.0f));
+            _connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), _connection.ToDataPoint("9.001", 25.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 24ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 24.0f));
+            _connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), _connection.ToDataPoint("9.001", 24.0f));
             Thread.Sleep(200);
         }
 
-        private static void Event(string address, string state)
+        private static void Event(object sender, KnxEventArgs args)
         {
-            if (Temperatures.Contains(address))
+            if (!(args.DestinationAddress is KnxGroupAddress address))
+                return;
+
+            string state = args.State;
+
+            if (Temperatures.Contains(address.ToString()))
             {
                 var temp = (float)_connection.FromDataPoint("9.001", state);
                 Console.WriteLine("New Event: TEMPERATURE device " + address + " has status (" + state + ")" + temp);
             }
-            else if (Lights.Contains(address))
+            else if (Lights.Contains(address.ToString()))
             {
                 Console.WriteLine("New Event: LIGHT device " + address + " has status (" + state + ")" + state);
             }
@@ -132,9 +139,9 @@ namespace KNXTest
             }
         }
 
-        private static void Status(string address, string state)
+        private static void Status(object sender, KnxStatusArgs args)
         {
-            Console.WriteLine("New Status: device " + address + " has status " + state);
+            Console.WriteLine("New Status: device " + args.DestinationAddress + " has status " + args.State);
         }
 
         private static void Connected()
