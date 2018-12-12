@@ -290,9 +290,6 @@ namespace KNXLib
             if (data.Length == 1 && data[0] < 0x3F)
                 return 1;
 
-            if (data[0] < 0x3F)
-                return data.Length;
-
             return data.Length + 1;
         }
 
@@ -311,21 +308,9 @@ namespace KNXLib
             }
             else if (data.Length > 1)
             {
-                if (data[0] < 0x3F)
+                for (var i = 0; i < data.Length; i++)
                 {
-                    datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
-
-                    for (var i = 1; i < data.Length; i++)
-                    {
-                        datagram[dataStart + i] = data[i];
-                    }
-                }
-                else
-                {
-                    for (var i = 0; i < data.Length; i++)
-                    {
-                        datagram[dataStart + 1 + i] = data[i];
-                    }
+                    datagram[dataStart + 1 + i] = data[i];
                 }
             }
         }
