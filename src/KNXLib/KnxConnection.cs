@@ -286,7 +286,7 @@ namespace KNXLib
         /// <param name="data">byte value</param>
         public void Action(string address, byte data)
         {
-            Action(address, new byte[] {0x00, data});
+            Action(address, new byte[] {data});
         }
 
         /// <summary>
