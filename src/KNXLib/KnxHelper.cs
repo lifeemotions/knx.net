@@ -311,22 +311,11 @@ namespace KNXLib
             }
             else if (data.Length > 1)
             {
-                if (data[0] < 0x3F)
-                {
                     datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
-
                     for (var i = 1; i < data.Length; i++)
                     {
                         datagram[dataStart + i] = data[i];
                     }
-                }
-                else
-                {
-                    for (var i = 0; i < data.Length; i++)
-                    {
-                        datagram[dataStart + 1 + i] = data[i];
-                    }
-                }
             }
         }
         #endregion

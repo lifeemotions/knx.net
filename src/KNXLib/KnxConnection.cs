@@ -221,7 +221,7 @@ namespace KNXLib
             if (val == null)
                 throw new InvalidKnxDataException(data.ToString());
 
-            Action(address, val);
+            Action(address, val, false);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace KNXLib
         /// <param name="data">byte value</param>
         public void Action(string address, byte data)
         {
-            Action(address, new byte[] {0x00, data});
+            Action(address, new byte[] {data});
         }
 
         /// <summary>
@@ -294,8 +294,17 @@ namespace KNXLib
         /// </summary>
         /// <param name="address">KNX Address</param>
         /// <param name="data">Byte array value</param>
-        public void Action(string address, byte[] data)
+        /// <param name="addTruncateByte">adds extra byte to chop off for payload</param>
+        public void Action(string address, byte[] data, bool addTruncateByte = true)
         {
+            if (addTruncateByte)
+            {
+                // reverse bytes temporary to add byte in front
+                Array.Reverse(data);
+                Array.Resize(ref data, data.Length + 1);
+                data[data.Length - 1] = 0x00;
+                Array.Reverse(data);
+            }
             Logger.Debug(ClassName, "Sending 0x{0} to {1}.", BitConverter.ToString(data), address);
 
             _lockManager.PerformLockedOperation(() => KnxSender.Action(address, data));
