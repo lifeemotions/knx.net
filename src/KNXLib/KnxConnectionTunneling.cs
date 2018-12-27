@@ -245,5 +245,13 @@
 
             KnxSender.SendData(datagram);
         }
+
+        public override void Dispose() => Dispose(true);
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Disconnect();
+        }
     }
 }
