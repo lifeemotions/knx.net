@@ -8,7 +8,6 @@
 
     using KNXLib;
     using KNXLib.Addressing;
-    using KNXLib.Events;
     using FunctionalLiving.Parser;
 
     public class TestRouting
