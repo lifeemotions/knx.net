@@ -23,11 +23,7 @@ namespace KNXLib.DPT
 
         public override object FromDataPoint(byte[] data)
         {
-            if (data == null)
-                return 0;
-            if (data.Length == 2)
-                data = data.Skip(1).ToArray();
-            else if (data.Length != 1)
+            if (data == null || data.Length != 1)
                 return 0;
 
             var value = (int) data[0];
@@ -45,9 +41,8 @@ namespace KNXLib.DPT
 
         public override byte[] ToDataPoint(object val)
         {
-            var dataPoint = new byte[2];
+            var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            dataPoint[1] = 0x00;
 
             decimal input = 0;
             if (val is int)
@@ -75,7 +70,7 @@ namespace KNXLib.DPT
             input = input * 255;
             input = input / 100;
 
-            dataPoint[1] = (byte) (input);
+            dataPoint[0] = (byte) (input);
 
             return dataPoint;
         }

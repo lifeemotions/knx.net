@@ -1,5 +1,4 @@
-using KNXLib.Log;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -8,8 +7,6 @@ namespace KNXLib
 {
     internal class KnxReceiverTunneling : KnxReceiver
     {
-        private static readonly string ClassName = typeof(KnxReceiverTunneling).ToString();
-
         private UdpClient _udpClient;
         private IPEndPoint _localEndpoint;
 
@@ -43,10 +40,9 @@ namespace KNXLib
                     ProcessDatagram(datagram);
                 }
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
-                Logger.Error(ClassName, e);
-                KnxConnectionTunneling.Disconnected();
+                // ignore, probably reconnect happening
             }
             catch (ObjectDisposedException)
             {
@@ -76,9 +72,6 @@ namespace KNXLib
                     case KnxHelper.SERVICE_TYPE.DISCONNECT_REQUEST:
                         ProcessDisconnectRequest(datagram);
                         break;
-                    case KnxHelper.SERVICE_TYPE.DISCONNECT_RESPONSE:
-                        ProcessDisconnectResponse(datagram);
-                        break;
                     case KnxHelper.SERVICE_TYPE.TUNNELLING_REQUEST:
                         ProcessDatagramHeaders(datagram);
                         break;
@@ -86,7 +79,15 @@ namespace KNXLib
             }
             catch (Exception e)
             {
-                Logger.Error(ClassName, e);
+                Console.Write(e.Message);
+                Console.Write(e.ToString());
+                Console.Write(e.StackTrace);
+                if (e.InnerException != null)
+                {
+                    Console.Write(e.InnerException.Message);
+                    Console.Write(e.ToString());
+                    Console.Write(e.InnerException.StackTrace);
+                }
 
                 // ignore, missing warning information
             }
@@ -132,16 +133,13 @@ namespace KNXLib
 
         private void ProcessDisconnectRequest(byte[] datagram)
         {
-            KnxConnectionTunneling.DisconnectRequest();
-        }
-
-        private void ProcessDisconnectResponse(byte[] datagram)
-        {
             var channelId = datagram[6];
             if (channelId != KnxConnectionTunneling.ChannelId)
                 return;
 
-            KnxConnectionTunneling.Disconnect();
+            Stop();
+            KnxConnection.Disconnected();
+            _udpClient.Close();
         }
 
         private void ProcessTunnelingAck(byte[] datagram)
@@ -167,7 +165,8 @@ namespace KNXLib
             if (response != 0x21)
                 return;
 
-            Logger.Debug(ClassName, "Received connection state response - No active connection with channel ID {0}", knxDatagram.channel_id);
+            if (KnxConnection.Debug)
+                Console.WriteLine("KnxReceiverTunneling: Received connection state response - No active connection with channel ID {0}", knxDatagram.channel_id);
 
             KnxConnection.Disconnect();
         }
@@ -187,7 +186,8 @@ namespace KNXLib
 
             if (knxDatagram.channel_id == 0x00 && knxDatagram.status == 0x24)
             {
-                Logger.Info(ClassName, "KNXLib received connect response - No more connections available");                
+                if (KnxConnection.Debug)
+                    Console.WriteLine("KnxReceiverTunneling: Received connect response - No more connections available");
             }
             else
             {

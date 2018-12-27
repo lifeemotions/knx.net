@@ -1,5 +1,4 @@
-using KNXLib.Log;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -9,8 +8,6 @@ namespace KNXLib
 {
     internal class KnxReceiverRouting : KnxReceiver
     {
-        private static readonly string ClassName = typeof(KnxReceiverRouting).ToString();
-
         private readonly IList<UdpClient> _udpClients;
 
         internal KnxReceiverRouting(KnxConnection connection, IList<UdpClient> udpClients)
@@ -34,9 +31,9 @@ namespace KNXLib
             {
                 Thread.ResetAbort();
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(ClassName, e);
+                // ignore exception and exit
             }
         }
 
@@ -58,10 +55,6 @@ namespace KNXLib
             {
                 // ignore and exit, session was disposed
             }
-            catch (Exception e)
-            {
-                Logger.Error(ClassName, e);
-            }
         }
 
         private void ProcessDatagram(byte[] datagram)
@@ -70,9 +63,9 @@ namespace KNXLib
             {
                 ProcessDatagramHeaders(datagram);
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(ClassName, e);
+                // ignore, missing warning information
             }
         }
 

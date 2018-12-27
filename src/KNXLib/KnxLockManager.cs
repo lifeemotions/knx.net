@@ -9,8 +9,6 @@ namespace KNXLib
         private readonly object _connectedLock = new object();
         private bool _isConnected;
 
-        internal int IntervalMs { get; set; } = 200;
-
         public int LockCount
         {
             get { return _sendLock.CurrentCount; }
@@ -67,19 +65,13 @@ namespace KNXLib
 
         private void SendUnlockPause()
         {
-            if (IntervalMs == 0)
-            {
-                _sendLock.Release();
-                return;
-            }
-
             var t = new Thread(SendUnlockPauseThread) { IsBackground = true };
             t.Start();
         }
 
         private void SendUnlockPauseThread()
         {
-            Thread.Sleep(IntervalMs);
+            Thread.Sleep(200);
             _sendLock.Release();
         }
     }

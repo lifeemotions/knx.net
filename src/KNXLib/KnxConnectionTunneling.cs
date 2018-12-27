@@ -1,9 +1,7 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Timers;
 using KNXLib.Exceptions;
-using KNXLib.Log;
-using System;
 
 namespace KNXLib
 {
@@ -14,11 +12,8 @@ namespace KNXLib
     /// </summary>
     public class KnxConnectionTunneling : KnxConnection
     {
-        private static readonly string ClassName = typeof(KnxConnectionTunneling).ToString();
-
         private readonly IPEndPoint _localEndpoint;
         private readonly Timer _stateRequestTimer;
-        private const int stateRequestTimerInterval = 60000;
         private UdpClient _udpClient;
         private byte _sequenceNumber;
 
@@ -37,7 +32,7 @@ namespace KNXLib
 
             ChannelId = 0x00;
             SequenceNumberLock = new object();
-            _stateRequestTimer = new Timer(stateRequestTimerInterval) { AutoReset = true }; // same time as ETS with group monitor open
+            _stateRequestTimer = new Timer(60000) {AutoReset = true}; // same time as ETS with group monitor open
             _stateRequestTimer.Elapsed += StateRequest;
         }
 
@@ -65,8 +60,6 @@ namespace KNXLib
         /// </summary>
         public override void Connect()
         {
-            Logger.Info(ClassName, "KNXLib connecting...");
-
             try
             {
                 if (_udpClient != null)
@@ -74,19 +67,17 @@ namespace KNXLib
                     try
                     {
                         _udpClient.Close();
-
-                        if (_udpClient.Client != null)
-                            _udpClient.Client.Dispose();
+                        _udpClient.Client.Dispose();
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        Logger.Error(ClassName, e);
+                        // ignore
                     }
                 }
 
                 _udpClient = new UdpClient(_localEndpoint)
                 {
-                    Client = { DontFragment = true, SendBufferSize = 0, ReceiveTimeout = stateRequestTimerInterval * 2 }
+                    Client = {DontFragment = true, SendBufferSize = 0}
                 };
             }
             catch (SocketException ex)
@@ -111,9 +102,9 @@ namespace KNXLib
             {
                 ConnectRequest();
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(ClassName, e);
+                // ignore
             }
         }
 
@@ -129,9 +120,9 @@ namespace KNXLib
                 KnxReceiver.Stop();
                 _udpClient.Close();
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(ClassName, e);
+                // ignore
             }
 
             base.Disconnected();
@@ -200,7 +191,7 @@ namespace KNXLib
             ((KnxSenderTunneling) KnxSender).SendDataSingle(datagram);
         }
 
-        private void StateRequest(object sender, ElapsedEventArgs ev)
+        private void StateRequest(object sender, ElapsedEventArgs e)
         {
             // HEADER
             var datagram = new byte[16];
@@ -226,13 +217,13 @@ namespace KNXLib
             {
                 KnxSender.SendData(datagram);
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(ClassName, e);
+                // ignore
             }
         }
 
-        internal void DisconnectRequest()
+        private void DisconnectRequest()
         {
             // HEADER
             var datagram = new byte[16];
