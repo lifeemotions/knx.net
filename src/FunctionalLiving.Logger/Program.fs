@@ -1,6 +1,7 @@
 ﻿open System
 open System.Threading
 open KNXLib
+open KNXLib.Events
 
 let logDevice device state =
     async {
@@ -19,13 +20,13 @@ let logDevice device state =
         | _ -> ()
     }
 
-let log address state =
+let log sender (args: KnxEventArgs) =
     let device =
         devices
-        |> List.tryFind (fun x -> x.Address = address)
+        |> List.tryFind (fun x -> x.Address = args.DestinationAddress.ToString())
 
     match device with
-    | Some x -> Async.Start(logDevice x state)
+    | Some x -> Async.Start(logDevice x args.State)
     | None -> ()
 
 let connect = fun reconnect ->

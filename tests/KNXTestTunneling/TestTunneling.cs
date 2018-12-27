@@ -1,10 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using KNXLib;
-
-namespace KNXTest
+﻿namespace KNXTest
 {
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using KNXLib;
+    using KNXLib.Events;
+    using KNXLib.Addressing;
+
     public class TestTunneling
     {
         private static KnxConnection _connection;
@@ -26,8 +28,13 @@ namespace KNXTest
             Environment.Exit(0);
         }
 
-        private static void Event(string address, byte[] state)
+        private static void Event(object sender, KnxEventArgs args)
         {
+            if (!(args.DestinationAddress is KnxGroupAddress address))
+                return;
+
+            var state = args.State;
+
             if (address.Equals("1/2/1") || address.Equals("1/2/2"))
             {
                 Console.WriteLine("New Event: device " + address + " has status (" + state + ") --> " + _connection.FromDataPoint("9.001", state));
@@ -55,15 +62,13 @@ namespace KNXTest
 
                 if (state.Length == 1)
                 {
-                    data = ((byte) state[0]).ToString();
+                    data = state[0].ToString();
                 }
                 else
                 {
                     var bytes = new byte[state.Length];
                     for (var i = 0; i < state.Length; i++)
-                    {
                         bytes[i] = Convert.ToByte(state[i]);
-                    }
 
                     data = state.Aggregate(data, (current, t) => current + t.ToString());
                 }
@@ -72,9 +77,9 @@ namespace KNXTest
             }
         }
 
-        private static void Status(string address, byte[] state)
+        private static void Status(object sender, KnxStatusArgs args)
         {
-            Console.WriteLine("New Status: device " + address + " has status " + state);
+            Console.WriteLine("New Status: device " + args.DestinationAddress + " has status " + args.State);
         }
 
         private static void Connected()
