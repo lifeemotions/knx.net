@@ -4,8 +4,8 @@ source https://www.nuget.org/api/v2/
 
 nuget Unquote
 nuget Exude
-nuget xunit
-nuget xunit.runners
+nuget xunit 1.9.2
+nuget xunit.runners 1.9.2
 nuget FsCheck.NUnit
 nuget NUnit
 nuget NUnit.Runners

@@ -7,6 +7,8 @@
     using System.Threading;
 
     using KNXLib;
+    using KNXLib.Addressing;
+    using KNXLib.Events;
     using FunctionalLiving.Parser;
 
     public class TestRouting
@@ -134,8 +136,8 @@
                 connection.SetLockIntervalMs(20);
                 connection.KnxConnectedDelegate += Connected;
                 connection.KnxDisconnectedDelegate += () => Disconnected(connection);
-                connection.KnxEventDelegate += (address, state) => Event(connection, address, state);
-                connection.KnxStatusDelegate += (address, state) => Status(connection, address, state);
+                connection.KnxEventDelegate += (sender, args) => Event(connection, args.DestinationAddress, args.State);
+                connection.KnxStatusDelegate += (sender, args) => Status(connection, args.DestinationAddress, args.State);
                 connection.Connect();
 
                 //LightOnOff(connection);
@@ -151,17 +153,18 @@
             Environment.Exit(0);
         }
 
-        private static void Event(KnxConnectionRouting connection, string address, byte[] state) => Print(connection, address, state);
+        private static void Event(KnxConnection connection, KnxAddress address, byte[] state) => Print(connection, address, state);
 
-        private static void Status(KnxConnectionRouting connection, string address, byte[] state) => Print(connection, address, state);
+        private static void Status(KnxConnection connection, KnxAddress address, byte[] state) => Print(connection, address, state);
 
-        private static void Print(KnxConnectionRouting connection, string address, byte[] state)
+        private static void Print(KnxConnection connection, KnxAddress knxAddress, byte[] state)
         {
             const int categoryWidth = 15;
             const int descriptionWidth = -60;
-            string description;
 
-            if (Switches.TryGetValue(address, out description))
+            var address = knxAddress.ToString();
+
+            if (Switches.TryGetValue(address, out var description))
             {
                 var functionalToggle = Category1_SingleBit.parseSingleBit(state[0]);
                 Console.WriteLine($"{"[ON/OFF]", categoryWidth} {description, descriptionWidth} ({(functionalToggle.Exists() ? functionalToggle.Value.Text : "N/A")})");
@@ -226,16 +229,16 @@
             }
         }
 
-        private static void LightOnOff(KnxConnectionRouting connection)
+        private static void LightOnOff(KnxConnection connection)
         {
             Console.WriteLine("Press [ENTER] to send command ({0}) - false", LightOnOffAddress);
             Console.ReadLine();
-            connection.Action(LightOnOffAddress, false);
+            connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command ({0}) - true", LightOnOffAddress);
             Console.ReadLine();
-            connection.Action(LightOnOffAddress, true);
+            connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), true);
             Thread.Sleep(200);
         }
 
@@ -243,17 +246,17 @@
         {
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - false");
             Console.ReadLine();
-            connection.Action("2/1/1", false);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 1, 1), false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - true");
             Console.ReadLine();
-            connection.Action("2/1/1", true);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 1, 1), true);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            connection.Action("2/2/1", true);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 2, 1), true);
             Thread.Sleep(200);
         }
 
@@ -261,22 +264,22 @@
         {
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x00");
             Console.ReadLine();
-            connection.Action("2/3/1", 0x00);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0x00);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \xFF");
             Console.ReadLine();
-            connection.Action("2/3/1", 0xFF);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0xFF);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x80");
             Console.ReadLine();
-            connection.Action("2/3/1", 0x80);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 3, 1), 0x80);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            connection.Action("2/2/1", true);
+            connection.Action(new KnxThreeLevelGroupAddress(2, 2, 1), true);
             Thread.Sleep(200);
         }
 
@@ -284,33 +287,33 @@
         {
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 28ºC");
             Console.ReadLine();
-            connection.Action("1/1/16", connection.ToDataPoint("9.001", 28.0f));
+            connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), connection.ToDataPoint("9.001", 28.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 27ºC");
             Console.ReadLine();
-            connection.Action("1/1/16", connection.ToDataPoint("9.001", 27.0f));
+            connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), connection.ToDataPoint("9.001", 27.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 26ºC");
             Console.ReadLine();
-            connection.Action("1/1/16", connection.ToDataPoint("9.001", 26.0f));
+            connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), connection.ToDataPoint("9.001", 26.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 25ºC");
             Console.ReadLine();
-            connection.Action("1/1/16", connection.ToDataPoint("9.001", 25.0f));
+            connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), connection.ToDataPoint("9.001", 25.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 24ºC");
             Console.ReadLine();
-            connection.Action("1/1/16", connection.ToDataPoint("9.001", 24.0f));
+            connection.Action(new KnxThreeLevelGroupAddress(1, 1, 16), connection.ToDataPoint("9.001", 24.0f));
             Thread.Sleep(200);
         }
 
         private static void Connected() => Console.WriteLine("Connected!");
 
-        private static void Disconnected(KnxConnectionRouting connection)
+        private static void Disconnected(KnxConnection connection)
         {
             Console.WriteLine("Disconnected! Reconnecting");
             if (connection == null)

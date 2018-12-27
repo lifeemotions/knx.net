@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{89DCC014-2BE4-4ED1-8090-6A9387DA9D30}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,8 +22,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B89118A5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "notes", "notes", "{2DA39BD6-01AA-49A3-A16A-5A7618D55FE5}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		notes\BUILD_WEBSITE.txt = notes\BUILD_WEBSITE.txt
 		notes\DEPLOY_NUGET_PACKAGE.txt = notes\DEPLOY_NUGET_PACKAGE.txt
+		LICENSE = LICENSE
+		paket.dependencies = paket.dependencies
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FunctionalLiving.Parser", "src\FunctionalLiving.Parser\FunctionalLiving.Parser.fsproj", "{30C78232-571C-45B7-B390-1F0BF7B9BF84}"
@@ -111,5 +115,8 @@ Global
 		{A7A43714-99FD-4CC1-A078-3C922ABE33C0} = {3F2D2127-9AC6-4E02-BA07-B860F4A06164}
 		{DF6C06F0-8B0F-415C-80F8-D73B8874081A} = {B89118A5-8F45-45BA-863D-7865C523791F}
 		{E8E329E6-D67D-4844-B02A-2209F037A5B3} = {3F2D2127-9AC6-4E02-BA07-B860F4A06164}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9664DC20-170E-4A8B-A392-6948F604DBA3}
 	EndGlobalSection
 EndGlobal

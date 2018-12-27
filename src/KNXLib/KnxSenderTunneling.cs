@@ -3,6 +3,7 @@
     using System;
     using System.Net;
     using System.Net.Sockets;
+    using Addressing;
 
     internal class KnxSenderTunneling : KnxSender
     {
@@ -49,7 +50,7 @@
             _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
-        protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)
+        protected override byte[] CreateActionDatagram(KnxAddress destinationAddress, byte[] data)
         {
             lock (KnxConnectionTunneling.SequenceNumberLock)
             {
@@ -84,7 +85,7 @@
             }
         }
 
-        protected override byte[] CreateRequestStatusDatagram(string destinationAddress)
+        protected override byte[] CreateRequestStatusDatagram(KnxAddress destinationAddress)
         {
             lock (KnxConnectionTunneling.SequenceNumberLock)
             {
