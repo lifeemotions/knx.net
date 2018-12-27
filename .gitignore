@@ -1,80 +1,36 @@
-.paket/paket.exe
-nunit-result.xml
+.vs/
+.fake/
+.idea/
 
-# site ignore directories
-site/build
-site/output
-site/src/ref
-node_modules
-
-#OS junk files
-[Tt]humbs.db
-*.DS_Store
-
-#Visual Studio files
-*.[Oo]bj
-*.user
-*.aps
-*.pch
-*.vspscc
-*.vssscc
-*_i.c
-*_p.c
-*.ncb
-*.suo
-*.tlb
-*.tlh
-*.bak
-*.[Cc]ache
-*.ilk
-*.log
-*.lib
-*.sbr
-*.sdf
-*.opensdf
-*.unsuccessfulbuild
-ipch/
+[Pp]ackages/
+[Pp]aket-files/
+[Dd]ebug/
+[Rr]elease/
+[Bb]build/
+[Bb]in/
 [Oo]bj/
-[Bb]in
-[Dd]ebug*/
-[Rr]elease*/
-Ankh.NoLoad
+[Xx]64/
+[Dd]ist/
 
-#MonoDevelop
-*.pidb
-*.userprefs
+*.suo
+*.user
+*.sln.docstates
+*.ntvs*
+*.njsproj
+*.trx
 
-#Tooling
-_ReSharper*/
-*.resharper
-[Tt]est[Rr]esult*
-*.sass-cache
+node_modules/
+bower_components/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.ncrunchproject
+*ncrunchsolution
+_Ncrunch_*
+TestResults.xml
 
-#Project files
-[Bb]uild/
-
-#Subversion files
-.svn
-
-# Office Temp Files
-~$*
-
-# vim Temp Files
-*~
-
-#NuGet
-packages/
-*.nupkg
-
-#ncrunch
-*ncrunch*
-*crunch*.local.xml
-
-# visual studio database projects
-*.dbmdl
-
-#Test files
-*.testsettings
-
-# Mac OS
 .DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
