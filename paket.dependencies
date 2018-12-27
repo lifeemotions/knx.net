@@ -1,0 +1,12 @@
+redirects: on
+source https://api.nuget.org/v3/index.json
+source https://www.nuget.org/api/v2/
+
+nuget Unquote
+nuget Exude
+nuget xunit
+nuget xunit.runners
+nuget FsCheck.NUnit
+nuget NUnit
+nuget NUnit.Runners
+nuget FSharp.Core

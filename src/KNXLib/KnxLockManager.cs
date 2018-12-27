@@ -1,18 +1,17 @@
-﻿using System;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Threading;
+
     internal class KnxLockManager
     {
         private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(0);
         private readonly object _connectedLock = new object();
         private bool _isConnected;
 
-        public int LockCount
-        {
-            get { return _sendLock.CurrentCount; }
-        }
+        internal int IntervalMs { get; set; } = 200;
+
+        public int LockCount => _sendLock.CurrentCount;
 
         public void LockConnection()
         {
@@ -65,13 +64,19 @@ namespace KNXLib
 
         private void SendUnlockPause()
         {
+            if (IntervalMs == 0)
+            {
+                _sendLock.Release();
+                return;
+            }
+
             var t = new Thread(SendUnlockPauseThread) { IsBackground = true };
             t.Start();
         }
 
         private void SendUnlockPauseThread()
         {
-            Thread.Sleep(200);
+            Thread.Sleep(IntervalMs);
             _sendLock.Release();
         }
     }

@@ -22,6 +22,6 @@
         public string destination_address;
         public int data_length;
         public byte[] apdu;
-        public string data;
+        public byte[] data;
     }
 }

@@ -6,16 +6,6 @@ namespace KNXLibTests.Unit.DataPoint
     [TestFixture]
     internal class DataPoint2ByteFloatTemperature
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-        }
-
         [Category("KNXLib.Unit.DataPoint.2ByteFloat"), Test]
         public void DataPoint2ByteFloatTemperatureTest()
         {

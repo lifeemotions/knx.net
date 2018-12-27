@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Threading;
+    using Log;
+
     internal class KnxReceiverRouting : KnxReceiver
     {
+        private static readonly string ClassName = typeof(KnxReceiverRouting).ToString();
+
         private readonly IList<UdpClient> _udpClients;
 
         internal KnxReceiverRouting(KnxConnection connection, IList<UdpClient> udpClients)
-            : base(connection)
-        {
-            _udpClients = udpClients;
-        }
+            : base(connection) => _udpClients = udpClients;
 
         public override void ReceiverThreadFlow()
         {
@@ -31,17 +31,17 @@ namespace KNXLib
             {
                 Thread.ResetAbort();
             }
-            catch
+            catch (Exception e)
             {
-                // ignore exception and exit
+                Logger.Error(ClassName, e);
             }
         }
 
         private void OnReceive(IAsyncResult result)
         {
             IPEndPoint endPoint = null;
-            var args = (object[])result.AsyncState;
-            var session = (UdpClient)args[0];
+            var args = (object[]) result.AsyncState;
+            var session = (UdpClient) args[0];
 
             try
             {
@@ -55,6 +55,10 @@ namespace KNXLib
             {
                 // ignore and exit, session was disposed
             }
+            catch (Exception e)
+            {
+                Logger.Error(ClassName, e);
+            }
         }
 
         private void ProcessDatagram(byte[] datagram)
@@ -63,9 +67,9 @@ namespace KNXLib
             {
                 ProcessDatagramHeaders(datagram);
             }
-            catch
+            catch (Exception e)
             {
-                // ignore, missing warning information
+                Logger.Error(ClassName, e);
             }
         }
 
@@ -80,8 +84,8 @@ namespace KNXLib
                 total_length = datagram[4] + datagram[5]
             };
 
-            var cemi = new byte[datagram.Length - 6];
-            Array.Copy(datagram, 6, cemi, 0, datagram.Length - 6);
+            var cemi = new byte[datagram.Length - datagram[0]];
+            Array.Copy(datagram, datagram[0], cemi, 0, datagram.Length - datagram[0]);
 
             ProcessCEMI(knxDatagram, cemi);
         }

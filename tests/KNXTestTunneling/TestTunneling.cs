@@ -26,7 +26,7 @@ namespace KNXTest
             Environment.Exit(0);
         }
 
-        private static void Event(string address, string state)
+        private static void Event(string address, byte[] state)
         {
             if (address.Equals("1/2/1") || address.Equals("1/2/2"))
             {
@@ -72,7 +72,7 @@ namespace KNXTest
             }
         }
 
-        private static void Status(string address, string state)
+        private static void Status(string address, byte[] state)
         {
             Console.WriteLine("New Status: device " + address + " has status " + state);
         }

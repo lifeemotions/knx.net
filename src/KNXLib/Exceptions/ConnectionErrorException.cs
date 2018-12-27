@@ -1,16 +1,16 @@
-﻿using System;
-
-namespace KNXLib.Exceptions
+﻿namespace KNXLib.Exceptions
 {
+    using System;
+
     internal class ConnectionErrorException : Exception
     {
         public ConnectionErrorException(KnxConnectionConfiguration configuration)
-            : base(string.Format("ConnectionErrorException: Error connecting to {0}:{1}", configuration.Host, configuration.Port))
+            : base($"ConnectionErrorException: Error connecting to {configuration.Host}:{configuration.Port}")
         {
         }
 
         public ConnectionErrorException(KnxConnectionConfiguration configuration, Exception innerException)
-            : base(string.Format("ConnectionErrorException: Error connecting to {0}:{1}", configuration.Host, configuration.Port), innerException)
+            : base($"ConnectionErrorException: Error connecting to {configuration.Host}:{configuration.Port}", innerException)
         {
         }
 

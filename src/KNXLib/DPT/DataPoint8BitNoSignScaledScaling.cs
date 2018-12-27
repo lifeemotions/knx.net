@@ -1,16 +1,13 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using KNXLib.Log;
+﻿using System.Linq;
 
 namespace KNXLib.DPT
 {
+    using System.Globalization;
+    using Log;
+
     internal sealed class DataPoint8BitNoSignScaledScaling : DataPoint
     {
-        public override string[] Ids
-        {
-            get { return new[] { "5.001" }; }
-        }
+        public override string[] Ids => new[] { "5.001" };
 
         public override object FromDataPoint(string data)
         {
@@ -23,7 +20,9 @@ namespace KNXLib.DPT
 
         public override object FromDataPoint(byte[] data)
         {
-            if (data == null || data.Length != 1)
+            if (data?.Length == 2)
+                data = data.Skip(1).ToArray();
+            else
                 return 0;
 
             var value = (int) data[0];
@@ -34,27 +33,36 @@ namespace KNXLib.DPT
             return result;
         }
 
-        public override byte[] ToDataPoint(string value)
-        {
-            return ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
-        }
+        public override byte[] ToDataPoint(string value) => ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
 
         public override byte[] ToDataPoint(object val)
         {
-            var dataPoint = new byte[1];
+            var dataPoint = new byte[2];
             dataPoint[0] = 0x00;
+            dataPoint[1] = 0x00;
 
-            decimal input = 0;
+            decimal input;
+
             if (val is int)
-                input = (decimal) ((int) val);
+            {
+                input = (int) val;
+            }
             else if (val is float)
-                input = (decimal) ((float) val);
+            {
+                input = (decimal) (float) val;
+            }
             else if (val is long)
-                input = (decimal) ((long) val);
+            {
+                input = (long) val;
+            }
             else if (val is double)
-                input = (decimal) ((double) val);
+            {
+                input = (decimal) (double) val;
+            }
             else if (val is decimal)
+            {
                 input = (decimal) val;
+            }
             else
             {
                 Logger.Error("5.001", "input value received is not a valid type");
@@ -70,7 +78,7 @@ namespace KNXLib.DPT
             input = input * 255;
             input = input / 100;
 
-            dataPoint[0] = (byte) (input);
+            dataPoint[1] = (byte) input;
 
             return dataPoint;
         }

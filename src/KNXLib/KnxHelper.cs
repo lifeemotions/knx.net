@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using KNXLib.Exceptions;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Linq;
+    using Exceptions;
+
     internal class KnxHelper
     {
         #region Address Processing
@@ -38,20 +38,11 @@ namespace KNXLib
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //           |  | Main Grp  |            Sub Group           |
         //           +--+--------------------+-----------------------+
-        public static bool IsAddressIndividual(string address)
-        {
-            return address.Contains('.');
-        }
+        public static bool IsAddressIndividual(string address) => address.Contains('.');
 
-        public static string GetIndividualAddress(byte[] addr)
-        {
-            return GetAddress(addr, '.', false);
-        }
+        public static string GetIndividualAddress(byte[] addr) => GetAddress(addr, '.', false);
 
-        public static string GetGroupAddress(byte[] addr, bool threeLevelAddressing)
-        {
-            return GetAddress(addr, '/', threeLevelAddressing);
-        }
+        public static string GetGroupAddress(byte[] addr, bool threeLevelAddressing) => GetAddress(addr, '/', threeLevelAddressing);
 
         private static string GetAddress(byte[] addr, char separator, bool threeLevelAddressing)
         {
@@ -121,7 +112,7 @@ namespace KNXLib
                     if (part > 15)
                         throw new InvalidKnxAddressException(address);
 
-                    addr[0] = (byte)(part << 3);
+                    addr[0] = (byte) (part << 3);
                     part = int.Parse(parts[1]);
                     if (part > 2047)
                         throw new InvalidKnxAddressException(address);
@@ -130,7 +121,7 @@ namespace KNXLib
                     if (part2.Length > 2)
                         throw new InvalidKnxAddressException(address);
 
-                    addr[0] = (byte)(addr[0] | part2[0]);
+                    addr[0] = (byte) (addr[0] | part2[0]);
                     addr[1] = part2[1];
                 }
                 else
@@ -140,19 +131,19 @@ namespace KNXLib
                         throw new InvalidKnxAddressException(address);
 
                     addr[0] = group
-                        ? (byte)(part << 3)
-                        : (byte)(part << 4);
+                        ? (byte) (part << 3)
+                        : (byte) (part << 4);
 
                     part = int.Parse(parts[1]);
                     if ((group && part > 7) || (!group && part > 15))
                         throw new InvalidKnxAddressException(address);
 
-                    addr[0] = (byte)(addr[0] | part);
+                    addr[0] = (byte) (addr[0] | part);
                     part = int.Parse(parts[2]);
                     if (part > 255)
                         throw new InvalidKnxAddressException(address);
 
-                    addr[1] = (byte)part;
+                    addr[1] = (byte) part;
                 }
 
                 return addr;
@@ -217,13 +208,10 @@ namespace KNXLib
             GROUP = 1
         }
 
-        public static KnxDestinationAddressType GetKnxDestinationAddressType(byte control_field_2)
-        {
-            return (0x80 & control_field_2) != 0
+        public static KnxDestinationAddressType GetKnxDestinationAddressType(byte control_field_2) =>
+            (0x80 & control_field_2) != 0
                 ? KnxDestinationAddressType.GROUP
                 : KnxDestinationAddressType.INDIVIDUAL;
-        }
-
         #endregion
 
         #region Data Processing
@@ -262,21 +250,50 @@ namespace KNXLib
         // +--------+--------+--------+--------+--------+--------+--------+--------++--------+----....
         // +                            B  Y  T  E    2                            ||       B Y T E  3
         // +-----------------------------------------------------------------------++-------------....
-        public static string GetData(int dataLength, byte[] apdu)
+        public static byte[] GetData(int dataLength, byte[] apdu)
         {
-            
             switch (dataLength)
             {
+                //case 0:
+                //    return string.Empty;
+                //case 1:
+                //    return Convert.ToChar(0x3F & apdu[1]).ToString();
+                //case 2:
+                //    return Convert.ToChar(apdu[2]).ToString();
+                //default:
+                //    var data = string.Empty;
+                //    for (var i = 2; i < apdu.Length; i++)
+                //        data += Convert.ToChar(apdu[i]);
+
+                //    return data;
+
+                //case 0:
+                //    return string.Empty;
+                //case 1:
+                //    //return Convert.ToChar(0x3F & apdu[1]).ToString();
+                //    return string.Format("{0:x2}", (0x3F & apdu[1])).ToUpperInvariant();
+                //case 2:
+                //    //return Convert.ToChar(apdu[2]).ToString();
+                //    return string.Format("{0:x2}", apdu[2]).ToUpperInvariant();
+                //default:
+                //    var data = new StringBuilder(apdu.Length * 2);
+                //    for (var i = 2; i < apdu.Length; i++)
+                //        data.AppendFormat("{0:x2}", apdu[i]);
+                //    return data.ToString().ToUpperInvariant();
+
                 case 0:
-                    return string.Empty;
+                    return new byte[0];
+
                 case 1:
-                    return Convert.ToChar(0x3F & apdu[1]).ToString();
+                    return new[] { (byte) (0x3F & apdu[1]) };
+
                 case 2:
-                    return Convert.ToChar(apdu[2]).ToString();
+                    return new[] { apdu[2] };
+
                 default:
-                    var data = string.Empty;
+                    var data = new byte[apdu.Length - 2];
                     for (var i = 2; i < apdu.Length; i++)
-                        data += Convert.ToChar(apdu[i]);
+                        data[i - 2] = apdu[i];
 
                     return data;
             }
@@ -302,7 +319,7 @@ namespace KNXLib
             {
                 if (data[0] < 0x3F)
                 {
-                    datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
+                    datagram[dataStart] = (byte) (datagram[dataStart] | data[0]);
                 }
                 else
                 {
@@ -311,22 +328,10 @@ namespace KNXLib
             }
             else if (data.Length > 1)
             {
-                if (data[0] < 0x3F)
-                {
-                    datagram[dataStart] = (byte)(datagram[dataStart] | data[0]);
+                datagram[dataStart] = (byte) (datagram[dataStart] | data[0]);
 
-                    for (var i = 1; i < data.Length; i++)
-                    {
-                        datagram[dataStart + i] = data[i];
-                    }
-                }
-                else
-                {
-                    for (var i = 0; i < data.Length; i++)
-                    {
-                        datagram[dataStart + 1 + i] = data[i];
-                    }
-                }
+                for (var i = 1; i < data.Length; i++)
+                    datagram[dataStart + i] = data[i];
             }
         }
         #endregion
@@ -375,15 +380,17 @@ namespace KNXLib
         {
             switch (datagram[2])
             {
-                case (0x02):
+                case 0x02:
                     {
                         switch (datagram[3])
                         {
-                            case (0x06):
+                            case 0x06:
                                 return SERVICE_TYPE.CONNECT_RESPONSE;
-                            case (0x09):
+                            case 0x09:
                                 return SERVICE_TYPE.DISCONNECT_REQUEST;
-                            case (0x08):
+                            case 0x0a:
+                                return SERVICE_TYPE.DISCONNECT_RESPONSE;
+                            case 0x08:
                                 return SERVICE_TYPE.CONNECTIONSTATE_RESPONSE;
                         }
                     }
@@ -392,9 +399,9 @@ namespace KNXLib
                     {
                         switch (datagram[3])
                         {
-                            case (0x20):
+                            case 0x20:
                                 return SERVICE_TYPE.TUNNELLING_REQUEST;
-                            case (0x21):
+                            case 0x21:
                                 return SERVICE_TYPE.TUNNELLING_ACK;
                         }
                     }
@@ -410,7 +417,6 @@ namespace KNXLib
 
             return -1;
         }
-
         #endregion
     }
 }

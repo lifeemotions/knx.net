@@ -1,17 +1,11 @@
-﻿using System.Globalization;
-using KNXLib.Log;
-
-namespace KNXLib.DPT
+﻿namespace KNXLib.DPT
 {
+    using System.Globalization;
+    using Log;
+
     internal sealed class DataPoint3BitControl : DataPoint
     {
-        public override string[] Ids
-        {
-            get
-            {
-                return new[] {"3.008", "3.007"};
-            }
-        }
+        public override string[] Ids => new[] { "3.008", "3.007" };
 
         public override object FromDataPoint(string data)
         {
@@ -27,50 +21,47 @@ namespace KNXLib.DPT
             if (data == null || data.Length != 1)
                 return 0;
 
-            int input = data[0] & 0x0F;
+            var input = data[0] & 0x0F;
 
-            bool direction = (input >> 3) == 1;
-            int step = input & 0x07;
+            var direction = input >> 3 == 1;
+            var step = input & 0x07;
 
             if (step != 0)
             {
                 if (direction)
                 {
-                    step = step*-1;
+                    step = step * -1;
                     step = step + 8;
                 }
                 else
                 {
-                    step = step*-1;
+                    step = step * -1;
                     step = step + 8;
-                    step = step*-1;
+                    step = step * -1;
                 }
             }
 
             return step;
         }
 
-        public override byte[] ToDataPoint(string value)
-        {
-            return ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
-        }
+        public override byte[] ToDataPoint(string value) => ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
 
         public override byte[] ToDataPoint(object val)
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
 
-            var input = 0;
+            int input;
             if (val is int)
-                input = ((int) val);
+                input = (int) val;
             else if (val is float)
-                input = (int) ((float) val);
+                input = (int) (float) val;
             else if (val is long)
-                input = (int) ((long) val);
+                input = (int) (long) val;
             else if (val is double)
-                input = (int) ((double) val);
+                input = (int) (double) val;
             else if (val is decimal)
-                input = (int) ((decimal) val);
+                input = (int) (decimal) val;
             else
             {
                 Logger.Error("6.xxx", "input value received is not a valid type");
@@ -89,17 +80,17 @@ namespace KNXLib.DPT
             if (input <= 0)
             {
                 direction = 0;
-                input = input*-1;
+                input = input * -1;
                 input = input - 8;
-                input = input*-1;
+                input = input * -1;
             }
             else
             {
-                input = input*-1;
+                input = input * -1;
                 input = input + 8;
             }
 
-            int step = (input & 7);
+            var step = input & 7;
 
             dataPoint[0] = (byte) (step | direction);
 

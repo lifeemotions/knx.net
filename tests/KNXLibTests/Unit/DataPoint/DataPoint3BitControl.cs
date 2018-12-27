@@ -6,16 +6,6 @@ namespace KNXLibTests.Unit.DataPoint
     [TestFixture]
     internal class DataPoint3BitControl
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-        }
-
         [Category("KNXLib.Unit.DataPoint.3BitControl"), Test]
         public void DataPoint3BitControlDimmingTest()
         {

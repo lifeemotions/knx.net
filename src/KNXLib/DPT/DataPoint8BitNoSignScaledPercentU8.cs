@@ -1,16 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using KNXLib.Log;
-
-namespace KNXLib.DPT
+﻿namespace KNXLib.DPT
 {
+    using System.Globalization;
+    using Log;
+
     internal sealed class DataPoint8BitNoSignScaledPercentU8 : DataPoint
     {
-        public override string[] Ids
-        {
-            get { return new[] { "5.004" }; }
-        }
+        public override string[] Ids => new[] { "5.004" };
 
         public override object FromDataPoint(string data)
         {
@@ -29,27 +24,35 @@ namespace KNXLib.DPT
             return (int) data[0];
         }
 
-        public override byte[] ToDataPoint(string value)
-        {
-            return ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
-        }
+        public override byte[] ToDataPoint(string value) => ToDataPoint(float.Parse(value, CultureInfo.InvariantCulture));
 
         public override byte[] ToDataPoint(object val)
         {
             var dataPoint = new byte[1];
             dataPoint[0] = 0x00;
-            
-            int input = 0;
+
+            int input;
+
             if (val is int)
-                input = ((int) val);
+            {
+                input = (int) val;
+            }
             else if (val is float)
-                input = (int) ((float) val);
+            {
+                input = (int) (float) val;
+            }
             else if (val is long)
-                input = (int) ((long) val);
+            {
+                input = (int) (long) val;
+            }
             else if (val is double)
-                input = (int) ((double) val);
+            {
+                input = (int) (double) val;
+            }
             else if (val is decimal)
-                input = (int) ((decimal) val);
+            {
+                input = (int) (decimal) val;
+            }
             else
             {
                 Logger.Error("5.004", "input value received is not a valid type");
@@ -61,7 +64,7 @@ namespace KNXLib.DPT
                 Logger.Error("5.004", "input value received is not in a valid range");
                 return dataPoint;
             }
-            
+
             dataPoint[0] = (byte) input;
 
             return dataPoint;

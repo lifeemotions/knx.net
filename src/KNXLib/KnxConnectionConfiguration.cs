@@ -1,11 +1,19 @@
-﻿using System;
-using System.Net;
-using KNXLib.Exceptions;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Net;
+    using Exceptions;
+
     internal class KnxConnectionConfiguration
     {
+        public string Host { get; }
+
+        public int Port { get; }
+
+        public IPAddress IpAddress { get; }
+
+        public IPEndPoint EndPoint { get; }
+
         public KnxConnectionConfiguration(string host, int port)
         {
             Host = host;
@@ -33,13 +41,5 @@ namespace KNXLib
 
             EndPoint = new IPEndPoint(IpAddress, port);
         }
-
-        public string Host { get; private set; }
-
-        public int Port { get; private set; }
-
-        public IPAddress IpAddress { get; private set; }
-
-        public IPEndPoint EndPoint { get; private set; }
     }
 }

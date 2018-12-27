@@ -2,24 +2,15 @@
 {
     internal abstract class KnxSender
     {
-        protected KnxSender(KnxConnection connection)
-        {
-            KnxConnection = connection;
-        }
+        protected KnxConnection KnxConnection { get; }
 
-        protected KnxConnection KnxConnection { get; private set; }
+        protected KnxSender(KnxConnection connection) => KnxConnection = connection;
 
         public abstract void SendData(byte[] datagram);
 
-        public void Action(string destinationAddress, byte[] data)
-        {
-            SendData(CreateActionDatagram(destinationAddress, data));
-        }
+        public void Action(string destinationAddress, byte[] data) => SendData(CreateActionDatagram(destinationAddress, data));
 
-        public void RequestStatus(string destinationAddress)
-        {
-            SendData(CreateRequestStatusDatagram(destinationAddress));
-        }
+        public void RequestStatus(string destinationAddress) => SendData(CreateRequestStatusDatagram(destinationAddress));
 
         protected abstract byte[] CreateActionDatagram(string destinationAddress, byte[] data);
 
@@ -97,22 +88,22 @@
             datagram[i++] =
                 KnxConnection.ActionMessageCode != 0x00
                     ? KnxConnection.ActionMessageCode
-                    : (byte)0x11;
+                    : (byte) 0x11;
 
             datagram[i++] = 0x00;
             datagram[i++] = 0xAC;
 
             datagram[i++] =
                 KnxHelper.IsAddressIndividual(destinationAddress)
-                    ? (byte)0x50
-                    : (byte)0xF0;
+                    ? (byte) 0x50
+                    : (byte) 0xF0;
 
             datagram[i++] = 0x00;
             datagram[i++] = 0x00;
             var dst_address = KnxHelper.GetAddress(destinationAddress);
             datagram[i++] = dst_address[0];
             datagram[i++] = dst_address[1];
-            datagram[i++] = (byte)dataLength;
+            datagram[i++] = (byte) dataLength;
             datagram[i++] = 0x00;
             datagram[i] = 0x80;
 
@@ -128,15 +119,15 @@
             datagram[cemi_start_pos + i++] =
                 KnxConnection.ActionMessageCode != 0x00
                     ? KnxConnection.ActionMessageCode
-                    : (byte)0x11;
+                    : (byte) 0x11;
 
             datagram[cemi_start_pos + i++] = 0x00;
             datagram[cemi_start_pos + i++] = 0xAC;
 
             datagram[cemi_start_pos + i++] =
                 KnxHelper.IsAddressIndividual(destinationAddress)
-                    ? (byte)0x50
-                    : (byte)0xF0;
+                    ? (byte) 0x50
+                    : (byte) 0xF0;
 
             datagram[cemi_start_pos + i++] = 0x00;
             datagram[cemi_start_pos + i++] = 0x00;

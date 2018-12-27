@@ -13,11 +13,11 @@ The following datapoints are available in the API:
 
 | DPT     | input type                                  | input range     | output type | output range    | Description                         |
 | ------- |-------------------------------------------- | --------------- | ----------- | --------------- | ----------------------------------- |
-| `3.007` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control blinds (steps) [`0` stops]  |
-| `3.008` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control dimming (steps) [`0` stops] |
+| `3.007` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control dimming (steps) [`0` stops] |
+| `3.008` | `int`, `float`, `long`, `double`, `decimal` | `[-7,7]`        | `int`       | `[-7,7]`        | Control blinds (steps) [`0` stops]  |
 | `5.001` | `int`, `float`, `long`, `double`, `decimal` | `[0,100]`       | `decimal`   | `[0,100]`       | Percentage (%)                      |
 | `5.003` | `int`, `float`, `long`, `double`, `decimal` | `[0,360]`       | `decimal`   | `[0,360]`       | Angle (°)                           |
-| `5.004` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Percentage `[0,255]` (%)          |
+| `5.004` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Percentage `[0,255]` (%)            |
 | `5.010` | `int`, `float`, `long`, `double`, `decimal` | `[0,255]`       | `int`       | `[0,255]`       | Counter Pulses                      |
 | `6.001` | `int`, `float`, `long`, `double`, `decimal` | `[-128,127]`    | `int`       | `[-128,127]`    | Percentage (%)                      |
 | `6.010` | `int`, `float`, `long`, `double`, `decimal` | `[-128,127]`    | `int`       | `[-128,127]`    | Counter Pulses                      |
@@ -134,3 +134,10 @@ If connecting in routing mode:
 
 If connecting in tunneling mode:
 * make sure the system firewall allows incoming connections to the specified `localPort`
+
+### Run Tests
+`./packages/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/KNXLibTests/bin/Release/KNXLibTests.dll  --labels=On --nocolor --verbose --workers=1 --full --result:"./nunit-result.xml;format=nunit2"`
+
+`./packages/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/InfluxDB.FSharp.UnitTests/bin/Release/InfluxDB.FSharp.UnitTests.dll  --labels=On --nocolor --verbose --workers=1 --full --result:"./nunit-result.xml;format=nunit2"`
+
+`./packages/xunit.runners/tools/xunit.console.clr4.exe ./tests/FunctionalLiving.Parser.Tests/bin/Release/FunctionalLiving.Parser.Tests.dll`
