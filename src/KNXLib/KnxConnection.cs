@@ -11,7 +11,7 @@
     /// <summary>
     ///     Base class that controls the KNX connection, implemented by KnxConnectionRouting and KnxConnetionTunneling
     /// </summary>
-    public abstract class KnxConnection
+    public abstract class KnxConnection : IDisposable
     {
         private static readonly string ClassName = typeof(KnxConnection).ToString();
 
@@ -350,5 +350,9 @@
         /// <param name="value">Value to convert</param>
         /// <returns></returns>
         public byte[] ToDataPoint(string type, object value) => DataPointTranslator.Instance.ToDataPoint(type, value);
+
+        public abstract void Dispose();
+
+        protected abstract void Dispose(bool disposing);
     }
 }

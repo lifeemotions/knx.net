@@ -11,8 +11,6 @@
 
     public class TestRouting
     {
-        private static KnxConnection _connection;
-
         private const string LightOnOffAddress = "2/3/33";
 
         private static readonly IDictionary<string, string> Lights = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
@@ -131,37 +129,33 @@
         {
             _logFile = new StreamWriter("telegrams.txt");
 
-            _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
-            _connection.SetLockIntervalMs(20);
+            using (var connection = new KnxConnectionRouting {Debug = false, ActionMessageCode = 0x29})
+            {
+                connection.SetLockIntervalMs(20);
+                connection.KnxConnectedDelegate += Connected;
+                connection.KnxDisconnectedDelegate += () => Disconnected(connection);
+                connection.KnxEventDelegate += (address, state) => Event(connection, address, state);
+                connection.KnxStatusDelegate += (address, state) => Status(connection, address, state);
+                connection.Connect();
 
-            _connection.KnxConnectedDelegate += Connected;
-            _connection.KnxDisconnectedDelegate += Disconnected;
-            _connection.KnxEventDelegate += Event;
-            _connection.KnxStatusDelegate += Status;
-            _connection.Connect();
+                //LightOnOff(connection);
+                //BlindUpDown1(connection);
+                //BlindUpDown2(connection);
+                //TemperatureSetpoint(connection);
 
-            //LightOnOff();
-            //BlindUpDown1();
-            //BlindUpDown2();
-            //TemperatureSetpoint();
+                Console.WriteLine("Done. Press [ENTER] to finish");
+                Console.Read();
+            }
 
-            Console.WriteLine("Done. Press [ENTER] to finish");
-            Console.Read();
             _logFile.Dispose();
             Environment.Exit(0);
         }
 
-        private static void Event(string address, byte[] state)
-        {
-            Print(address, state);
-        }
+        private static void Event(KnxConnectionRouting connection, string address, byte[] state) => Print(connection, address, state);
 
-        private static void Status(string address, byte[] state)
-        {
-            Print(address, state);
-        }
+        private static void Status(KnxConnectionRouting connection, string address, byte[] state) => Print(connection, address, state);
 
-        private static void Print(string address, byte[] state)
+        private static void Print(KnxConnectionRouting connection, string address, byte[] state)
         {
             const int categoryWidth = 15;
             const int descriptionWidth = -60;
@@ -194,7 +188,7 @@
             }
             else if (Temperatures.TryGetValue(address, out description))
             {
-                var temp = _connection.FromDataPoint("9.001", state); // (decimal)
+                var temp = connection.FromDataPoint("9.001", state); // (decimal)
                 var functionalTemp = Category9_2ByteFloatValue.parseTwoByteFloat(state[0], state[1]);
                 Console.WriteLine($"{"[TEMP]", categoryWidth} {description, descriptionWidth} (C#: {temp} °C) (F#: {functionalTemp} °C)");
             }
@@ -210,19 +204,19 @@
             }
             else if (EnergyWattHour.TryGetValue(address, out description))
             {
-                var wattHour = _connection.FromDataPoint("13.010", state); // (int)
+                var wattHour = connection.FromDataPoint("13.010", state); // (int)
                 var functionalWattHour = Category13_4ByteSignedValue.parseFourByteSigned(state[0], state[1], state[2], state[3]);
                 Console.WriteLine($"{"[ENERGY]", categoryWidth} {description, descriptionWidth} (C#: {wattHour} Wh) (F#: {functionalWattHour} Wh)");
             }
             else if (Dates.TryGetValue(address, out description))
             {
-                var date = (DateTime)_connection.FromDataPoint("11.001", state); // (DateTime)
+                var date = (DateTime)connection.FromDataPoint("11.001", state); // (DateTime)
                 var functionalDate = Category11_Date.parseDate(state[0], state[1], state[2]);
                 Console.WriteLine($"{"[DATE]", categoryWidth} {description, descriptionWidth} (C#: {date:dd/MM/yyyy}) (F#: {functionalDate:dd/MM/yyyy})");
             }
             else if (Speed.TryGetValue(address, out description))
             {
-                var speed = _connection.FromDataPoint("9.005", state); // (decimal)
+                var speed = connection.FromDataPoint("9.005", state); // (decimal)
                 var functionalSpeed = Category9_2ByteFloatValue.parseTwoByteFloat(state[0], state[1]);
                 Console.WriteLine($"{"[SPEED]",categoryWidth} {description, descriptionWidth} (C#: {speed} m/s) (F#: {functionalSpeed} m/s)");
             }
@@ -232,101 +226,98 @@
             }
         }
 
-        private static void LightOnOff()
+        private static void LightOnOff(KnxConnectionRouting connection)
         {
             Console.WriteLine("Press [ENTER] to send command ({0}) - false", LightOnOffAddress);
             Console.ReadLine();
-            _connection.Action(LightOnOffAddress, false);
+            connection.Action(LightOnOffAddress, false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command ({0}) - true", LightOnOffAddress);
             Console.ReadLine();
-            _connection.Action(LightOnOffAddress, true);
+            connection.Action(LightOnOffAddress, true);
             Thread.Sleep(200);
         }
 
-        private static void BlindUpDown1()
+        private static void BlindUpDown1(KnxConnectionRouting connection)
         {
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - false");
             Console.ReadLine();
-            _connection.Action("2/1/1", false);
+            connection.Action("2/1/1", false);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/1/1) - true");
             Console.ReadLine();
-            _connection.Action("2/1/1", true);
+            connection.Action("2/1/1", true);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            _connection.Action("2/2/1", true);
+            connection.Action("2/2/1", true);
             Thread.Sleep(200);
         }
 
-        private static void BlindUpDown2()
+        private static void BlindUpDown2(KnxConnectionRouting connection)
         {
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x00");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0x00);
+            connection.Action("2/3/1", 0x00);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \xFF");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0xFF);
+            connection.Action("2/3/1", 0xFF);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/3/1) - \x80");
             Console.ReadLine();
-            _connection.Action("2/3/1", 0x80);
+            connection.Action("2/3/1", 0x80);
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (2/2/1) - true");
             Console.ReadLine();
-            _connection.Action("2/2/1", true);
+            connection.Action("2/2/1", true);
             Thread.Sleep(200);
         }
 
-        private static void TemperatureSetpoint()
+        private static void TemperatureSetpoint(KnxConnectionRouting connection)
         {
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 28ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 28.0f));
+            connection.Action("1/1/16", connection.ToDataPoint("9.001", 28.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 27ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 27.0f));
+            connection.Action("1/1/16", connection.ToDataPoint("9.001", 27.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 26ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 26.0f));
+            connection.Action("1/1/16", connection.ToDataPoint("9.001", 26.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 25ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 25.0f));
+            connection.Action("1/1/16", connection.ToDataPoint("9.001", 25.0f));
             Thread.Sleep(200);
 
             Console.WriteLine("Press [ENTER] to send command (1/1/16) - 24ºC");
             Console.ReadLine();
-            _connection.Action("1/1/16", _connection.ToDataPoint("9.001", 24.0f));
+            connection.Action("1/1/16", connection.ToDataPoint("9.001", 24.0f));
             Thread.Sleep(200);
         }
 
-        private static void Connected()
-        {
-            Console.WriteLine("Connected!");
-        }
+        private static void Connected() => Console.WriteLine("Connected!");
 
-        private static void Disconnected()
+        private static void Disconnected(KnxConnectionRouting connection)
         {
             Console.WriteLine("Disconnected! Reconnecting");
-            if (_connection == null)
+            if (connection == null)
                 return;
 
             Thread.Sleep(1000);
-            _connection.Connect();
+            connection.Connect();
         }
     }
 }

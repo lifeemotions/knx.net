@@ -1,4 +1,4 @@
-﻿namespace KNXLib
+﻿﻿namespace KNXLib
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -104,6 +104,14 @@
                 client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();
             }
+        }
+
+        public override void Dispose() => Dispose(true);
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Disconnect();
         }
     }
 }
