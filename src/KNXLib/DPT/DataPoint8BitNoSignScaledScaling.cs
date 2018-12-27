@@ -1,4 +1,6 @@
-﻿namespace KNXLib.DPT
+﻿using System.Linq;
+
+namespace KNXLib.DPT
 {
     using System.Globalization;
     using Log;
@@ -18,7 +20,9 @@
 
         public override object FromDataPoint(byte[] data)
         {
-            if (data == null || data.Length != 1)
+            if (data?.Length == 2)
+                data = data.Skip(1).ToArray();
+            else
                 return 0;
 
             var value = (int) data[0];
@@ -33,8 +37,9 @@
 
         public override byte[] ToDataPoint(object val)
         {
-            var dataPoint = new byte[1];
+            var dataPoint = new byte[2];
             dataPoint[0] = 0x00;
+            dataPoint[1] = 0x00;
 
             decimal input;
 
@@ -73,7 +78,7 @@
             input = input * 255;
             input = input / 100;
 
-            dataPoint[0] = (byte) input;
+            dataPoint[1] = (byte) input;
 
             return dataPoint;
         }

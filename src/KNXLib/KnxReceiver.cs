@@ -13,6 +13,8 @@
         private Thread _receiverThread;
         private Thread _consumerThread;
 
+        private const ThreadState StateAlive = ThreadState.Running | ThreadState.Background | ThreadState.WaitSleepJoin;
+
         private BlockingCollection<KnxDatagram> _rxDatagrams;
 
         protected KnxReceiver(KnxConnection connection) => KnxConnection = connection;
@@ -33,8 +35,10 @@
                     {
                         datagram = _rxDatagrams.Take();
                     }
-                    catch (InvalidOperationException)
+                    catch (Exception e)
                     {
+                        if (e is ThreadAbortException)
+                            throw;
                     }
 
                     if (datagram != null)
@@ -61,16 +65,25 @@
         {
             try
             {
-                if (!_receiverThread.ThreadState.Equals(ThreadState.Running))
-                    return;
-
-                _receiverThread.Abort();
-                _consumerThread.Abort();
+                if (_receiverThread.ThreadState.Equals(StateAlive))
+                    _receiverThread.Abort();
             }
             catch
             {
                 Thread.ResetAbort();
             }
+
+            try
+            {
+                if (_consumerThread.ThreadState.Equals(StateAlive))
+                    _consumerThread.Abort();
+            }
+            catch
+            {
+                Thread.ResetAbort();
+            }
+
+            _rxDatagrams.Dispose();
         }
 
         protected void ProcessCEMI(KnxDatagram datagram, byte[] cemi)

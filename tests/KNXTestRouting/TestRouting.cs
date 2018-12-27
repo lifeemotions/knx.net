@@ -13,9 +13,14 @@
     {
         private static KnxConnection _connection;
 
-        private const string LightOnOffAddress = "5/0/2";
+        private const string LightOnOffAddress = "2/3/33";
 
-        private static readonly IList<string> Lights = new List<string> { "5/1/2" };
+        private static readonly IDictionary<string, string> Lights = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+        {
+            { "2/3/31", "Bureau - Spots Buitencirkel - Aan/Uit" },
+            { "2/3/32", "Bureau - Spots Binnencirkel - Aan/Uit" },
+            { "2/3/33", "Bureau - Spots - Aan/Uit" },
+        });
 
         // 1.001 Switches
         private static readonly IDictionary<string, string> Switches = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
@@ -127,6 +132,8 @@
             _logFile = new StreamWriter("telegrams.txt");
 
             _connection = new KnxConnectionRouting { Debug = false, ActionMessageCode = 0x29 };
+            _connection.SetLockIntervalMs(20);
+
             _connection.KnxConnectedDelegate += Connected;
             _connection.KnxDisconnectedDelegate += Disconnected;
             _connection.KnxEventDelegate += Event;
@@ -157,7 +164,7 @@
         private static void Print(string address, byte[] state)
         {
             const int categoryWidth = 15;
-            const int descriptionWidth = -70;
+            const int descriptionWidth = -60;
             string description;
 
             if (Switches.TryGetValue(address, out description))
