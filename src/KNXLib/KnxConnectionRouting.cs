@@ -105,6 +105,7 @@ namespace KNXLib
                 client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();
             }
+            base.Disconnected();
         }
     }
 }
