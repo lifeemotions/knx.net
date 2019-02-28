@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using KNXLib.Exceptions;
 
@@ -6,7 +6,7 @@ namespace KNXLib
 {
     internal class KnxHelper
     {
-        #region Address Processing
+        #region Address Processing     
         //           +-----------------------------------------------+
         // 16 bits   |              INDIVIDUAL ADDRESS               |
         //           +-----------------------+-----------------------+
@@ -18,7 +18,7 @@ namespace KNXLib
         //           +-----------+-----------+     Device Address    |
         //           |(Area Adrs)|(Line Adrs)|                       |
         //           +-----------------------+-----------------------+
-
+        // -- up to ETS3 --------------------------------------------+
         //           +-----------------------------------------------+
         // 16 bits   |             GROUP ADDRESS (3 level)           |
         //           +-----------------------+-----------------------+
@@ -26,7 +26,8 @@ namespace KNXLib
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //    bits   | 7| 6| 5| 4| 3| 2| 1| 0| 7| 6| 5| 4| 3| 2| 1| 0|
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-        //           |  | Main Grp  | Midd G |       Sub Group       |
+        // up to ETS3|  | Main Grp  | Midd G |       Sub Group       |
+        // as of ETS4|  Main Grp    | Midd G |       Sub Group       |
         //           +--+--------------------+-----------------------+
 
         //           +-----------------------------------------------+
@@ -36,8 +37,14 @@ namespace KNXLib
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
         //    bits   | 7| 6| 5| 4| 3| 2| 1| 0| 7| 6| 5| 4| 3| 2| 1| 0|
         //           +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-        //           |  | Main Grp  |            Sub Group           |
+        // up to ETS3|  | Main Grp  |            Sub Group           |
+        // as of ETS4|  Main Grp    |            Sub Group           |
         //           +--+--------------------+-----------------------+
+        // These tables clearly show why ETS3 can only visualize 16 MaGs (0...15). 
+        //  The reason is that the MaGs are coded in 4 bits. As of ETS4, 
+        //  the entire range of usable GAs is doubled by using one more bit. 
+        //  The 15th bit increases the number of group addresses by 32768 entries (2^16 - 2^15).
+
         public static bool IsAddressIndividual(string address)
         {
             return address.Contains('.');
@@ -68,8 +75,13 @@ namespace KNXLib
             else
             {
                 // 3 level individual or group
+                // up to ETS3
+                // address = group
+                //    ? ((addr[0] & 0x7F) >> 3).ToString()
+                //    : (addr[0] >> 4).ToString();
+                // as of ETS4
                 address = group
-                    ? ((addr[0] & 0x7F) >> 3).ToString()
+                    ? (addr[0] >> 3).ToString()
                     : (addr[0] >> 4).ToString();
 
                 address += separator;
@@ -118,7 +130,10 @@ namespace KNXLib
                 if (!threeLevelAddressing)
                 {
                     var part = int.Parse(parts[0]);
-                    if (part > 15)
+                    // -- up to ETS3
+                    // if (part > 15)
+                    // -- as of ETS4
+                    if (part > 31)
                         throw new InvalidKnxAddressException(address);
 
                     addr[0] = (byte)(part << 3);
@@ -136,7 +151,10 @@ namespace KNXLib
                 else
                 {
                     var part = int.Parse(parts[0]);
-                    if (part > 15)
+                    // -- up to ETS3
+                    // if (part > 15)
+                    // -- as of ETS4
+                    if (part > 31)
                         throw new InvalidKnxAddressException(address);
 
                     addr[0] = group
@@ -264,7 +282,7 @@ namespace KNXLib
         // +-----------------------------------------------------------------------++-------------....
         public static string GetData(int dataLength, byte[] apdu)
         {
-            
+
             switch (dataLength)
             {
                 case 0:
