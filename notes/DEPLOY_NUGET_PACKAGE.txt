@@ -1,5 +1,0 @@
-1) Build KNXLib project in Release mode
-2) Execute in KNXLib folder:
-    - nuget pack KNXLib.csproj
-3) Execute in KNXLib folder:
-    - nuget push <CREATED_NUGET_PACKAGE> -Source nuget.org -ApiKey <API_KEY>

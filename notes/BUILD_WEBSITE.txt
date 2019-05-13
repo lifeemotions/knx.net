@@ -1,7 +1,0 @@
-1) Execute in site folder:
-    - gulp update-ref
-    - gulp build
-2) Site output will be on site/output
-
-Note:
- * This will build website for currently deployed package in nuget.org

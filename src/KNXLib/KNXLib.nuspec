@@ -12,6 +12,6 @@
     <description>$description$</description>
     <releaseNotes>#36, #39</releaseNotes>
     <copyright>Copyright 2018</copyright>
-    <tags>knx .net c#</tags>
+    <tags>knx .net core c#</tags>
   </metadata>
 </package>

@@ -1,4 +1,8 @@
-﻿namespace KNXLib.DPT
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("KNXLibTests")]
+
+namespace KNXLib.DPT
 {
     internal abstract class DataPoint
     {

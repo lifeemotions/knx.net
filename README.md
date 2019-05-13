@@ -1,7 +1,13 @@
-KNX.net ![build status](https://travis-ci.org/lifeemotions/knx.net.svg?branch=master) [![NuGet version](https://badge.fury.io/nu/KNX.net.svg)](https://badge.fury.io/nu/KNX.net)
+# KNX.net for .NET Core
+
 =======
 
-KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET
+KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET Core
+
+knx.net for .NET Core is a port of [lifeemotions KNX.net] (https://github.com/lifeemotions/knx.net) for [Microsofts .NET Core] (https://www.microsoft.com/net/core)
+
+
+=======
 
 This API allows to connect in both modes:
 * Tunneling
