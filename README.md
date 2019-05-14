@@ -1,13 +1,11 @@
-# KNX.net for .NET Core
+# KNX.net-core (KNX.net for .NET Core >= 2.x)
 
-=======
+KNX.net-core (KNX.net for .NET Core >= 2.x) is a port of [lifeemotions KNX.net] (https://github.com/lifeemotions/knx.net) for [Microsofts .NET Core] (https://www.microsoft.com/net/core).
 
-KNX.net provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET Core
-
-knx.net for .NET Core is a port of [lifeemotions KNX.net] (https://github.com/lifeemotions/knx.net) for [Microsofts .NET Core] (https://www.microsoft.com/net/core)
+KNX.net-core provides a [KNX](http://en.wikipedia.org/wiki/KNX_%28standard%29) API for .NET Core based in .NET Standard dll.
 
 
-=======
+=======================
 
 This API allows to connect in both modes:
 * Tunneling
