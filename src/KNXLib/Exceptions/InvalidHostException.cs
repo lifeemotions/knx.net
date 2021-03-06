@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace KNXLib.Exceptions
+﻿namespace KNXLib.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Exception thrown when trying to connect to an invalid host
     /// </summary>
@@ -26,7 +26,7 @@ namespace KNXLib.Exceptions
         /// </returns>
         public override string ToString()
         {
-            return string.Format("InvalidHostException: Host {0} is invalid.", _host);
+            return $"InvalidHostException: Host {_host} is invalid.";
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace KNXLib.DPT
+﻿namespace KNXLib.DPT
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     internal sealed class DataPointTranslator
     {
         public static readonly DataPointTranslator Instance = new DataPointTranslator();
@@ -17,19 +17,17 @@ namespace KNXLib.DPT
 
         private DataPointTranslator()
         {
-            Type type = typeof(DataPoint);
-            IEnumerable<Type> types = AppDomain.CurrentDomain.GetAssemblies()
-                            .SelectMany(s => s.GetTypes())
-                            .Where(p => type.IsAssignableFrom(p) && p != type);
+            var type = typeof(DataPoint);
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => type.IsAssignableFrom(p) && p != type);
 
-            foreach (Type t in types)
+            foreach (var t in types)
             {
-                DataPoint dp = (DataPoint)Activator.CreateInstance(t);
+                var dp = (DataPoint) Activator.CreateInstance(t);
 
-                foreach (string id in dp.Ids)
-                {
+                foreach (var id in dp.Ids)
                     _dataPoints.Add(id, dp);
-                }
             }
         }
 
@@ -37,8 +35,7 @@ namespace KNXLib.DPT
         {
             try
             {
-                DataPoint dpt;
-                if (_dataPoints.TryGetValue(type, out dpt))
+                if (_dataPoints.TryGetValue(type, out DataPoint dpt))
                     return dpt.FromDataPoint(data);
             }
             catch
@@ -52,8 +49,7 @@ namespace KNXLib.DPT
         {
             try
             {
-                DataPoint dpt;
-                if (_dataPoints.TryGetValue(type, out dpt))
+                if (_dataPoints.TryGetValue(type, out DataPoint dpt))
                     return dpt.FromDataPoint(data);
             }
             catch
@@ -67,8 +63,7 @@ namespace KNXLib.DPT
         {
             try
             {
-                DataPoint dpt;
-                if (_dataPoints.TryGetValue(type, out dpt))
+                if (_dataPoints.TryGetValue(type, out DataPoint dpt))
                     return dpt.ToDataPoint(value);
             }
             catch
@@ -82,8 +77,7 @@ namespace KNXLib.DPT
         {
             try
             {
-                DataPoint dpt;
-                if (_dataPoints.TryGetValue(type, out dpt))
+                if (_dataPoints.TryGetValue(type, out DataPoint dpt))
                     return dpt.ToDataPoint(value);
             }
             catch

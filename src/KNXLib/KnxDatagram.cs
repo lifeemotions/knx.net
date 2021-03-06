@@ -1,5 +1,7 @@
 ﻿namespace KNXLib
 {
+    using Addressing;
+
     internal class KnxDatagram
     {
         // HEADER
@@ -16,12 +18,12 @@
         public byte message_code;
         public int aditional_info_length;
         public byte[] aditional_info;
-        public byte control_field_1;
-        public byte control_field_2;
-        public string source_address;
-        public string destination_address;
+        public KnxControlField1 control_field_1;
+        public KnxControlField2 control_field_2;
+        public KnxAddress source_address;
+        public KnxAddress destination_address;
         public int data_length;
         public byte[] apdu;
-        public string data;
+        public byte[] data;
     }
 }

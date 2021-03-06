@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KNXLib</RootNamespace>
     <AssemblyName>KNXLib</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,18 +34,36 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\KNXLib.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DPT\DataPoint3BytesDate.cs" />
+    <Compile Include="DPT\DataPoint4Bytes.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignNonScaledValue1UCount.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledPercentU8.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledAngle.cs" />
     <Compile Include="DPT\DataPoint8BitSignRelativeValue.cs" />
     <Compile Include="DPT\DataPoint8BitNoSignScaledScaling.cs" />
     <Compile Include="DPT\DataPoint3BitControl.cs" />
+    <Compile Include="Enums\KnxDestinationAddressType.cs" />
+    <Compile Include="Enums\KnxTelegramRepetitionStatus.cs" />
+    <Compile Include="Enums\KnxTelegramPriority.cs" />
+    <Compile Include="Enums\KnxGroupAddressStyle.cs" />
+    <Compile Include="Addressing\KnxAddress.cs" />
+    <Compile Include="Addressing\KnxFreeStyleGroupAddress.cs" />
+    <Compile Include="Addressing\KnxGroupAddress.cs" />
+    <Compile Include="Addressing\KnxIndividualAddress.cs" />
+    <Compile Include="Addressing\KnxThreeLevelGroupAddress.cs" />
+    <Compile Include="Addressing\KnxTwoLevelGroupAddress.cs" />
+    <Compile Include="Enums\KnxTelegramType.cs" />
+    <Compile Include="Events\KnxEventArgs.cs" />
+    <Compile Include="Events\KnxStatusArgs.cs" />
+    <Compile Include="KnxControlField2.cs" />
+    <Compile Include="KnxControlField1.cs" />
     <Compile Include="Log\Logger.cs" />
     <Compile Include="Properties\AssemblyConfiguration.cs" />
     <Compile Include="DPT\DataPoint.cs" />

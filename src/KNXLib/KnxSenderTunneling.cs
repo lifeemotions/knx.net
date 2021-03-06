@@ -1,13 +1,16 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using Addressing;
+
     internal class KnxSenderTunneling : KnxSender
     {
         private UdpClient _udpClient;
         private readonly IPEndPoint _remoteEndpoint;
+
+        private KnxConnectionTunneling KnxConnectionTunneling => (KnxConnectionTunneling) KnxConnection;
 
         internal KnxSenderTunneling(KnxConnection connection, UdpClient udpClient, IPEndPoint remoteEndpoint)
             : base(connection)
@@ -16,20 +19,9 @@ namespace KNXLib
             _remoteEndpoint = remoteEndpoint;
         }
 
-        private KnxConnectionTunneling KnxConnectionTunneling
-        {
-            get { return (KnxConnectionTunneling)KnxConnection; }
-        }
+        public void SetClient(UdpClient client) => _udpClient = client;
 
-        public void SetClient(UdpClient client)
-        {
-            _udpClient = client;
-        }
-
-        public void SendDataSingle(byte[] datagram)
-        {
-            _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
-        }
+        public void SendDataSingle(byte[] datagram) => _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
 
         public override void SendData(byte[] datagram)
         {
@@ -58,7 +50,7 @@ namespace KNXLib
             _udpClient.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
-        protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)
+        protected override byte[] CreateActionDatagram(KnxAddress destinationAddress, byte[] data)
         {
             lock (KnxConnectionTunneling.SequenceNumberLock)
             {
@@ -93,7 +85,7 @@ namespace KNXLib
             }
         }
 
-        protected override byte[] CreateRequestStatusDatagram(string destinationAddress)
+        protected override byte[] CreateRequestStatusDatagram(KnxAddress destinationAddress)
         {
             lock (KnxConnectionTunneling.SequenceNumberLock)
             {

@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace KNXLib.Log
+﻿namespace KNXLib.Log
 {
+    using System;
+
     /// <summary>
     /// </summary>
     public class Logger
@@ -14,7 +14,7 @@ namespace KNXLib.Log
 
         /// <summary>
         /// </summary>
-        public static DebugEvent DebugEventEndpoint;
+        public static DebugEvent DebugEventEndpoint = (id, message) => { };
 
         /// <summary>
         /// </summary>
@@ -24,7 +24,7 @@ namespace KNXLib.Log
 
         /// <summary>
         /// </summary>
-        public static InfoEvent InfoEventEndpoint;
+        public static InfoEvent InfoEventEndpoint = (id, message) => { };
 
         /// <summary>
         /// </summary>
@@ -34,7 +34,7 @@ namespace KNXLib.Log
 
         /// <summary>
         /// </summary>
-        public static WarnEvent WarnEventEndpoint;
+        public static WarnEvent WarnEventEndpoint = (id, message) => { };
 
         /// <summary>
         /// </summary>
@@ -44,30 +44,26 @@ namespace KNXLib.Log
 
         /// <summary>
         /// </summary>
-        public static ErrorEvent ErrorEventEndpoint;
+        public static ErrorEvent ErrorEventEndpoint = (id, message) => { };
 
         internal static void Debug(string id, string message, params object[] arg)
         {
-            if (DebugEventEndpoint != null)
-                DebugEventEndpoint(id, string.Format(message, arg));
+            DebugEventEndpoint(id, string.Format(message, arg));
         }
 
         internal static void Info(string id, string message, params object[] arg)
         {
-            if (InfoEventEndpoint != null)
-                InfoEventEndpoint(id, string.Format(message, arg));
+            InfoEventEndpoint(id, string.Format(message, arg));
         }
 
         internal static void Warn(string id, string message, params object[] arg)
         {
-            if (WarnEventEndpoint != null)
-                WarnEventEndpoint(id, string.Format(message, arg));
+            WarnEventEndpoint(id, string.Format(message, arg));
         }
 
         internal static void Error(string id, string message, params object[] arg)
         {
-            if (ErrorEventEndpoint != null)
-                ErrorEventEndpoint(id, string.Format(message, arg));
+            ErrorEventEndpoint(id, string.Format(message, arg));
         }
 
         internal static void Error(string id, Exception e)

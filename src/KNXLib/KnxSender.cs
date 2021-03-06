@@ -1,31 +1,25 @@
 ﻿namespace KNXLib
 {
+    using Addressing;
+    using Enums;
+
     internal abstract class KnxSender
     {
-        protected KnxSender(KnxConnection connection)
-        {
-            KnxConnection = connection;
-        }
+        protected KnxConnection KnxConnection { get; }
 
-        protected KnxConnection KnxConnection { get; private set; }
+        protected KnxSender(KnxConnection connection) => KnxConnection = connection;
 
         public abstract void SendData(byte[] datagram);
 
-        public void Action(string destinationAddress, byte[] data)
-        {
-            SendData(CreateActionDatagram(destinationAddress, data));
-        }
+        public void Action(KnxAddress destinationAddress, byte[] data) => SendData(CreateActionDatagram(destinationAddress, data));
 
-        public void RequestStatus(string destinationAddress)
-        {
-            SendData(CreateRequestStatusDatagram(destinationAddress));
-        }
+        public void RequestStatus(KnxAddress destinationAddress) => SendData(CreateRequestStatusDatagram(destinationAddress));
 
-        protected abstract byte[] CreateActionDatagram(string destinationAddress, byte[] data);
+        protected abstract byte[] CreateActionDatagram(KnxAddress destinationAddress, byte[] data);
 
-        protected abstract byte[] CreateRequestStatusDatagram(string destinationAddress);
+        protected abstract byte[] CreateRequestStatusDatagram(KnxAddress destinationAddress);
 
-        protected byte[] CreateActionDatagramCommon(string destinationAddress, byte[] data, byte[] header)
+        protected byte[] CreateActionDatagramCommon(KnxAddress destinationAddress, byte[] data, byte[] header)
         {
             int i;
             var dataLength = KnxHelper.GetDataLength(data);
@@ -97,22 +91,28 @@
             datagram[i++] =
                 KnxConnection.ActionMessageCode != 0x00
                     ? KnxConnection.ActionMessageCode
-                    : (byte)0x11;
+                    : (byte) 0x11;
 
+            // Additional Info Length
             datagram[i++] = 0x00;
-            datagram[i++] = 0xAC;
 
-            datagram[i++] =
-                KnxHelper.IsAddressIndividual(destinationAddress)
-                    ? (byte)0x50
-                    : (byte)0xF0;
+            // Control Fields
+            datagram[i++] = new KnxControlField1(KnxTelegramType.StandardFrame, KnxTelegramRepetitionStatus.Original, KnxTelegramPriority.Low).GetValue();
+            datagram[i++] = new KnxControlField2(destinationAddress).GetValue();
 
+            // Source Address
             datagram[i++] = 0x00;
-            datagram[i++] = 0x00;
-            var dst_address = KnxHelper.GetAddress(destinationAddress);
+            datagram[i++] = 0x01;
+
+            // Destination Address
+            var dst_address = destinationAddress.GetAddress();
             datagram[i++] = dst_address[0];
             datagram[i++] = dst_address[1];
-            datagram[i++] = (byte)dataLength;
+
+            // Data Length
+            datagram[i++] = (byte) dataLength;
+
+            // APDU
             datagram[i++] = 0x00;
             datagram[i] = 0x80;
 
@@ -121,32 +121,37 @@
             return datagram;
         }
 
-        protected byte[] CreateRequestStatusDatagramCommon(string destinationAddress, byte[] datagram, int cemi_start_pos)
+        protected byte[] CreateRequestStatusDatagramCommon(KnxAddress destinationAddress, byte[] datagram, int cemi_start_pos)
         {
-            var i = 0;
+            var i = cemi_start_pos;
 
-            datagram[cemi_start_pos + i++] =
+            datagram[i++] =
                 KnxConnection.ActionMessageCode != 0x00
                     ? KnxConnection.ActionMessageCode
-                    : (byte)0x11;
+                    : (byte) 0x11;
 
-            datagram[cemi_start_pos + i++] = 0x00;
-            datagram[cemi_start_pos + i++] = 0xAC;
+            // Additional Info Length
+            datagram[i++] = 0x00;
 
-            datagram[cemi_start_pos + i++] =
-                KnxHelper.IsAddressIndividual(destinationAddress)
-                    ? (byte)0x50
-                    : (byte)0xF0;
+            // Control Fields
+            datagram[i++] = new KnxControlField1(KnxTelegramType.StandardFrame, KnxTelegramRepetitionStatus.Original, KnxTelegramPriority.Low).GetValue();
+            datagram[i++] = new KnxControlField2(destinationAddress).GetValue();
 
-            datagram[cemi_start_pos + i++] = 0x00;
-            datagram[cemi_start_pos + i++] = 0x00;
-            byte[] dst_address = KnxHelper.GetAddress(destinationAddress);
-            datagram[cemi_start_pos + i++] = dst_address[0];
-            datagram[cemi_start_pos + i++] = dst_address[1];
+            // Source Address
+            datagram[i++] = 0x00;
+            datagram[i++] = 0x01;
 
-            datagram[cemi_start_pos + i++] = 0x01;
-            datagram[cemi_start_pos + i++] = 0x00;
-            datagram[cemi_start_pos + i] = 0x00;
+            // Destination Address
+            byte[] dst_address = destinationAddress.GetAddress();
+            datagram[i++] = dst_address[0];
+            datagram[i++] = dst_address[1];
+
+            // Data Length
+            datagram[i++] = 0x01;
+
+            // APDU
+            datagram[i++] = 0x00;
+            datagram[i] = 0x00;
 
             return datagram;
         }

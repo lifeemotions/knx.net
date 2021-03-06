@@ -1,10 +1,12 @@
-﻿using System;
-using System.Threading;
-using KNXLib;
-using NUnit.Framework;
-
-namespace KNXLibTests.Integration.Tunneling
+﻿namespace KNXLibTests.Integration.Tunneling
 {
+    using System;
+    using System.Threading;
+    using NUnit.Framework;
+    using KNXLib;
+    using KNXLib.Addressing;
+    using KNXLib.Events;
+
     [TestFixture, Platform(Exclude = "Win")]
     internal class ActionFeedback
     {
@@ -14,18 +16,18 @@ namespace KNXLibTests.Integration.Tunneling
             try
             {
                 if (!Support.Eibd.DaemonManager.IsEibdAvailable())
-                    throw new PlatformNotSupportedException(
-                        "Can't run integration tests without eibd daemon installed on the system");
+                    throw new PlatformNotSupportedException("Can't run integration tests without eibd daemon installed on the system");
+
                 if (!Support.Eibd.VBusMonitorManager.IsVBusMonitorAvailable())
-                    throw new PlatformNotSupportedException(
-                        "Can't run integration tests without vbusmonitor installed on the system");
+                    throw new PlatformNotSupportedException("Can't run integration tests without vbusmonitor installed on the system");
 
                 if (!Support.Eibd.DaemonManager.StartTunneling())
                     throw new Exception("Could not start eibd daemon");
+
                 if (!Support.Eibd.VBusMonitorManager.Start())
                     throw new Exception("Could not start vbusmonitor");
             }
-            catch (Exception)
+            catch
             {
                 TearDown();
                 throw;
@@ -57,16 +59,16 @@ namespace KNXLibTests.Integration.Tunneling
 
             Thread.Sleep(50);
 
-            connection.Action(LightOnOffAddress, true);
+            connection.Action(KnxGroupAddress.Parse(LightOnOffAddress), true);
 
             if (!ResetEvent.Wait(Timeout))
                 Assert.Fail("Didn't receive feedback from the action");
         }
 
-        private void Event(string address, string state)
+        private void Event(object sender, KnxEventArgs args)
         {
-            //Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
-            if (LightOnOffAddress.Equals(address) && state != null && state.Length == 1 && state[0] == 1)
+            // Console.WriteLine("Received feedback from " + address + " with value " + (int) state[0]);
+            if (LightOnOffAddress.Equals(args.DestinationAddress.ToString()) && args.State != null && args.State.Length == 1 && args.State[0] == 1)
                 ResetEvent.Set();
         }
     }

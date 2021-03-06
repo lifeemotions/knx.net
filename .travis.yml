@@ -1,5 +1,4 @@
 language: csharp
-dist: precise
 mono: alpha
 solution: KNX.net.sln
 sudo: required
@@ -11,4 +10,4 @@ install:
   - nuget install NUnit.Console -ExcludeVersion -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release KNX.net.sln
-  - mono ./testrunner/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/KNXLibTests/bin/Release/KNXLibTests.dll --labels=On --nocolor --trace=Verbose --workers=1 --result:"./nunit-result.xml;format=nunit2"
+  - mono ./testrunner/NUnit.ConsoleRunner/tools/nunit3-console.exe ./tests/KNXLibTests/bin/Release/KNXLibTests.dll --labels=On --nocolor --verbose --workers=1 --full --result:"./nunit-result.xml;format=nunit2"

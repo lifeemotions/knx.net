@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-
-namespace KNXLib
+﻿﻿namespace KNXLib
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+    using Addressing;
+
     internal class KnxSenderRouting : KnxSender
     {
         private readonly IList<UdpClient> _udpClients;
@@ -23,7 +24,7 @@ namespace KNXLib
                 client.Send(datagram, datagram.Length, _remoteEndpoint);
         }
 
-        protected override byte[] CreateActionDatagram(string destinationAddress, byte[] data)
+        protected override byte[] CreateActionDatagram(KnxAddress destinationAddress, byte[] data)
         {
             var dataLength = KnxHelper.GetDataLength(data);
 
@@ -40,7 +41,7 @@ namespace KNXLib
             return CreateActionDatagramCommon(destinationAddress, data, datagram);
         }
 
-        protected override byte[] CreateRequestStatusDatagram(string destinationAddress)
+        protected override byte[] CreateRequestStatusDatagram(KnxAddress destinationAddress)
         {
             // TODO: Test this
 

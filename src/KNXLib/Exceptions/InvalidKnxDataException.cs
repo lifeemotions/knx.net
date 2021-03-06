@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace KNXLib.Exceptions
+﻿namespace KNXLib.Exceptions
 {
+    using System;
+
     /// <summary>
     /// Exception is thrown when invalid data has been provided to an action method
     /// </summary>
@@ -26,7 +26,7 @@ namespace KNXLib.Exceptions
         /// </returns>
         public override string ToString()
         {
-            return string.Format("InvalidKnxDataException: Data {0} is invalid.", _data);
+            return $"InvalidKnxDataException: Data {_data} is invalid.";
         }
     }
 }

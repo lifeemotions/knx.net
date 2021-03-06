@@ -1,11 +1,11 @@
-using KNXLib.Log;
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Threading;
+    using Log;
+
     internal class KnxReceiverTunneling : KnxReceiver
     {
         private static readonly string ClassName = typeof(KnxReceiverTunneling).ToString();
@@ -23,15 +23,9 @@ namespace KNXLib
             _localEndpoint = localEndpoint;
         }
 
-        private KnxConnectionTunneling KnxConnectionTunneling
-        {
-            get { return (KnxConnectionTunneling)KnxConnection; }
-        }
+        private KnxConnectionTunneling KnxConnectionTunneling => (KnxConnectionTunneling) KnxConnection;
 
-        public void SetClient(UdpClient client)
-        {
-            _udpClient = client;
-        }
+        public void SetClient(UdpClient client) => _udpClient = client;
 
         public override void ReceiverThreadFlow()
         {
@@ -55,6 +49,10 @@ namespace KNXLib
             catch (ThreadAbortException)
             {
                 Thread.ResetAbort();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(ClassName, e);
             }
         }
 
@@ -87,8 +85,6 @@ namespace KNXLib
             catch (Exception e)
             {
                 Logger.Error(ClassName, e);
-
-                // ignore, missing warning information
             }
         }
 
@@ -127,7 +123,7 @@ namespace KNXLib
                 ProcessCEMI(knxDatagram, cemi);
             }
 
-            ((KnxSenderTunneling)KnxConnectionTunneling.KnxSender).SendTunnelingAck(sequenceNumber);
+            ((KnxSenderTunneling) KnxConnectionTunneling.KnxSender).SendTunnelingAck(sequenceNumber);
         }
 
         private void ProcessDisconnectRequest(byte[] datagram)
@@ -187,7 +183,7 @@ namespace KNXLib
 
             if (knxDatagram.channel_id == 0x00 && knxDatagram.status == 0x24)
             {
-                Logger.Info(ClassName, "KNXLib received connect response - No more connections available");                
+                Logger.Info(ClassName, "KNXLib received connect response - No more connections available");
             }
             else
             {

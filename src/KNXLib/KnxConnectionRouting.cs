@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using KNXLib.Exceptions;
-
-namespace KNXLib
+﻿﻿namespace KNXLib
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using Exceptions;
+
     /// <summary>
     ///     Class that controls a Routing KNX connection, a routing connection is UDP based and has no state.
     ///     This class will bind to a multicast address to listen for events and send actions and requests to
@@ -67,12 +67,11 @@ namespace KNXLib
         {
             try
             {
-                IEnumerable<IPAddress> ipv4Addresses =
-                    Dns
-                        .GetHostAddresses(Dns.GetHostName())
-                        .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
+                var ipv4Addresses = Dns
+                    .GetHostAddresses(Dns.GetHostName())
+                    .Where(i => i.AddressFamily == AddressFamily.InterNetwork);
 
-                foreach (IPAddress localIp in ipv4Addresses)
+                foreach (var localIp in ipv4Addresses)
                 {
                     var client = new UdpClient(new IPEndPoint(localIp, _localEndpoint.Port));
                     _udpClients.Add(client);
@@ -100,11 +99,19 @@ namespace KNXLib
         public override void Disconnect()
         {
             KnxReceiver.Stop();
-            foreach (UdpClient client in _udpClients)
+            foreach (var client in _udpClients)
             {
                 client.DropMulticastGroup(ConnectionConfiguration.IpAddress);
                 client.Close();
             }
+        }
+
+        public override void Dispose() => Dispose(true);
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                Disconnect();
         }
     }
 }

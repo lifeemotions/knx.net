@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
-
-namespace KNXLib
+﻿namespace KNXLib
 {
+    using System;
+    using System.Threading;
+
     internal class KnxLockManager
     {
         private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(0);
@@ -11,10 +11,7 @@ namespace KNXLib
 
         internal int IntervalMs { get; set; } = 200;
 
-        public int LockCount
-        {
-            get { return _sendLock.CurrentCount; }
-        }
+        public int LockCount => _sendLock.CurrentCount;
 
         public void LockConnection()
         {
@@ -42,7 +39,8 @@ namespace KNXLib
 
         public void PerformLockedOperation(Action action)
         {
-            // TODO: Shouldn't this check if we are connected?
+            if (!_isConnected)
+                throw new InvalidOperationException("Unable to perform action: KNX is not connected.");
 
             try
             {
